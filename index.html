@@ -3,71 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crafts POS | Retail Intelligence</title>
+    <title>Crafts POS | Enterprise Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .animate-in { animation: slideUp 0.4s ease-out; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .animate-in { animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .transition-all-custom { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .hide-scroll::-webkit-scrollbar { display: none; }
+        .glass-header { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); }
     </style>
 </head>
-<body>
+<body class="text-slate-900">
 
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-[#0f172a]">
-        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in text-center">
-            <h1 class="text-3xl font-extrabold tracking-tighter mb-8 text-slate-900">Crafts POS</h1>
-            <div class="space-y-4 text-left">
-                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none focus:ring-2 focus:ring-slate-900 transition-all">
-                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none focus:ring-2 focus:ring-slate-900 transition-all">
-                <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all">Ingresar al sistema</button>
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-slate-900">
+        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-slate-700">
+            <div class="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-orange-900/20">
+                <i class="fas fa-gem text-white text-2xl"></i>
             </div>
-            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-semibold"></p>
+            <h1 class="text-3xl font-black tracking-tight text-center text-slate-900 mb-8">Crafts POS</h1>
+            <div class="space-y-4">
+                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-900">
+                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-900">
+                <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all">Acceder</button>
+            </div>
+            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold text-center"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex min-h-screen">
-        <aside class="w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col z-20">
-            <div class="p-8 mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-xs"></i></div>
-                    <span class="hidden md:block font-extrabold text-slate-900 tracking-tighter">CRAFTS CO.</span>
+        <aside class="w-20 md:w-64 bg-slate-900 text-slate-400 flex flex-col z-20">
+            <div class="p-8 flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-sm"></i></div>
+                <div class="hidden md:block">
+                    <p class="font-black text-[10px] tracking-widest text-slate-500 uppercase leading-none">Crafts</p>
+                    <p class="font-bold text-white text-sm italic">Colombia</p>
                 </div>
             </div>
-            <nav id="nav-menu" class="px-4 space-y-2 flex-1"></nav>
+            <nav id="nav-menu" class="mt-4 px-4 space-y-2 flex-1"></nav>
             <div class="p-6">
-                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 text-slate-400 border-0 bg-transparent cursor-pointer font-bold transition-all">
-                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Salir</span>
+                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800 text-red-400 border-0 bg-transparent cursor-pointer font-bold transition-all">
+                    <i class="fas fa-power-off"></i><span class="hidden md:block">Salir</span>
                 </button>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between z-10">
+            <header class="h-16 glass-header px-8 flex items-center justify-between z-10 border-b border-slate-800">
                 <div class="flex items-center gap-4">
-                    <span id="user-role-badge" class="text-[9px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest">Admin</span>
-                    <span id="user-display" class="font-medium text-slate-400 text-xs">usuario@crafts.com</span>
+                    <span id="user-role-badge" class="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest">ROL</span>
+                    <span id="user-display" class="font-bold text-slate-400 text-xs">Usuario</span>
                 </div>
                 <div class="flex flex-col items-center">
-                    <span id="header-time" class="text-sm font-bold text-slate-900 tabular-nums">00:00:00</span>
+                    <span id="header-time" class="text-sm font-black text-white tabular-nums">00:00:00</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Online</span>
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-black text-slate-500 tracking-widest uppercase">Online</span>
                 </div>
             </header>
             
-            <section id="view-container" class="flex-1 overflow-y-auto p-12 bg-slate-50/50"></section>
+            <section id="view-container" class="flex-1 overflow-y-auto p-12 bg-slate-100/50"></section>
         </main>
     </div>
 
     <script>
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
             authDomain: "crafts-colombia-pos.firebaseapp.com",
@@ -94,7 +99,7 @@
             const email = document.getElementById('login-email').value, pass = document.getElementById('login-pass').value;
             auth.signInWithEmailAndPassword(email, pass).catch(() => {
                 document.getElementById('login-error').classList.remove('hidden');
-                document.getElementById('login-error').innerText = "Credenciales incorrectas";
+                document.getElementById('login-error').innerText = "Acceso incorrecto";
             });
         }
 
@@ -118,9 +123,9 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-900 text-white border-0 text-left cursor-pointer font-bold"><i class="fas fa-shopping-cart"></i><span class="hidden md:block">Ventas</span></button>`;
+            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-orange-500 text-white border-0 text-left cursor-pointer font-bold shadow-lg shadow-orange-900/20"><i class="fas fa-shopping-cart"></i><span class="hidden md:block">Ventas</span></button>`;
             if (rol === 'admin' || rol === 'control') {
-                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer font-bold transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Inventario</span></button>`;
+                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl text-slate-500 hover:text-white hover:bg-slate-800 border-0 bg-transparent text-left cursor-pointer font-bold transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Inventario</span></button>`;
             }
             nav.innerHTML = menu;
         }
@@ -129,32 +134,36 @@
             const container = document.getElementById('view-container');
             if (vista === 'ventas') {
                 container.innerHTML = `
-                    <div id="pos-layout" class="animate-in max-w-6xl mx-auto flex flex-col items-center pt-20 transition-all-custom">
+                    <div id="pos-layout" class="animate-in max-w-6xl mx-auto flex flex-col items-center pt-12 transition-all">
                         <div class="text-center mb-10">
-                            <h1 class="text-5xl font-extrabold tracking-tighter text-indigo-600 mb-2">Crafts Colombia</h1>
-                            <p class="text-orange-400 font-bold uppercase tracking-[0.3em] text-xs">Sede ${currentUserData.sede}</p>
+                            <h1 class="text-5xl font-black tracking-tighter text-slate-900 mb-2">Crafts Colombia</h1>
+                            <p class="text-orange-500 font-bold uppercase tracking-[0.4em] text-[10px]">Sede ${currentUserData.sede}</p>
                         </div>
 
-                        <div id="search-container" class="w-full max-w-2xl relative mb-12 transition-all-custom">
-                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="Buscar producto..." 
-                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border-0 shadow-sm outline-none text-lg ring-1 ring-slate-100 focus:ring-2 focus:ring-slate-900 transition-all">
+                        <div id="search-container" class="w-full max-w-2xl relative mb-12">
+                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></i>
+                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="Buscar por nombre de artesanía..." 
+                                class="w-full pl-16 pr-6 py-6 bg-white rounded-3xl border border-slate-200 shadow-xl outline-none text-lg font-medium focus:ring-4 focus:ring-orange-50 transition-all">
                         </div>
 
                         <div id="top-sellers" class="w-full mb-12">
-                            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Más vendidos en ${currentUserData.sede}</h2>
-                            <div id="top-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 overflow-x-auto hide-scroll"></div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <span class="h-px bg-slate-200 flex-1"></span>
+                                <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sugeridos del día</h2>
+                                <span class="h-px bg-slate-200 flex-1"></span>
+                            </div>
+                            <div id="top-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 w-full">
-                            <div id="pos-grid" class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                            <div id="pos-grid" class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 
-                            <div id="cesta-pos" class="hidden lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-col h-[65vh] sticky top-8 animate-in">
-                                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Resumen de Venta</h2>
-                                <div id="cesta-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
-                                <div class="border-t mt-6 pt-6 space-y-4">
-                                    <div class="flex justify-between items-baseline text-slate-900"><span class="font-medium text-sm">TOTAL</span><span id="pos-total" class="font-extrabold text-3xl tabular-nums">$0</span></div>
-                                    <button onclick="finalizarVenta()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all uppercase text-xs tracking-widest">Confirmar Venta</button>
+                            <div id="cesta-pos" class="hidden lg:col-span-4 bg-slate-900 p-10 rounded-[3.5rem] shadow-2xl flex flex-col h-[70vh] sticky top-8 animate-in text-white border border-slate-800">
+                                <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-8">Mi Carrito</h2>
+                                <div id="cesta-items" class="flex-1 overflow-y-auto space-y-4 pr-2 hide-scroll"></div>
+                                <div class="border-t border-slate-800 mt-8 pt-8 space-y-6">
+                                    <div class="flex justify-between items-baseline text-white"><span class="font-medium text-xs text-slate-500 uppercase">Total</span><span id="pos-total" class="font-black text-4xl tabular-nums text-orange-500">$0</span></div>
+                                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-6 rounded-3xl font-black hover:bg-orange-600 shadow-xl shadow-orange-900/40 transition-all uppercase text-[10px] tracking-[0.2em]">Confirmar Cobro</button>
                                 </div>
                             </div>
                         </div>
@@ -174,44 +183,42 @@
         function renderTopSellers() {
             const grid = document.getElementById('top-grid');
             if(!grid) return;
-            // Simulamos los 10 más vendidos tomando los primeros 10 por ahora
             let html = "";
             productosData.slice(0, 10).forEach(p => {
                 html += `
-                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 hover:border-indigo-600 transition-all cursor-pointer group text-center shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-indigo-600 group-hover:text-white transition-all"><i class="fas fa-star text-[10px]"></i></div>
-                        <h4 class="text-[10px] font-bold text-slate-600 truncate uppercase">${p.nombre}</h4>
+                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-5 rounded-[2rem] border border-slate-100 hover:border-orange-500 transition-all cursor-pointer group text-center shadow-sm">
+                        <div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fas fa-magic text-[10px]"></i></div>
+                        <h4 class="text-[9px] font-black text-slate-600 truncate uppercase tracking-tighter">${p.nombre}</h4>
                     </div>`;
             });
             grid.innerHTML = html;
         }
 
         function filtrarPos(query) {
-            const grid = document.getElementById('pos-grid');
-            const topModule = document.getElementById('top-sellers');
+            const grid = document.getElementById('pos-grid'), topModule = document.getElementById('top-sellers');
             const q = query.toLowerCase();
-            
             if(!q) { grid.innerHTML = ""; topModule.classList.remove('hidden'); return; }
             topModule.classList.add('hidden');
-            
             let html = "";
             productosData.filter(p => p.nombre.toLowerCase().includes(q)).forEach(p => {
                 html += `
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 hover:shadow-lg transition-all animate-in group relative overflow-hidden">
-                        <span class="absolute top-6 right-6 text-[9px] font-bold text-slate-300 uppercase">Stock: ${p.stock}</span>
-                        <h3 class="font-bold text-slate-800 text-lg mb-6 leading-tight">${p.nombre}</h3>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-900 font-extrabold text-2xl">$${p.precio.toLocaleString()}</span>
-                            <button onclick="agregarAlCarrito('${p.id}')" class="bg-orange-400 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-orange-500 shadow-lg shadow-orange-100 transition-all active:scale-90"><i class="fas fa-plus"></i></button>
+                    <div class="bg-white p-8 rounded-[3rem] border border-slate-100 hover:shadow-2xl transition-all animate-in group relative overflow-hidden">
+                        <div class="flex flex-col h-full">
+                            <span class="text-[9px] font-black text-slate-300 uppercase mb-4 tracking-widest">Unidades: ${p.stock}</span>
+                            <h3 class="font-black text-slate-800 text-xl mb-8 leading-tight">${p.nombre}</h3>
+                            <div class="mt-auto flex justify-between items-center">
+                                <span class="text-slate-900 font-black text-3xl">$${p.precio.toLocaleString()}</span>
+                                <button onclick="agregarAlCarrito('${p.id}')" class="bg-slate-900 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-orange-500 shadow-xl transition-all active:scale-90"><i class="fas fa-plus"></i></button>
+                            </div>
                         </div>
                     </div>`;
             });
-            grid.innerHTML = html || `<p class="col-span-full text-center text-slate-300 py-20 font-medium italic">Sin resultados para "${query}"</p>`;
+            grid.innerHTML = html || `<div class="col-span-full py-20 text-center text-slate-300 italic font-bold">Sin coincidencias para "${query}"</div>`;
         }
 
         function agregarAlCarrito(id) {
             const p = productosData.find(item => item.id === id);
-            if(p.stock <= 0) return alert("Sin existencias");
+            if(p.stock <= 0) return alert("Producto agotado");
             const existe = carrito.find(item => item.id === id);
             if(existe) { if(existe.cantidad < p.stock) existe.cantidad++; }
             else { carrito.push({...p, cantidad: 1}); }
@@ -231,12 +238,12 @@
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
                 html += `
-                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <div class="flex-1 font-bold text-slate-700 text-xs uppercase">${item.nombre}</div>
+                    <div class="flex items-center gap-4 bg-slate-800/50 p-5 rounded-3xl border border-slate-800">
+                        <div class="flex-1 font-bold text-white text-[10px] uppercase tracking-wider">${item.nombre}</div>
                         <div class="flex items-center gap-3">
-                            <button onclick="cambiarCant(${idx},-1)" class="w-8 h-8 rounded-xl bg-white text-slate-400 shadow-sm border-0 cursor-pointer hover:text-red-500 transition-colors">-</button>
-                            <span class="text-xs font-bold text-slate-900">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx},1)" class="w-8 h-8 rounded-xl bg-white text-slate-400 shadow-sm border-0 cursor-pointer hover:text-indigo-600 transition-colors">+</button>
+                            <button onclick="cambiarCant(${idx},-1)" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 border-0 cursor-pointer hover:text-red-500 transition-colors">-</button>
+                            <span class="text-xs font-black text-orange-500">${item.cantidad}</span>
+                            <button onclick="cambiarCant(${idx},1)" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 border-0 cursor-pointer hover:text-green-500 transition-colors">+</button>
                         </div>
                     </div>`;
             });
@@ -258,10 +265,9 @@
                 for(let item of carrito) {
                     await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
                 }
-                alert("Venta completada");
-                carrito = []; renderCarrito();
-                document.getElementById('pos-search').value = ""; filtrarPos("");
-            } catch (e) { alert("Error al procesar"); }
+                alert("Venta registrada con éxito");
+                carrito = []; renderCarrito(); document.getElementById('pos-search').value = ""; filtrarPos("");
+            } catch (e) { alert("Error en el proceso"); }
         }
     </script>
 </body>

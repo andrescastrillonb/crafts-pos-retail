@@ -136,8 +136,15 @@
         async function iniciarSesion() { 
             const email = safeStr(document.getElementById('login-email')?.value).trim(), pass = safeStr(document.getElementById('login-pass')?.value), vend = safeStr(document.getElementById('login-vendedor')?.value).trim(), sedeChoice = safeStr(document.getElementById('login-sede')?.value);
             if(!vend || !sedeChoice) return alert("Completa todos los campos.");
-            try { await auth.signInWithEmailAndPassword(email, pass); localStorage.setItem('vendedor_nombre', vend.toUpperCase()); localStorage.setItem('active_sede_choice', sedeChoice); } 
-            catch (e) { alert("Acceso denegado."); }
+            try { 
+                await auth.signInWithEmailAndPassword(email, pass); 
+                localStorage.setItem('vendedor_nombre', vend.toUpperCase()); 
+                localStorage.setItem('active_sede_choice', sedeChoice); 
+            } 
+            catch (e) { 
+                console.error("Error en autenticación:", e);
+                alert("Acceso denegado. Verifica tus credenciales."); 
+            }
         }
 
         function cerrarSesion() { localStorage.removeItem('vendedor_nombre'); localStorage.removeItem('active_sede_choice'); auth.signOut().finally(() => location.reload()); }
@@ -166,7 +173,7 @@
                         filtrarVenta(document.getElementById('global-search')?.value || "");
                     });
                     escucharCategorias(); escucharProveedores(); renderSidebar(currentUserData.rol); navegar('inicio');
-                } else { alert("Acceso no autorizado."); cerrarSesion(); }
+                } else { alert("Acceso no autorizado para esta sede."); cerrarSesion(); }
             } else { document.getElementById('login-screen')?.classList.remove('hidden'); document.getElementById('main-app')?.classList.add('hidden'); }
         });
 
@@ -198,7 +205,72 @@
             }
         }
 
-        // --- HISTORIAL DE VENTAS DEL TURNO (MÓDULO NUEVO) ---
+        // --- CESTA DE VENTA Y CARRITO (CÓDIGO INYECTADO) ---
+        function agregarCarrito(id) {
+            const prod = productosData.find(p => p.id === id);
+            if(!prod) return;
+            
+            const itemEnCesta = carrito.find(item => item.id === id);
+            if(itemEnCesta) {
+                if(itemEnCesta.cantidad < prod.stock) {
+                    itemEnCesta.cantidad++;
+                    itemEnCesta.subtotal = itemEnCesta.cantidad * itemEnCesta.precio;
+                } else {
+                    alert("Stock máximo alcanzado para este producto.");
+                }
+            } else {
+                if(prod.stock > 0) {
+                    carrito.push({ ...prod, cantidad: 1, subtotal: prod.precio });
+                } else {
+                    alert("Producto sin stock en esta sede.");
+                }
+            }
+            renderCarrito();
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            renderCarrito();
+        }
+
+        function renderCarrito() {
+            const container = document.getElementById('cesta-items');
+            const totalEl = document.getElementById('cesta-total');
+            const sidebarCesta = document.getElementById('sidebar-cesta');
+            
+            if(!container || !totalEl || !sidebarCesta) return;
+
+            if (carrito.length === 0) {
+                sidebarCesta.classList.add('hidden');
+                totalEl.innerText = "$0";
+                container.innerHTML = "";
+                return;
+            }
+
+            sidebarCesta.classList.remove('hidden');
+            let html = "";
+            let granTotal = 0;
+
+            carrito.forEach((item, index) => {
+                granTotal += item.subtotal;
+                html += `
+                <div class="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center text-left transition-all hover:bg-white/10">
+                    <div class="truncate flex-1 pr-2 leading-tight">
+                        <p class="text-[10px] font-bold text-white uppercase truncate mb-1">${item.nombre}</p>
+                        <p class="text-[9px] text-slate-400 font-medium">${money(item.precio)} x ${item.cantidad}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-black text-orange-400 text-xs">${money(item.subtotal)}</span>
+                        <button onclick="eliminarDelCarrito(${index})" class="text-slate-500 hover:text-red-400 bg-transparent border-0 cursor-pointer transition-colors"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+            totalEl.innerText = money(granTotal);
+        }
+
+        // --- HISTORIAL DE VENTAS DEL TURNO ---
         function renderHistorialTurno(ventasHoy) {
             const container = document.getElementById('turn-history-container'); if(!container) return;
             let html = `<p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6 italic leading-none">Desglose de Ventas hoy</p><div class="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden leading-none"><table class="w-full text-left leading-none"><thead class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 italic"><tr><th class="p-6">Producto</th><th class="p-6 text-center">Unid.</th><th class="p-6 text-right">Subtotal</th><th class="p-6 text-center">Pago</th></tr></thead><tbody class="divide-y divide-slate-50">`;
@@ -227,8 +299,17 @@
                 const vData = { fecha: firebase.firestore.FieldValue.serverTimestamp(), vendedor: vendedorActivo, sede: activeSede, total, metodo_pago: metodo, items: carrito };
                 batch.set(vRef, vData);
                 carrito.forEach(i => { batch.update(db.collection("productos").doc(i.id), { stock: firebase.firestore.FieldValue.increment(-i.cantidad) }); });
-                await batch.commit(); alert("✅ Venta Completada"); imprimirTicket(vData); carrito = []; renderCarrito(); cerrarModal(); navegar('inicio');
-            } catch (e) { alert("Error"); }
+                await batch.commit(); 
+                alert("✅ Venta Completada"); 
+                imprimirTicket(vData); 
+                carrito = []; 
+                renderCarrito(); 
+                cerrarModal(); 
+                navegar('inicio');
+            } catch (e) { 
+                console.error("Error confirmando pago:", e);
+                alert("Ocurrió un error al procesar la venta. Revisa tu conexión a internet."); 
+            }
         }
 
         function imprimirTicket(v) {
@@ -275,8 +356,10 @@
 
         function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
         function cerrarModal() { document.getElementById('main-modal')?.classList.add('hidden'); }
+        
         // Inicial
-        updateClock(); renderCarrito();
+        updateClock(); 
+        renderCarrito();
     </script>
 </body>
 </html>

@@ -36,10 +36,13 @@
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-petrol">
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10">
             <h1 class="text-3xl font-black text-center text-slate-500 mb-8 uppercase tracking-tighter">CRAFTS POS</h1>
-            <div class="space-y-4">
-                <input id="login-email" type="email" placeholder="Email / Sede" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
-                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
-                <input id="login-vendedor" type="text" placeholder="Tu Nombre (Vendedor)" class="w-full p-4 bg-orange-50 rounded-2xl border-0 ring-1 ring-orange-200 outline-none focus:ring-2 focus:ring-orange-400 font-bold uppercase text-pavo-real">
+            <div class="space-y-4 text-left">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Sede / Usuario</label>
+                <input id="login-email" type="email" placeholder="ejemplo@sede.com" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Contraseña</label>
+                <input id="login-pass" type="password" placeholder="••••••••" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
+                <label class="text-[10px] font-black text-orange-500 uppercase tracking-widest ml-2 italic">Nombre del Vendedor</label>
+                <input id="login-vendedor" type="text" placeholder="Tu nombre..." class="w-full p-4 bg-orange-50 rounded-2xl border-0 ring-1 ring-orange-200 outline-none focus:ring-2 focus:ring-orange-400 font-bold uppercase text-pavo-real">
                 <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs mt-4">Entrar</button>
             </div>
         </div>
@@ -50,22 +53,19 @@
             <div class="p-6 flex items-center gap-3 border-b border-white/5">
                 <div class="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-xs"></i></div>
                 <div class="hidden md:block leading-tight text-left">
-                    <p class="font-black text-[9px] tracking-widest text-slate-500 uppercase leading-none mb-1 italic">Crafts Co.</p>
-                    <p id="sidebar-sede-name" class="font-bold text-white text-[10px] uppercase italic">Sede...</p>
+                    <p class="font-black text-[9px] tracking-widest text-slate-500 uppercase leading-none mb-1">Central Hub</p>
+                    <p id="sidebar-sede-name" class="font-bold text-white text-[10px] uppercase italic">Cargando...</p>
                 </div>
             </div>
             
             <nav id="nav-menu" class="p-4 mt-10 space-y-2 flex-1 hide-scroll"></nav>
 
             <div id="sidebar-cesta" class="hidden p-4 border-t border-white/5 animate-in">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Cesta de Venta</p>
-                <div id="cesta-items" class="sidebar-scroll space-y-3 pr-1 hide-scroll"></div>
-                <div class="mt-6 pt-4 border-t border-white/10">
-                    <div class="flex justify-between items-baseline mb-4">
-                        <span class="text-[9px] font-bold text-slate-500 uppercase">Total</span>
-                        <span id="cesta-total" class="font-black text-xl text-orange-500 tabular-nums">$0</span>
-                    </div>
-                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/20">Finalizar</button>
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Cesta Actual</p>
+                <div id="cesta-items" class="sidebar-scroll space-y-3 hide-scroll"></div>
+                <div class="mt-6 pt-4 border-t border-white/10 text-right">
+                    <span id="cesta-total" class="block font-black text-xl text-orange-500 tabular-nums mb-4">$0</span>
+                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all">Cobrar</button>
                 </div>
             </div>
 
@@ -80,17 +80,17 @@
             <header class="h-28 bg-slate-900 px-10 flex items-center justify-between z-10 border-b border-white/5">
                 <div class="flex items-center gap-6 text-white text-left">
                     <div class="flex flex-col">
-                        <span id="label-sede-top" class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1 italic tracking-widest">...</span>
+                        <span id="label-sede-top" class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1">...</span>
                         <span id="current-vendedor-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest italic tracking-tighter">Vendedor</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-center">
-                    <span id="header-date" class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">...</span>
+                    <span id="header-date" class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">...</span>
                     <span id="header-time" class="text-3xl font-black text-white tabular-nums tracking-widest uppercase leading-none">00:00:00</span>
                 </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Activo</span>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
+                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">ONLINE</span>
                 </div>
             </header>
             
@@ -98,13 +98,13 @@
         </main>
     </div>
 
-    <div id="main-modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-6">
+    <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
-            <div class="bg-slate-900 p-8 text-white flex justify-between items-center">
-                <h2 id="modal-title" class="font-bold text-2xl italic tracking-tighter uppercase italic">Operación</h2>
+            <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10">
+                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none">Gestión de Producto</h2>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
-            <div id="modal-content" class="p-10 max-h-[75vh] overflow-y-auto hide-scroll"></div>
+            <div id="modal-content" class="p-10 max-h-[80vh] overflow-y-auto hide-scroll bg-slate-50/30"></div>
         </div>
     </div>
 
@@ -126,7 +126,7 @@
             auth.signInWithEmailAndPassword(email, pass).then(() => {
                 localStorage.setItem('vendedor_nombre', vend.toUpperCase());
                 vendedorActivo = vend.toUpperCase();
-            }).catch(() => alert("Error de acceso.")); 
+            }).catch(() => alert("Error de credenciales.")); 
         }
 
         function cerrarSesion() { localStorage.removeItem('vendedor_nombre'); auth.signOut(); location.reload(); }
@@ -139,9 +139,17 @@
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('sidebar-sede-name').innerText = currentUserData.sede;
                 document.getElementById('label-sede-top').innerText = "SEDE " + currentUserData.sede;
-                document.getElementById('current-vendedor-display').innerText = vendedorActivo || "ADMIN";
-                escucharCategorias(); renderSidebar(currentUserData.rol); navegar('inicio');
-                db.collection("productos").onSnapshot(snap => { productosData = []; snap.forEach(d => productosData.push({id: d.id, ...d.data()})); });
+                document.getElementById('current-vendedor-display').innerText = vendedorActivo || "OPERARIO";
+                
+                escucharCategorias(); 
+                renderSidebar(currentUserData.rol); 
+                navegar('inicio');
+                
+                // ESCUCHA DE INVENTARIO
+                db.collection("productos").onSnapshot(snap => { 
+                    productosData = []; 
+                    snap.forEach(d => productosData.push({id: d.id, ...d.data()})); 
+                });
             } else { document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('main-app').classList.add('hidden'); }
         });
 
@@ -149,151 +157,167 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('inicio')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-th-large"></i><span class="hidden md:block">Inicio</span></button>`;
+            let menu = `<button onclick="navegar('inicio')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-th-large"></i><span class="hidden md:block">Dashboard</span></button>`;
             if (rol === 'admin' || rol === 'control') {
-                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Inventario</span></button>`;
+                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Logística</span></button>`;
             }
             nav.innerHTML = menu;
         }
 
         function navegar(vista) {
             const container = document.getElementById('view-container');
-            const navButtons = document.querySelectorAll('#nav-menu button');
-            navButtons.forEach(btn => btn.getAttribute('onclick').includes(`'${vista}'`) ? btn.classList.add('nav-active') : btn.classList.remove('nav-active'));
-
             if (vista === 'inicio') {
                 container.innerHTML = `
                     <div class="animate-in max-w-7xl mx-auto pt-4 text-center">
                         <h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1>
-                        <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 italic">SEDE ${currentUserData.sede}</p>
+                        <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs mb-16 italic">Consola de Operaciones</p>
                         <div class="max-w-2xl mx-auto relative mb-20">
                             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i>
-                            <input id="global-search" onkeyup="filtrarInventario(this.value)" type="text" placeholder="Buscar pieza o artesanía..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all">
+                            <input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Buscar por nombre o categoría..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all">
                         </div>
                         <div id="search-results-list" class="space-y-4 text-left"></div>
                     </div>`;
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-20 tracking-widest">Sede ${currentUserData.sede}</p><div class="max-w-2xl mx-auto relative mb-16"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i><input id="inv-search" onkeyup="filtrarInventario(this.value)" type="text" placeholder="Filtrar inventario..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div><div id="inventory-list" class="space-y-3"></div></div>`;
+                container.innerHTML = `
+                    <div class="animate-in max-w-7xl mx-auto pt-4 text-center">
+                        <h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase">Logística Central</h1>
+                        <p class="text-orange-500 font-bold uppercase text-xs mb-20">Administración de Stock Maestro</p>
+                        <div class="max-w-2xl mx-auto relative mb-16">
+                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i>
+                            <input id="inv-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Buscar producto en cualquier sede..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 text-left">
+                            <button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer">
+                                <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-plus"></i></div>
+                                <div><h3 class="font-black text-xl uppercase tracking-tighter leading-none italic">Nuevo Item</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Ingresar Stock</p></div>
+                            </button>
+                        </div>
+                        <div id="inventory-list" class="space-y-3"></div>
+                    </div>`;
             }
         }
 
-        // --- LÓGICA DE VENTAS (MÓDULO QUIRÚRGICO) ---
-        function filtrarInventario(q) {
+        // --- LÓGICA QUIRÚRGICA DE BÚSQUEDA Y FICHA ---
+        function filtrarVenta(q) {
             const query = q.toLowerCase().trim();
-            const list = document.getElementById('inventory-list') || document.getElementById('search-results-list');
+            const list = document.getElementById('search-results-list') || document.getElementById('inventory-list');
             if(!list) return;
             if(!query) { list.innerHTML = ''; return; }
-            
-            // Solo mostramos productos de la sede actual para vendedores
-            const filtered = productosData.filter(p => {
-                const matchesSearch = p.nombre.toLowerCase().includes(query) || (p.categoria && p.categoria.toLowerCase().includes(query));
-                const matchesSede = currentUserData.rol === 'admin' || p.sede_ubicacion === currentUserData.sede;
-                return matchesSearch && matchesSede;
-            });
-            
-            renderResultadosVenta(filtered, list);
-        }
 
-        function renderResultadosVenta(data, container) {
+            const filtered = productosData.filter(p => {
+                const searchMatch = p.nombre.toLowerCase().includes(query) || (p.categoria && p.categoria.toLowerCase().includes(query));
+                // Si es vendedor, solo ve su sede. Si es admin, ve TODO.
+                if(currentUserData.rol === 'admin') return searchMatch;
+                return searchMatch && p.sede_ubicacion === currentUserData.sede;
+            });
+
             let html = "";
-            data.forEach(p => {
-                const stockAlerta = p.stock <= 0;
+            filtered.forEach(p => {
+                const stockOk = p.stock > 0;
+                const isAdmin = currentUserData.rol === 'admin';
                 html += `
                     <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in">
                         <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl"><i class="fas fa-gem"></i></div>
                         <div class="flex-1">
-                            <p class="text-[8px] font-black text-pavo-real uppercase tracking-widest mb-1 italic leading-none">${p.categoria || 'Craft'}</p>
+                            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${p.categoria}</p>
                             <h3 class="font-black text-slate-600 text-lg uppercase truncate leading-tight">${p.nombre}</h3>
                         </div>
-                        <div class="text-center min-w-[140px] border-l border-slate-50 pl-4">
-                            <p class="text-[8px] font-black text-slate-400 uppercase mb-1 italic">Existencias</p>
-                            <span class="font-black text-sm ${stockAlerta ? 'text-red-500' : 'text-slate-700'} tabular-nums">${p.stock} Unidades</span>
+                        <div class="text-center min-w-[120px] border-l border-slate-50 pl-4">
+                            <span class="bg-pavo-real text-white text-[9px] px-3 py-1 rounded-full font-black uppercase italic">${p.sede_ubicacion || 'Sin Sede'}</span>
+                            <p class="font-black text-base mt-1 ${stockOk ? 'text-slate-800' : 'text-red-500'} tabular-nums">${p.stock} Unid.</p>
                         </div>
                         <div class="text-right min-w-[120px] border-l border-slate-50 pl-4">
-                            <p class="font-black text-pavo-real text-xl tabular-nums leading-none tracking-tighter">$${p.precio.toLocaleString()}</p>
+                            <p class="font-black text-pavo-real text-xl tabular-nums leading-none">$${p.precio.toLocaleString()}</p>
                         </div>
                         <div class="flex gap-2 border-l border-slate-50 pl-4">
-                            <button onclick="agregarAlCarrito('${p.id}')" ${stockAlerta ? 'disabled' : ''} class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed">
-                                Agregar a la canasta
-                            </button>
+                            ${isAdmin ? `<button onclick="verFicha('${p.id}')" class="text-slate-300 hover:text-pavo-real transition-all text-xl bg-transparent border-0 cursor-pointer"><i class="fas fa-edit"></i></button>` : 
+                            `<button onclick="agregarCarrito('${p.id}')" ${stockOk ? '' : 'disabled'} class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 disabled:opacity-30 border-0 cursor-pointer">Agregar</button>`}
                         </div>
                     </div>`;
             });
-            container.innerHTML = html || '<div class="text-center p-10 text-slate-300 italic uppercase">Sin coincidencias en esta sede</div>';
+            list.innerHTML = html || '<div class="text-center p-10 text-slate-300 italic uppercase">Sin resultados para esta sede</div>';
         }
 
-        function agregarAlCarrito(id) {
-            const p = productosData.find(item => item.id === id);
-            const itemExistente = carrito.find(item => item.id === id);
+        // --- FICHA TÉCNICA (MODAL DE EDICIÓN Y CREACIÓN) ---
+        function verFicha(id) {
+            const modal = document.getElementById('main-modal'), content = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = id ? "Ficha Técnica de Producto" : "Nuevo Registro de Stock";
             
-            if (itemExistente) {
-                if (itemExistente.cantidad < p.stock) itemExistente.cantidad++;
-                else alert("Máximo stock alcanzado");
-            } else {
-                carrito.push({...p, cantidad: 1});
-            }
+            const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: 0, stock: 0, categoria: 'Mochilas', precio_compra: 0, stock_ideal: 0, sede_ubicacion: 'Bodega' };
+            
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="space-y-6">
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Nombre Comercial</label><input id="edit-nombre" type="text" value="${p.nombre}" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase text-lg shadow-sm"></div>
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Categoría Principal</label><select id="edit-categoria" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm">${listaCategorias.map(c => `<option value="${c}" ${p.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+                        <div><label class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2 block ml-2 italic">Asignar a Sede</label>
+                            <select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm">
+                                ${["Bodega", "Filandia 1", "Filandia 2", "Cable Plaza", "Fundadores", "Jardín", "Online"].map(s => `<option value="${s}" ${p.sede_ubicacion === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label class="text-[9px] font-black text-slate-400 uppercase mb-2 block text-center">Venta Publico</label><input id="edit-precio" type="number" value="${p.precio}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl"></div>
+                            <div><label class="text-[9px] font-black text-slate-400 uppercase mb-2 block text-center">Costo Compra</label><input id="edit-compra" type="number" value="${p.precio_compra}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label class="text-[9px] font-black text-slate-400 uppercase mb-2 block text-center">Stock Actual</label><input id="edit-stock" type="number" value="${p.stock}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl"></div>
+                            <div><label class="text-[9px] font-black text-slate-400 uppercase mb-2 block text-center">Stock Ideal</label><input id="edit-ideal" type="number" value="${p.stock_ideal}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl"></div>
+                        </div>
+                        <button onclick="guardarCambios('${id}')" class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 transition-all shadow-xl shadow-slate-900/20 mt-4 border-0 cursor-pointer">Guardar Cambios</button>
+                    </div>
+                </div>`;
+            modal.classList.remove('hidden');
+        }
+
+        async function guardarCambios(id) {
+            const data = {
+                nombre: document.getElementById('edit-nombre').value.toUpperCase(),
+                categoria: document.getElementById('edit-categoria').value,
+                sede_ubicacion: document.getElementById('edit-sede').value,
+                precio: parseInt(document.getElementById('edit-precio').value) || 0,
+                precio_compra: parseInt(document.getElementById('edit-compra').value) || 0,
+                stock: parseInt(document.getElementById('edit-stock').value) || 0,
+                stock_ideal: parseInt(document.getElementById('edit-ideal').value) || 0
+            };
+            try {
+                if(!id || id === "null") await db.collection("productos").add(data);
+                else await db.collection("productos").doc(id).update(data);
+                cerrarModal(); alert("✅ Producto Actualizado");
+            } catch (e) { alert("❌ Error al guardar"); }
+        }
+
+        function agregarCarrito(id) {
+            const p = productosData.find(item => item.id === id);
+            const existe = carrito.find(item => item.id === id);
+            if(existe) { if(existe.cant < p.stock) existe.cant++; }
+            else carrito.push({ ...p, cant: 1 });
             renderCarrito();
         }
 
         function renderCarrito() {
-            const container = document.getElementById('cesta-items');
-            const sidebarCesta = document.getElementById('sidebar-cesta');
-            if(carrito.length > 0) sidebarCesta.classList.remove('hidden');
-            else { sidebarCesta.classList.add('hidden'); return; }
-
+            const box = document.getElementById('sidebar-cesta'), list = document.getElementById('cesta-items');
+            if(carrito.length === 0) { box.classList.add('hidden'); return; }
+            box.classList.remove('hidden');
             let html = "", total = 0;
-            carrito.forEach((item, idx) => {
-                total += item.precio * item.cantidad;
-                html += `
-                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5 animate-in flex items-center gap-3">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[9px] font-black text-white truncate uppercase tracking-widest leading-none mb-1">${item.nombre}</p>
-                            <p class="text-[10px] text-orange-400 font-bold">$${item.precio.toLocaleString()}</p>
-                        </div>
-                        <div class="flex items-center gap-2 bg-slate-900 rounded-xl p-1">
-                            <button onclick="cambiarCant(${idx}, -1)" class="w-6 h-6 text-xs font-bold hover:text-orange-500 transition-all border-0 bg-transparent text-white">-</button>
-                            <span class="text-[10px] font-bold text-white min-w-[12px] text-center">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx}, 1)" class="w-6 h-6 text-xs font-bold hover:text-orange-500 transition-all border-0 bg-transparent text-white">+</button>
-                        </div>
-                    </div>`;
+            carrito.forEach((item, i) => {
+                total += item.precio * item.cant;
+                html += `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between border border-white/5 animate-in"><div class="min-w-0 flex-1"><p class="text-[9px] font-black text-white truncate uppercase leading-none mb-1">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold">$${(item.precio * item.cant).toLocaleString()}</p></div><div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl"><button onclick="cambiarCant(${i},-1)" class="text-white font-bold w-5 border-0 bg-transparent">-</button><span class="text-[10px] text-white font-bold">${item.cant}</span><button onclick="cambiarCant(${i},1)" class="text-white font-bold w-5 border-0 bg-transparent">+</button></div></div>`;
             });
-            container.innerHTML = html;
+            list.innerHTML = html;
             document.getElementById('cesta-total').innerText = `$${total.toLocaleString()}`;
         }
 
-        function cambiarCant(idx, delta) {
-            const item = carrito[idx];
-            item.cantidad += delta;
-            if(item.cantidad <= 0) carrito.splice(idx, 1);
+        function cambiarCant(i, d) {
+            const item = carrito[i];
+            item.cant += d;
+            if(item.cant <= 0) carrito.splice(i, 1);
             else {
                 const prod = productosData.find(p => p.id === item.id);
-                if(item.cantidad > prod.stock) item.cantidad = prod.stock;
+                if(item.cant > prod.stock) item.cant = prod.stock;
             }
             renderCarrito();
-        }
-
-        async function finalizarVenta() {
-            if(carrito.length === 0) return;
-            try {
-                const batch = db.batch();
-                const total = carrito.reduce((s, i) => s + (i.precio * i.cantidad), 0);
-                
-                await db.collection("ventas").add({
-                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    vendedor: vendedorActivo,
-                    sede: currentUserData.sede,
-                    total: total,
-                    items: carrito.map(i => ({nombre: i.nombre, cant: i.cantidad, sub: i.precio * i.cantidad}))
-                });
-
-                for(let item of carrito) {
-                    const ref = db.collection("productos").doc(item.id);
-                    batch.update(ref, { stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
-                }
-                await batch.commit();
-                alert("✅ Venta Completada");
-                carrito = []; renderCarrito(); navegar('inicio');
-            } catch (e) { alert("Error al procesar"); }
         }
 
         function cerrarModal() { document.getElementById('main-modal').classList.add('hidden'); }

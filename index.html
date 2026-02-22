@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crafts POS | Blue Edition</title>
+    <title>Crafts POS | Retail Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,37 +11,36 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .animate-in { animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        /* Tonos de la Gama Azul Pavo Real/Real */
-        .bg-pavo-real { background-color: #004B8D; }
-        .bg-azul-real { background-color: #0074D9; }
+        /* Color Petróleo Personalizado */
+        .bg-petrol { background-color: #0f1d24; }
         .sidebar-scroll { max-height: calc(100vh - 350px); overflow-y: auto; }
     </style>
 </head>
 <body class="text-slate-900">
 
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-pavo-real">
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-[#0f1d24]">
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in">
             <h1 class="text-3xl font-black tracking-tight text-center text-slate-900 mb-8">CRAFTS POS</h1>
-            <div class="space-y-4 text-left">
-                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-pavo-real">
-                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-pavo-real">
-                <button onclick="iniciarSesion()" class="w-full bg-pavo-real text-white p-5 rounded-2xl font-bold hover:bg-azul-real transition-all shadow-lg">Entrar al Sistema</button>
+            <div class="space-y-4">
+                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-[#0f1d24]">
+                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-[#0f1d24]">
+                <button onclick="iniciarSesion()" class="w-full bg-[#0f1d24] text-white p-5 rounded-2xl font-bold hover:opacity-90 transition-all">Ingresar</button>
             </div>
             <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold text-center"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex min-h-screen">
-        <aside class="w-20 md:w-80 bg-pavo-real text-white flex flex-col z-20 shadow-2xl">
-            <div class="p-8 flex items-center gap-3 border-b border-white/10">
-                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-pavo-real text-sm"></i></div>
+        <aside class="w-20 md:w-80 bg-petrol text-white flex flex-col z-20 shadow-2xl">
+            <div class="p-8 flex items-center gap-3 border-b border-white/5">
+                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-sm"></i></div>
                 <div class="hidden md:block">
-                    <p class="font-black text-[10px] tracking-widest text-blue-200 uppercase leading-none">Crafts Colombia</p>
-                    <p class="font-bold text-white text-sm uppercase">Punto de Venta</p>
+                    <p class="font-black text-[10px] tracking-widest text-slate-500 uppercase leading-none">Crafts Colombia</p>
+                    <p class="font-bold text-white text-sm uppercase">Sede Central</p>
                 </div>
             </div>
 
@@ -49,40 +48,40 @@
 
             <div class="hidden md:flex flex-1 flex-col p-6 overflow-hidden">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-[10px] font-black text-blue-200 uppercase tracking-widest italic">Cesta de Venta</h2>
-                    <span id="items-count" class="bg-white text-pavo-real text-[9px] px-2 py-0.5 rounded-full font-black">0</span>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cesta de Venta</h2>
+                    <span id="items-count" class="bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-black">0</span>
                 </div>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 pr-2 hide-scroll">
-                    <p class="text-[10px] text-blue-300 italic text-center py-10">Esperando productos...</p>
+                    <p class="text-[10px] text-slate-500 italic text-center py-10">Agrega artesanías...</p>
                 </div>
-                <div id="cesta-footer" class="mt-auto pt-6 border-t border-white/10 hidden">
-                    <div class="flex justify-between items-baseline mb-4 px-2">
-                        <span class="text-[10px] font-bold text-blue-200 uppercase">Total Venta</span>
-                        <span id="pos-total" class="font-black text-2xl text-white">$0</span>
+                <div id="cesta-footer" class="mt-auto pt-6 border-t border-white/5 hidden">
+                    <div class="flex justify-between items-baseline mb-4">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Total</span>
+                        <span id="pos-total" class="font-black text-2xl text-orange-500">$0</span>
                     </div>
-                    <button onclick="finalizarVenta()" class="w-full bg-white text-pavo-real py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all shadow-xl">
+                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg shadow-orange-900/40">
                         Confirmar Cobro
                     </button>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-white/10">
-                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 text-blue-200 border-0 bg-transparent cursor-pointer font-bold transition-all text-xs">
-                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Cerrar Sesión</span>
+            <div class="p-6 border-t border-white/5">
+                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-xs">
+                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Salir</span>
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
-            <header class="h-16 bg-pavo-real px-8 flex items-center justify-between z-10 text-white border-l border-white/5 shadow-md">
-                <div class="flex items-center gap-4">
-                    <span id="user-role-badge" class="text-[8px] bg-white/20 text-white px-2 py-1 rounded font-black uppercase tracking-widest">Sede</span>
-                    <span id="user-display" class="font-bold text-xs text-blue-100">Usuario</span>
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-100">
+            <header class="h-16 bg-slate-900 px-8 flex items-center justify-between z-10 border-b border-white/5">
+                <div class="flex items-center gap-4 text-white">
+                    <span id="user-role-badge" class="text-[8px] bg-white/10 text-slate-400 px-2 py-1 rounded font-black uppercase tracking-widest">PERFIL</span>
+                    <span id="user-display" class="font-bold text-xs text-slate-400">Usuario</span>
                 </div>
                 <div id="header-time" class="text-xs font-black text-white tabular-nums tracking-widest uppercase">00:00:00</div>
                 <div class="flex items-center gap-2">
-                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span class="text-[9px] font-black text-blue-200 uppercase tracking-widest">Activo</span>
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Online</span>
                 </div>
             </header>
             
@@ -127,7 +126,7 @@
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('user-display').innerText = user.email;
-                document.getElementById('user-role-badge').innerText = currentUserData.sede;
+                document.getElementById('user-role-badge').innerText = currentUserData.rol;
                 renderSidebar(currentUserData.rol);
                 navegar('ventas');
             } else {
@@ -138,9 +137,9 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/10 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-search"></i><span>Panel Venta</span></button>`;
+            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-shopping-cart"></i><span>Nueva Venta</span></button>`;
             if (rol === 'admin') {
-                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-blue-200 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span>Inventario</span></button>`;
+                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span>Inventario</span></button>`;
             }
             nav.innerHTML = menu;
         }
@@ -150,15 +149,15 @@
             if (vista === 'ventas') {
                 container.innerHTML = `
                     <div class="animate-in max-w-5xl mx-auto pt-10">
-                        <div class="text-center mb-12">
-                            <h1 class="text-5xl font-black tracking-tighter text-slate-800 mb-2 italic">CRAFTS COLOMBIA</h1>
-                            <p class="text-azul-real font-bold uppercase tracking-[0.5em] text-[12px]">SEDE ${currentUserData.sede}</p>
+                        <div class="text-center mb-10">
+                            <h1 class="text-5xl font-black tracking-tighter text-slate-900 mb-2">CRAFTS COLOMBIA</h1>
+                            <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-[12px]">SEDE ${currentUserData.sede}</p>
                         </div>
 
                         <div class="max-w-2xl mx-auto relative mb-16">
                             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 text-xl"></i>
-                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué pieza artesanal buscas?" 
-                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-200 shadow-xl outline-none text-lg font-medium focus:ring-4 focus:ring-blue-100/20 transition-all">
+                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="Buscar artesanía..." 
+                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-200 shadow-xl outline-none text-lg font-medium focus:ring-4 focus:ring-orange-100 transition-all">
                         </div>
 
                         <div id="pos-grid" class="space-y-4"></div>
@@ -182,26 +181,26 @@
             let html = "";
             productosData.filter(p => p.nombre.toLowerCase().includes(q)).forEach(p => {
                 html += `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-8 animate-in hover:shadow-lg transition-all">
+                    <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-8 animate-in hover:shadow-lg transition-all">
                         <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200 text-3xl">
-                            <i class="fas fa-image"></i>
+                            <i class="fas fa-gem"></i>
                         </div>
                         <div class="flex-1">
                             <h3 class="font-black text-slate-800 text-xl leading-none mb-3">${p.nombre}</h3>
                             <div class="flex items-center gap-4">
-                                <span class="text-[9px] font-black bg-blue-50 text-azul-real px-3 py-1 rounded-full uppercase tracking-widest">Disponible: ${p.stock}</span>
-                                <p class="text-[11px] text-slate-400 italic">Pieza de alta artesanía colombiana</p>
+                                <span class="text-[9px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase tracking-widest">Disp: ${p.stock}</span>
+                                <p class="text-[11px] text-slate-400 italic">Producto artesanal de alta calidad</p>
                             </div>
                         </div>
                         <div class="text-right px-8 border-l border-slate-50">
                             <p class="font-black text-3xl text-slate-900 tracking-tighter">$${p.precio.toLocaleString()}</p>
                         </div>
-                        <button onclick="agregarAlCarrito('${p.id}')" class="bg-pavo-real text-white px-8 py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-azul-real transition-all active:scale-95 shadow-xl shadow-blue-100">
-                            AGREGAR
+                        <button onclick="agregarAlCarrito('${p.id}')" class="bg-slate-900 text-white px-8 py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-orange-500 transition-all active:scale-95 shadow-xl shadow-slate-200">
+                            Agregar
                         </button>
                     </div>`;
             });
-            grid.innerHTML = html || `<div class="py-20 text-center text-slate-300 font-bold uppercase tracking-widest text-xs">Sin piezas coincidentes</div>`;
+            grid.innerHTML = html || `<div class="py-20 text-center text-slate-300 font-bold uppercase tracking-widest text-xs">Sin coincidencias</div>`;
         }
 
         function agregarAlCarrito(id) {
@@ -222,19 +221,19 @@
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
                 html += `
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/10 flex items-center gap-3 animate-in">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center gap-3 animate-in">
                         <div class="flex-1 overflow-hidden">
-                            <p class="text-[10px] font-black text-white truncate uppercase tracking-wider leading-none mb-1">${item.nombre}</p>
-                            <p class="text-[9px] text-blue-200 opacity-60 italic">$${item.precio.toLocaleString()}</p>
+                            <p class="text-[10px] font-black text-white truncate uppercase tracking-wider">${item.nombre}</p>
+                            <p class="text-[9px] text-slate-500">$${item.precio.toLocaleString()}</p>
                         </div>
-                        <div class="flex items-center gap-2 bg-pavo-real p-1 rounded-xl shadow-inner">
-                            <button onclick="cambiarCant(${idx},-1)" class="w-7 h-7 rounded-lg bg-white/10 text-white border-0 cursor-pointer text-[10px] hover:bg-white/20">-</button>
-                            <span class="text-[10px] font-bold text-white min-w-[15px] text-center">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx},1)" class="w-7 h-7 rounded-lg bg-white/10 text-white border-0 cursor-pointer text-[10px] hover:bg-white/20">+</button>
+                        <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl">
+                            <button onclick="cambiarCant(${idx},-1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">-</button>
+                            <span class="text-[10px] font-bold text-orange-500 min-w-[15px] text-center">${item.cantidad}</span>
+                            <button onclick="cambiarCant(${idx},1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">+</button>
                         </div>
                     </div>`;
             });
-            lista.innerHTML = html || `<p class="text-[10px] text-blue-300 italic text-center py-10">Esperando productos...</p>`;
+            lista.innerHTML = html || `<p class="text-[10px] text-slate-500 italic text-center py-10">Agrega artesanías...</p>`;
             document.getElementById('items-count').innerText = carrito.length;
             document.getElementById('pos-total').innerText = `$${total.toLocaleString()}`;
         }
@@ -253,9 +252,9 @@
                 for(let item of carrito) {
                     await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
                 }
-                alert("✅ Venta Completada");
+                alert("Venta procesada con éxito");
                 carrito = []; renderCarrito(); document.getElementById('pos-search').value = ""; filtrarPos("");
-            } catch (e) { alert("Error de conexión"); }
+            } catch (e) { alert("Error crítico de red"); }
         }
     </script>
 </body>

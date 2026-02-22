@@ -11,65 +11,70 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .animate-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Estilos para impresión de ticket */
-        @media print {
-            body * { visibility: hidden; }
-            #ticket-print, #ticket-print * { visibility: visible; }
-            #ticket-print { position: absolute; left: 0; top: 0; width: 80mm; }
-        }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .google-shadow { shadow-sm hover:shadow-md transition-shadow duration-300; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-900">
+<body class="bg-slate-50 text-slate-900">
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white animate-in">
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
-                    <i class="fas fa-gem text-white text-2xl"></i>
-                </div>
-                <h1 class="text-3xl font-black tracking-tight">Crafts POS</h1>
-                <p class="text-slate-400 mt-2 font-medium">Acceso Autorizado</p>
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white animate-in text-center">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
+                <i class="fas fa-gem text-white text-2xl"></i>
             </div>
-            <div class="space-y-4">
+            <h1 class="text-3xl font-black tracking-tight mb-2">Crafts POS</h1>
+            <p class="text-slate-400 mb-8 font-medium italic text-sm">Crafts Colombia S.A.S</p>
+            <div class="space-y-4 text-left">
                 <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none">
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none">
                 <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-blue-600 transition-all">Entrar al Sistema</button>
             </div>
-            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden font-bold"></p>
+            <p id="login-error" class="text-red-500 text-xs mt-4 hidden font-bold"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex min-h-screen">
-        <aside class="w-20 md:w-64 bg-slate-900 text-white transition-all">
-            <div class="p-6 flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><i class="fas fa-gem text-white text-sm"></i></div>
-                <span class="font-bold text-lg hidden md:block tracking-tight uppercase">Crafts Colombia</span>
+        <aside class="w-20 md:w-64 bg-white border-r border-slate-100 flex flex-col z-20">
+            <div class="p-8 flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-sm"></i></div>
+                <div class="hidden md:block">
+                    <p class="font-black text-xs tracking-widest text-slate-400 uppercase">Crafts</p>
+                    <p class="font-bold text-slate-900 text-sm">Colombia</p>
+                </div>
             </div>
-            <nav id="nav-menu" class="mt-6 px-4 space-y-2"></nav>
-            <div class="absolute bottom-8 px-4 w-full md:w-64">
-                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-red-500/10 text-red-400 border-0 bg-transparent cursor-pointer font-bold">
-                    <i class="fas fa-power-off"></i><span class="hidden md:block">Cerrar Sesión</span>
+            <nav id="nav-menu" class="mt-4 px-4 space-y-2 flex-1"></nav>
+            <div class="p-4 mb-4">
+                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 text-red-500 border-0 bg-transparent cursor-pointer font-bold transition-colors">
+                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Salir</span>
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col">
-            <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
-                <div>
-                    <span id="user-role-badge" class="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md font-black mr-2 uppercase">ROL</span>
-                    <span id="user-display" class="font-bold text-slate-800 text-sm">Cargando...</span>
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 flex items-center justify-between z-10">
+                <div class="flex items-center gap-4">
+                    <span id="user-role-badge" class="text-[10px] bg-slate-900 text-white px-3 py-1 rounded-full font-black uppercase">ROL</span>
+                    <span id="user-display" class="font-bold text-slate-600 text-xs truncate max-w-[150px]">Usuario</span>
                 </div>
-                <div class="text-[10px] bg-green-100 px-3 py-1 rounded-full font-bold text-green-600 tracking-widest uppercase">Sistema Activo</div>
+                
+                <div class="hidden md:flex flex-col items-center">
+                    <span id="header-date" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sábado, 21 Feb</span>
+                    <span id="header-time" class="text-sm font-black text-slate-800 tracking-tighter">10:00 PM</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-black text-slate-400 tracking-widest uppercase">Sistema Activo</span>
+                </div>
             </header>
             
-            <section id="view-container" class="p-8"></section>
+            <section id="view-container" class="flex-1 overflow-y-auto p-8 relative"></section>
         </main>
     </div>
-
-    <div id="ticket-print" class="hidden p-4 text-sm font-mono leading-tight"></div>
 
     <script>
         // CONFIGURACIÓN FIREBASE
@@ -90,12 +95,21 @@
         let carrito = [];
         let productosData = [];
 
-        // 1. AUTENTICACIÓN
+        // RELOJ EN TIEMPO REAL
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'short' };
+            document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', options);
+            document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+
+        // AUTENTICACIÓN
         function iniciarSesion() {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             auth.signInWithEmailAndPassword(email, pass).catch(e => {
-                document.getElementById('login-error').innerText = "Credenciales Inválidas";
+                document.getElementById('login-error').innerText = "Credenciales Incorrectas";
                 document.getElementById('login-error').classList.remove('hidden');
             });
         }
@@ -105,7 +119,7 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const doc = await db.collection('usuarios').doc(user.email).get();
-                currentUserData = doc.data() || { rol: 'vendedor', sede: 'desconocida' };
+                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Cargando...' };
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('user-display').innerText = user.email;
@@ -113,27 +127,24 @@
                 
                 renderSidebar(currentUserData.rol);
                 navegar('ventas'); 
+                updateClock();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
             }
         });
 
-        // 2. NAVEGACIÓN Y SIDEBAR
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `
-                <button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white border-0 bg-transparent text-left cursor-pointer transition-all">
-                    <i class="fas fa-cash-register w-5 text-center"></i><span class="hidden md:block font-bold">Ventas</span>
-                </button>`;
+            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-900 text-white border-0 text-left cursor-pointer shadow-xl shadow-slate-200"><i class="fas fa-plus-circle"></i><span class="hidden md:block font-bold">Nueva Venta</span></button><div class="h-8"></div>`;
             
             if (rol === 'admin' || rol === 'control') {
                 menu += `
-                <button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white border-0 bg-transparent text-left cursor-pointer transition-all">
+                <button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer transition-all">
                     <i class="fas fa-boxes w-5 text-center"></i><span class="hidden md:block font-bold">Inventario</span>
                 </button>
-                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white border-0 bg-transparent text-left cursor-pointer transition-all">
-                    <i class="fas fa-chart-pie w-5 text-center"></i><span class="hidden md:block font-bold">Reportes</span>
+                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer transition-all">
+                    <i class="fas fa-chart-line w-5 text-center"></i><span class="hidden md:block font-bold">Reportes</span>
                 </button>`;
             }
             nav.innerHTML = menu;
@@ -143,102 +154,98 @@
             const container = document.getElementById('view-container');
             if (vista === 'ventas') {
                 container.innerHTML = `
-                    <div class="animate-in grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center gap-4">
-                                <i class="fas fa-search text-slate-400 ml-2"></i>
-                                <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="Buscar artesanía..." class="w-full bg-transparent p-2 outline-none text-lg font-medium">
-                            </div>
-                            <div id="pos-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+                    <div class="animate-in max-w-6xl mx-auto flex flex-col items-center pt-12">
+                        <div class="text-center mb-10">
+                            <h1 class="text-5xl font-black tracking-tighter text-slate-900 mb-2">Crafts Colombia</h1>
+                            <p class="text-blue-600 font-bold tracking-[0.3em] uppercase text-[10px]">Sede ${currentUserData.sede}</p>
                         </div>
-                        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-blue-50 flex flex-col h-[75vh] sticky top-8">
-                            <h2 class="text-xl font-black mb-6 flex items-center gap-2"><i class="fas fa-shopping-basket text-blue-600"></i> Cesta Actual</h2>
-                            <div id="cesta-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
-                            <div class="border-t mt-6 pt-6 space-y-4">
-                                <select id="metodo-pago" class="w-full p-4 bg-slate-50 rounded-2xl border-0 font-bold text-slate-600 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-blue-600">
-                                    <option value="Efectivo">💵 Pago en Efectivo</option>
-                                    <option value="Nequi">📱 Nequi / Transf.</option>
-                                    <option value="Tarjeta">💳 Tarjeta Débito/Crédito</option>
-                                </select>
-                                <div class="flex justify-between items-center text-2xl font-black px-2"><span>Total</span><span id="pos-total" class="text-blue-600">$0</span></div>
-                                <button onclick="finalizarVenta()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold hover:bg-green-600 shadow-lg shadow-blue-100 flex items-center justify-center gap-3 transition-all">
-                                    <i class="fas fa-check-circle"></i> Procesar Venta
-                                </button>
+
+                        <div class="w-full max-w-2xl relative mb-12">
+                            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300">
+                                <i class="fas fa-search text-xl"></i>
+                            </div>
+                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué artesania buscas hoy?" 
+                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border-0 shadow-lg shadow-slate-200/50 outline-none text-lg font-medium ring-1 ring-slate-100 focus:ring-4 focus:ring-blue-50 transition-all">
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
+                            <div id="pos-grid" class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 h-fit"></div>
+
+                            <div id="cesta-container" class="hidden lg:block bg-white p-6 rounded-[2.5rem] shadow-2xl border border-slate-50 flex flex-col h-[60vh] sticky top-8">
+                                <h2 class="text-sm font-black mb-4 uppercase text-slate-400 tracking-widest">Cesta de Venta</h2>
+                                <div id="cesta-items" class="flex-1 overflow-y-auto space-y-3"></div>
+                                <div class="border-t pt-4 mt-4 space-y-3">
+                                    <div class="flex justify-between items-center text-xl font-black"><span>Total</span><span id="pos-total" class="text-blue-600">$0</span></div>
+                                    <select id="metodo-pago" class="w-full p-3 bg-slate-50 rounded-xl border-0 font-bold text-xs text-slate-500 outline-none">
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Nequi">Nequi / Transf.</option>
+                                        <option value="Tarjeta">Tarjeta</option>
+                                    </select>
+                                    <button onclick="finalizarVenta()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-green-600 shadow-xl shadow-blue-100 transition-all text-xs uppercase tracking-widest">Cobrar</button>
+                                </div>
                             </div>
                         </div>
                     </div>`;
                 escucharProductos();
-            } else if (vista === 'productos') {
-                container.innerHTML = `<div class="p-20 text-center"><i class="fas fa-tools text-4xl text-slate-200 mb-4"></i><h2 class="text-xl font-bold">Gestión de Inventario</h2><p class="text-slate-400 italic">Módulo bajo mantenimiento para esta versión quirúrgica.</p></div>`;
             } else {
-                container.innerHTML = `<div class="p-20 text-center text-slate-400 font-bold">Módulo Próximamente...</div>`;
+                container.innerHTML = `<div class="flex items-center justify-center h-full text-slate-300 font-bold uppercase tracking-tighter text-4xl">Próximamente</div>`;
             }
         }
 
-        // 3. LÓGICA DE VENTAS (POS)
         function escucharProductos() {
             db.collection("productos").onSnapshot(snap => {
                 productosData = [];
                 snap.forEach(doc => productosData.push({ id: doc.id, ...doc.data() }));
-                filtrarPos(""); // Render inicial
             });
         }
 
         function filtrarPos(query) {
             const grid = document.getElementById('pos-grid');
             const q = query.toLowerCase();
+            if(!q) { grid.innerHTML = ""; return; }
+            
             let html = "";
             productosData.filter(p => p.nombre.toLowerCase().includes(q)).forEach(p => {
                 html += `
-                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-5 rounded-[2rem] border border-gray-100 hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer group">
-                        <div class="flex flex-col h-full">
-                            <span class="text-xs font-black text-slate-400 mb-1 uppercase tracking-tighter">Sede: ${currentUserData.sede}</span>
-                            <h3 class="font-bold text-slate-800 leading-tight mb-2 group-hover:text-blue-600">${p.nombre}</h3>
-                            <div class="mt-auto flex justify-between items-end">
-                                <span class="text-blue-600 font-black">$${p.precio.toLocaleString()}</span>
-                                <span class="text-[10px] bg-slate-100 px-2 py-1 rounded-md font-bold ${p.stock <= 5 ? 'text-red-500 bg-red-50' : ''}">STOCK: ${p.stock}</span>
+                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-6 rounded-[2rem] border border-slate-100 hover:shadow-2xl transition-all cursor-pointer group animate-in">
+                        <div class="flex flex-col">
+                            <h3 class="font-black text-slate-800 leading-tight mb-2 text-lg">${p.nombre}</h3>
+                            <div class="flex justify-between items-center">
+                                <span class="text-blue-600 font-black text-xl">$${p.precio.toLocaleString()}</span>
+                                <span class="text-[9px] font-black px-2 py-1 rounded-md ${p.stock <= 3 ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'} uppercase">Disp: ${p.stock}</span>
                             </div>
                         </div>
                     </div>`;
             });
-            grid.innerHTML = html || `<p class="col-span-full text-center p-10 text-slate-400">No hay productos que coincidan.</p>`;
+            grid.innerHTML = html || `<p class="col-span-full text-center text-slate-300 py-10 font-bold italic">No encontramos coincidencias</p>`;
         }
 
         function agregarAlCarrito(id) {
             const p = productosData.find(item => item.id === id);
-            if(p.stock <= 0) { alert("¡Producto sin existencias!"); return; }
+            if(p.stock <= 0) return alert("Sin existencias");
             const existe = carrito.find(item => item.id === id);
-            if(existe) { 
-                if(existe.cantidad < p.stock) existe.cantidad++; 
-                else alert("Máximo disponible alcanzado");
-            } else {
-                carrito.push({...p, cantidad: 1});
-            }
+            if(existe) { if(existe.cantidad < p.stock) existe.cantidad++; }
+            else { carrito.push({...p, cantidad: 1}); }
             renderCarrito();
         }
 
         function renderCarrito() {
             const lista = document.getElementById('cesta-items');
-            const totalLabel = document.getElementById('pos-total');
             let html = "", total = 0;
-            
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
                 html += `
-                    <div class="flex items-center gap-3 bg-slate-50 p-4 rounded-2xl animate-in">
-                        <div class="flex-1">
-                            <h4 class="text-xs font-black text-slate-800">${item.nombre}</h4>
-                            <span class="text-[10px] text-slate-400">$${item.precio.toLocaleString()} x ${item.cantidad}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="cambiarCant(${idx}, -1)" class="w-8 h-8 rounded-full bg-white border-0 shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 cursor-pointer"><i class="fas fa-minus text-xs"></i></button>
-                            <span class="font-bold text-sm min-w-[20px] text-center">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx}, 1)" class="w-8 h-8 rounded-full bg-white border-0 shadow-sm flex items-center justify-center text-slate-400 hover:text-blue-500 cursor-pointer"><i class="fas fa-plus text-xs"></i></button>
+                    <div class="flex items-center gap-2 bg-slate-50 p-3 rounded-xl">
+                        <div class="flex-1"><h4 class="text-[10px] font-black">${item.nombre}</h4></div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="cambiarCant(${idx},-1)" class="w-5 h-5 rounded-full bg-white border-0 shadow-sm text-[8px] cursor-pointer">-</button>
+                            <span class="text-[10px] font-bold">${item.cantidad}</span>
+                            <button onclick="cambiarCant(${idx},1)" class="w-5 h-5 rounded-full bg-white border-0 shadow-sm text-[8px] cursor-pointer">+</button>
                         </div>
                     </div>`;
             });
-            lista.innerHTML = html || `<p class="text-slate-400 text-center py-10 italic">La cesta está vacía</p>`;
-            totalLabel.innerText = `$${total.toLocaleString()}`;
+            lista.innerHTML = html;
+            document.getElementById('pos-total').innerText = `$${total.toLocaleString()}`;
         }
 
         function cambiarCant(idx, delta) {
@@ -249,36 +256,28 @@
             renderCarrito();
         }
 
-        // 4. FINALIZAR VENTA Y ACTUALIZAR STOCK
         async function finalizarVenta() {
             if(carrito.length === 0) return;
             const metodo = document.getElementById('metodo-pago').value;
             const total = carrito.reduce((sum, i) => sum + (i.precio * i.cantidad), 0);
             
             try {
-                // Registrar en la colección 'ventas'
                 await db.collection("ventas").add({
                     fecha: firebase.firestore.FieldValue.serverTimestamp(),
                     vendedor: auth.currentUser.email,
                     sede: currentUserData.sede,
                     metodo_pago: metodo,
                     total: total,
-                    items: carrito.map(i => ({nombre: i.nombre, cant: i.cantidad, subtotal: i.precio * i.cantidad}))
+                    items: carrito.map(i => ({nombre: i.nombre, cant: i.cantidad}))
                 });
 
-                // Restar Stock uno por uno (Quirúrgico)
                 for(let item of carrito) {
-                    const ref = db.collection("productos").doc(item.id);
-                    await ref.update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
+                    await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
                 }
 
-                alert("✅ Venta exitosa. Stock actualizado.");
-                carrito = [];
-                renderCarrito();
-            } catch (error) {
-                console.error("Error en la venta:", error);
-                alert("Hubo un error al procesar la venta.");
-            }
+                alert("Venta Registrada Correctamente");
+                carrito = []; renderCarrito(); document.getElementById('pos-search').value = ""; filtrarPos("");
+            } catch (error) { alert("Error al procesar"); }
         }
     </script>
 </body>

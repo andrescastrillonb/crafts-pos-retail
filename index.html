@@ -170,7 +170,9 @@
                     unsubProductos = db.collection("productos").onSnapshot(snap => {
                         productosData = [];
                         snap.forEach(d => productosData.push({id: d.id, ...d.data()}));
+                        // Si estamos en inicio, refrescar ventas. Si estamos en logística, refrescar tabla
                         filtrarVenta(document.getElementById('global-search')?.value || "");
+                        if(document.getElementById('inventory-list')) ejecutarBusquedaAvanzada();
                     });
                     escucharCategorias(); escucharProveedores(); renderSidebar(currentUserData.rol); navegar('inicio');
                 } else { alert("Acceso no autorizado para esta sede."); cerrarSesion(); }
@@ -201,11 +203,54 @@
                 }
                 cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative leading-none"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center leading-none"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl border-0 cursor-pointer shadow-lg leading-none">Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative leading-none"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center leading-none"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl border-0 cursor-pointer hover:bg-blue-800 transition-all leading-none">Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
+                // Al cargar la vista de logística, ejecutar una búsqueda inicial para mostrar todos los productos
+                ejecutarBusquedaAvanzada();
             }
         }
 
-        // --- CESTA DE VENTA Y CARRITO (CÓDIGO INYECTADO) ---
+        // --- MÓDULO LOGÍSTICA (BÚSQUEDA AVANZADA) NUEVO ---
+        function ejecutarBusquedaAvanzada() {
+            const nameQ = safeStr(document.getElementById('adv-name')?.value).toLowerCase().trim();
+            const sedeQ = safeStr(document.getElementById('adv-sede')?.value);
+            const catQ = safeStr(document.getElementById('adv-cat')?.value);
+            const list = document.getElementById('inventory-list');
+            
+            if(!list) return;
+
+            const filtered = productosData.filter(p => {
+                const matchName = !nameQ || safeStr(p.nombre).toLowerCase().includes(nameQ);
+                const matchSede = sedeQ === "TODAS" || normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(sedeQ);
+                const matchCat = catQ === "TODAS" || safeUpper(p.categoria) === safeUpper(catQ);
+                
+                return matchName && matchSede && matchCat;
+            });
+
+            renderInventario(filtered, list);
+        }
+
+        function renderInventario(data, container) {
+            container.innerHTML = data.map(p => `
+            <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none shadow-sm border border-slate-100">
+                <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 text-xl leading-none"><i class="fas fa-box"></i></div>
+                <div class="flex-1 text-left leading-none">
+                    <p class="text-[8px] font-black text-pavo-real uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
+                    <h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3>
+                </div>
+                <div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none">
+                    <span class="bg-slate-100 text-slate-600 text-[11px] px-4 py-2 rounded-full font-black uppercase italic leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
+                    <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
+                </div>
+                <div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none">
+                    <p class="font-black text-slate-500 text-xl tabular-nums leading-none">${money(p.precio)}</p>
+                </div>
+                <div class="flex gap-2 border-l border-slate-50 pl-4 leading-none">
+                    <button onclick="verFicha('${p.id}')" class="bg-pavo-real text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg hover:bg-blue-800 transition-all leading-none">Gestionar</button>
+                </div>
+            </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">No se encontraron existencias con esos filtros.</div>';
+        }
+
+        // --- CESTA DE VENTA Y CARRITO ---
         function agregarCarrito(id) {
             const prod = productosData.find(p => p.id === id);
             if(!prod) return;

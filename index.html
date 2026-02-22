@@ -3,51 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crafts POS | Panel Central</title>
+    <title>Crafts POS | Acceso Seguro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .login-card { animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-    <div class="flex min-h-screen">
+<body class="bg-slate-100 text-slate-900">
+
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
+        <div class="login-card bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200 w-full max-w-md border border-white">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
+                    <i class="fas fa-gem text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-black tracking-tight">Crafts POS</h1>
+                <p class="text-slate-400 mt-2 font-medium">Panel de Gestión Minorista</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Usuario / Sede</label>
+                    <input id="login-email" type="email" placeholder="ej: filandia@crafts.com" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Contraseña</label>
+                    <input id="login-pass" type="password" placeholder="••••••••" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none transition-all">
+                </div>
+                <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 flex items-center justify-center gap-2">
+                    <span>Ingresar al Sistema</span>
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+            <p id="login-error" class="text-red-500 text-sm mt-4 text-center font-medium hidden"></p>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden flex min-h-screen">
         <aside class="w-20 md:w-64 bg-slate-900 text-white transition-all duration-300">
             <div class="p-6 flex items-center gap-3">
                 <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><i class="fas fa-gem text-white text-sm"></i></div>
                 <span class="font-bold text-lg hidden md:block tracking-tight">Crafts POS</span>
             </div>
             <nav class="mt-6 px-4 space-y-2">
-                <button onclick="location.reload()" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-gray-400 hover:text-white border-0 bg-transparent text-left cursor-pointer">
-                    <i class="fas fa-chart-line w-5"></i><span class="hidden md:block">Dashboard</span>
-                </button>
-                <button onclick="navegar('inventario')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-gray-400 hover:text-white border-0 bg-transparent text-left cursor-pointer">
-                    <i class="fas fa-boxes w-5"></i><span class="hidden md:block">Inventario</span>
+                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-red-500/10 text-red-400 transition border-0 bg-transparent text-left cursor-pointer">
+                    <i class="fas fa-power-off w-5"></i><span class="hidden md:block">Cerrar Sesión</span>
                 </button>
             </nav>
         </aside>
 
         <main class="flex-1 flex flex-col">
             <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
-                <p class="font-bold text-slate-600">Admin Central / Andrés</p>
-                <div id="status-db" class="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold text-slate-400 tracking-widest">CONECTANDO...</div>
+                <div>
+                    <span class="text-slate-400 text-sm">Bienvenido,</span>
+                    <span id="user-display" class="font-bold text-slate-800 ml-1">Cargando...</span>
+                </div>
+                <div id="status-db" class="text-[10px] bg-green-100 px-3 py-1 rounded-full font-bold text-green-600 tracking-widest uppercase">SESIÓN ACTIVA</div>
             </header>
-
-            <section class="p-8" id="view-container">
-                <div class="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 text-center animate-fade-in">
-                    <h3 class="text-2xl font-black text-gray-800">Sistema Activo</h3>
-                    <p class="text-gray-400 mt-2">Bienvenido al núcleo de Tiendas Crafts.</p>
+            <section class="p-8">
+                <div class="bg-white p-12 rounded-[2rem] shadow-sm border border-gray-100 text-center">
+                    <h2 class="text-2xl font-black">¡Hola de nuevo!</h2>
+                    <p class="text-slate-400 mt-2">Has ingresado correctamente. Pronto configuraremos tus accesos según tu perfil.</p>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
+        // Configuración de tu Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
             authDomain: "crafts-colombia-pos.firebaseapp.com",
@@ -58,70 +88,43 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        db.collection('productos').limit(1).get().then(() => {
-            document.getElementById('status-db').innerText = "ONLINE";
-            document.getElementById('status-db').className = "text-[10px] bg-green-100 px-3 py-1 rounded-full font-bold text-green-600 tracking-widest";
+        // 1. FUNCIÓN PARA ENTRAR
+        function iniciarSesion() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const errorTxt = document.getElementById('login-error');
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    errorTxt.classList.add('hidden');
+                })
+                .catch((error) => {
+                    errorTxt.innerText = "Error: Usuario o contraseña incorrectos";
+                    errorTxt.classList.remove('hidden');
+                });
+        }
+
+        // 2. OBSERVADOR DE SESIÓN (Detecta si hay alguien conectado)
+        auth.onAuthStateChanged((user) => {
+            const loginScreen = document.getElementById('login-screen');
+            const mainApp = document.getElementById('main-app');
+            const userDisplay = document.getElementById('user-display');
+
+            if (user) {
+                loginScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                userDisplay.innerText = user.email; // Muestra el usuario arriba
+            } else {
+                loginScreen.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+            }
         });
 
-        function navegar(seccion) {
-            const contenedor = document.getElementById('view-container');
-            if (seccion === 'inventario') {
-                contenedor.innerHTML = `
-                    <div class="animate-fade-in max-w-5xl mx-auto">
-                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-8">
-                            <h2 class="text-xl font-black mb-6">Registrar Artesanía</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <input id="nombre" type="text" placeholder="Producto" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                                <input id="precio" type="number" placeholder="Precio ($)" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                                <input id="stock" type="number" placeholder="Stock" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                                <button onclick="guardar()" class="bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 transition">Guardar</button>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-slate-50 border-b border-gray-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                                    <tr><th class="p-6">Nombre</th><th class="p-6 text-center">Precio</th><th class="p-6 text-center">Stock</th></tr>
-                                </thead>
-                                <tbody id="tabla-productos" class="divide-y divide-gray-50">
-                                    <tr><td colspan="3" class="p-10 text-center text-slate-300">Cargando existencias...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-                escucharInventario();
-            }
-        }
-
-        function escucharInventario() {
-            db.collection("productos").orderBy("creado", "desc").onSnapshot((snapshot) => {
-                const tbody = document.getElementById('tabla-productos');
-                if (!tbody) return;
-                let html = "";
-                snapshot.forEach((doc) => {
-                    const p = doc.data();
-                    html += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-6 font-bold text-slate-700">${p.nombre}</td>
-                            <td class="p-6 text-center font-semibold text-blue-600">$${Number(p.precio).toLocaleString()}</td>
-                            <td class="p-6 text-center"><span class="bg-slate-100 px-3 py-1 rounded-full font-bold text-slate-600">${p.stock}</span></td>
-                        </tr>`;
-                });
-                tbody.innerHTML = html || '<tr><td colspan="3" class="p-10 text-center text-slate-400">No hay productos registrados aún.</td></tr>';
-            });
-        }
-
-        async function guardar() {
-            const n = document.getElementById('nombre').value;
-            const p = document.getElementById('precio').value;
-            const s = document.getElementById('stock').value;
-            if(!n || !p) return alert("Completa los datos");
-            try {
-                await db.collection("productos").add({ nombre: n, precio: Number(p), stock: Number(s), creado: firebase.firestore.FieldValue.serverTimestamp() });
-                document.getElementById('nombre').value = ""; document.getElementById('precio').value = ""; document.getElementById('stock').value = "";
-            } catch (e) { alert("Error: " + e.message); }
+        // 3. FUNCIÓN PARA SALIR
+        function cerrarSesion() {
+            auth.signOut();
         }
     </script>
 </body>

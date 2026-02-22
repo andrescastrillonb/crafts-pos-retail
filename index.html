@@ -14,70 +14,69 @@
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .animate-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .google-shadow { shadow-sm hover:shadow-md transition-shadow duration-300; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .transition-layout { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
 
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white animate-in text-center">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
-                <i class="fas fa-gem text-white text-2xl"></i>
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-blue-600">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md animate-in text-center">
+            <div class="w-20 h-20 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-orange-200">
+                <i class="fas fa-gem text-white text-3xl"></i>
             </div>
-            <h1 class="text-3xl font-black tracking-tight mb-2">Crafts POS</h1>
-            <p class="text-slate-400 mb-8 font-medium italic text-sm">Crafts Colombia S.A.S</p>
+            <h1 class="text-3xl font-black tracking-tight mb-2 text-blue-900">Crafts POS</h1>
+            <p class="text-slate-400 mb-8 font-medium">Panel de Gestión</p>
             <div class="space-y-4 text-left">
                 <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none">
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none">
-                <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-blue-600 transition-all">Entrar al Sistema</button>
+                <button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">Ingresar</button>
             </div>
             <p id="login-error" class="text-red-500 text-xs mt-4 hidden font-bold"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex min-h-screen">
-        <aside class="w-20 md:w-64 bg-white border-r border-slate-100 flex flex-col z-20">
+        <aside class="w-20 md:w-64 bg-blue-700 text-white flex flex-col z-20 shadow-2xl">
             <div class="p-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-sm"></i></div>
+                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-800"><i class="fas fa-gem text-white text-sm"></i></div>
                 <div class="hidden md:block">
-                    <p class="font-black text-xs tracking-widest text-slate-400 uppercase">Crafts</p>
-                    <p class="font-bold text-slate-900 text-sm">Colombia</p>
+                    <p class="font-black text-xs tracking-widest text-blue-200 uppercase leading-none">Crafts</p>
+                    <p class="font-bold text-white text-sm">Colombia</p>
                 </div>
             </div>
             <nav id="nav-menu" class="mt-4 px-4 space-y-2 flex-1"></nav>
             <div class="p-4 mb-4">
-                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 text-red-500 border-0 bg-transparent cursor-pointer font-bold transition-colors">
-                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Salir</span>
+                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-800 text-blue-200 border-0 bg-transparent cursor-pointer font-bold transition-all">
+                    <i class="fas fa-power-off"></i><span class="hidden md:block">Salir</span>
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 flex items-center justify-between z-10">
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            <header class="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between z-10">
                 <div class="flex items-center gap-4">
-                    <span id="user-role-badge" class="text-[10px] bg-slate-900 text-white px-3 py-1 rounded-full font-black uppercase">ROL</span>
-                    <span id="user-display" class="font-bold text-slate-600 text-xs truncate max-w-[150px]">Usuario</span>
+                    <span id="user-role-badge" class="text-[10px] bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">ROL</span>
+                    <span id="user-display" class="font-bold text-slate-500 text-xs">Cargando...</span>
                 </div>
                 
                 <div class="hidden md:flex flex-col items-center">
-                    <span id="header-date" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sábado, 21 Feb</span>
-                    <span id="header-time" class="text-sm font-black text-slate-800 tracking-tighter">10:00 PM</span>
+                    <span id="header-date" class="text-[10px] font-black text-blue-600 uppercase tracking-widest">FECHA</span>
+                    <span id="header-time" class="text-sm font-black text-slate-800 tracking-tighter">00:00:00</span>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[10px] font-black text-slate-400 tracking-widest uppercase">Sistema Activo</span>
+                <div class="flex items-center gap-3 bg-green-50 px-4 py-2 rounded-2xl">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-200"></div>
+                    <span class="text-[10px] font-black text-green-600 tracking-widest uppercase">En Línea</span>
                 </div>
             </header>
             
-            <section id="view-container" class="flex-1 overflow-y-auto p-8 relative"></section>
+            <section id="view-container" class="flex-1 overflow-y-auto p-8"></section>
         </main>
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
             authDomain: "crafts-colombia-pos.firebaseapp.com",
@@ -95,21 +94,21 @@
         let carrito = [];
         let productosData = [];
 
-        // RELOJ EN TIEMPO REAL
         function updateClock() {
             const now = new Date();
             const options = { weekday: 'long', day: 'numeric', month: 'short' };
-            document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', options);
-            document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            if(document.getElementById('header-date')) {
+                document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', options);
+                document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
         }
         setInterval(updateClock, 1000);
 
-        // AUTENTICACIÓN
         function iniciarSesion() {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             auth.signInWithEmailAndPassword(email, pass).catch(e => {
-                document.getElementById('login-error').innerText = "Credenciales Incorrectas";
+                document.getElementById('login-error').innerText = "Acceso Denegado";
                 document.getElementById('login-error').classList.remove('hidden');
             });
         }
@@ -119,14 +118,13 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const doc = await db.collection('usuarios').doc(user.email).get();
-                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Cargando...' };
+                currentUserData = doc.data() || { rol: 'vendedor', sede: '...' };
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('user-display').innerText = user.email;
                 document.getElementById('user-role-badge').innerText = currentUserData.rol;
-                
                 renderSidebar(currentUserData.rol);
-                navegar('ventas'); 
+                navegar('ventas');
                 updateClock();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
@@ -136,16 +134,10 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-900 text-white border-0 text-left cursor-pointer shadow-xl shadow-slate-200"><i class="fas fa-plus-circle"></i><span class="hidden md:block font-bold">Nueva Venta</span></button><div class="h-8"></div>`;
-            
+            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-orange-500 text-white border-0 text-left cursor-pointer shadow-lg shadow-orange-200 font-bold transition-all hover:scale-105 active:scale-95"><i class="fas fa-cart-plus"></i><span class="hidden md:block">Vender</span></button><div class="h-8"></div>`;
             if (rol === 'admin' || rol === 'control') {
-                menu += `
-                <button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer transition-all">
-                    <i class="fas fa-boxes w-5 text-center"></i><span class="hidden md:block font-bold">Inventario</span>
-                </button>
-                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer transition-all">
-                    <i class="fas fa-chart-line w-5 text-center"></i><span class="hidden md:block font-bold">Reportes</span>
-                </button>`;
+                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-800 text-blue-100 border-0 bg-transparent text-left cursor-pointer transition-all font-bold"><i class="fas fa-boxes w-5"></i><span class="hidden md:block">Inventario</span></button>
+                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-800 text-blue-100 border-0 bg-transparent text-left cursor-pointer transition-all font-bold"><i class="fas fa-file-invoice-dollar w-5"></i><span class="hidden md:block">Reportes</span></button>`;
             }
             nav.innerHTML = menu;
         }
@@ -154,41 +146,46 @@
             const container = document.getElementById('view-container');
             if (vista === 'ventas') {
                 container.innerHTML = `
-                    <div class="animate-in max-w-6xl mx-auto flex flex-col items-center pt-12">
-                        <div class="text-center mb-10">
-                            <h1 class="text-5xl font-black tracking-tighter text-slate-900 mb-2">Crafts Colombia</h1>
-                            <p class="text-blue-600 font-bold tracking-[0.3em] uppercase text-[10px]">Sede ${currentUserData.sede}</p>
+                    <div id="pos-layout" class="animate-in max-w-7xl mx-auto flex flex-col items-center pt-8 transition-layout">
+                        <div id="banner-pos" class="text-center mb-8">
+                            <h1 class="text-5xl font-black tracking-tighter text-blue-900 mb-1">Crafts Colombia</h1>
+                            <div class="inline-block bg-orange-500 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">Sede ${currentUserData.sede}</div>
                         </div>
 
-                        <div class="w-full max-w-2xl relative mb-12">
-                            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300">
+                        <div id="search-container" class="w-full max-w-2xl relative mb-12 transition-layout">
+                            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-blue-300">
                                 <i class="fas fa-search text-xl"></i>
                             </div>
-                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué artesania buscas hoy?" 
-                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border-0 shadow-lg shadow-slate-200/50 outline-none text-lg font-medium ring-1 ring-slate-100 focus:ring-4 focus:ring-blue-50 transition-all">
+                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué pieza de arte buscas?" 
+                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border-0 shadow-2xl shadow-blue-100 outline-none text-xl font-medium ring-1 ring-slate-100 focus:ring-4 focus:ring-blue-100 transition-all">
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
-                            <div id="pos-grid" class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 h-fit"></div>
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+                            <div id="pos-grid" class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-layout"></div>
 
-                            <div id="cesta-container" class="hidden lg:block bg-white p-6 rounded-[2.5rem] shadow-2xl border border-slate-50 flex flex-col h-[60vh] sticky top-8">
-                                <h2 class="text-sm font-black mb-4 uppercase text-slate-400 tracking-widest">Cesta de Venta</h2>
-                                <div id="cesta-items" class="flex-1 overflow-y-auto space-y-3"></div>
-                                <div class="border-t pt-4 mt-4 space-y-3">
-                                    <div class="flex justify-between items-center text-xl font-black"><span>Total</span><span id="pos-total" class="text-blue-600">$0</span></div>
-                                    <select id="metodo-pago" class="w-full p-3 bg-slate-50 rounded-xl border-0 font-bold text-xs text-slate-500 outline-none">
-                                        <option value="Efectivo">Efectivo</option>
-                                        <option value="Nequi">Nequi / Transf.</option>
-                                        <option value="Tarjeta">Tarjeta</option>
-                                    </select>
-                                    <button onclick="finalizarVenta()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-green-600 shadow-xl shadow-blue-100 transition-all text-xs uppercase tracking-widest">Cobrar</button>
+                            <div id="cesta-pos" class="hidden lg:col-span-5 bg-white p-8 rounded-[3rem] shadow-2xl border border-blue-50 flex flex-col h-[65vh] sticky top-8 animate-in">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h2 class="text-lg font-black text-blue-900 uppercase tracking-widest">Cesta Actual</h2>
+                                    <span id="items-count" class="bg-orange-500 text-white text-[10px] px-2 py-1 rounded-lg font-black">0 ITEMS</span>
+                                </div>
+                                <div id="cesta-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
+                                <div class="border-t mt-6 pt-6 space-y-4">
+                                    <div class="flex justify-between items-center text-3xl font-black text-blue-700"><span>TOTAL</span><span id="pos-total">$0</span></div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <select id="metodo-pago" class="col-span-2 p-4 bg-slate-50 rounded-2xl border-0 font-bold text-xs text-blue-600 outline-none ring-1 ring-slate-100">
+                                            <option value="Efectivo">💵 Efectivo</option>
+                                            <option value="Nequi">📱 Nequi/Transf.</option>
+                                            <option value="Tarjeta">💳 Tarjeta</option>
+                                        </select>
+                                        <button onclick="finalizarVenta()" class="col-span-2 bg-blue-600 text-white py-5 rounded-[2rem] font-black hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all uppercase tracking-widest text-xs">Confirmar Cobro</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>`;
                 escucharProductos();
             } else {
-                container.innerHTML = `<div class="flex items-center justify-center h-full text-slate-300 font-bold uppercase tracking-tighter text-4xl">Próximamente</div>`;
+                container.innerHTML = `<div class="flex items-center justify-center h-full text-blue-200 font-black text-4xl uppercase tracking-tighter">Módulo en Construcción</div>`;
             }
         }
 
@@ -207,22 +204,25 @@
             let html = "";
             productosData.filter(p => p.nombre.toLowerCase().includes(q)).forEach(p => {
                 html += `
-                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-6 rounded-[2rem] border border-slate-100 hover:shadow-2xl transition-all cursor-pointer group animate-in">
-                        <div class="flex flex-col">
-                            <h3 class="font-black text-slate-800 leading-tight mb-2 text-lg">${p.nombre}</h3>
-                            <div class="flex justify-between items-center">
-                                <span class="text-blue-600 font-black text-xl">$${p.precio.toLocaleString()}</span>
-                                <span class="text-[9px] font-black px-2 py-1 rounded-md ${p.stock <= 3 ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-400'} uppercase">Disp: ${p.stock}</span>
-                            </div>
+                    <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 hover:shadow-2xl transition-all group animate-in relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4">
+                            <span class="text-[9px] font-black px-2 py-1 rounded-lg ${p.stock <= 3 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">STOCK: ${p.stock}</span>
+                        </div>
+                        <h3 class="font-black text-blue-900 leading-tight mb-4 text-lg pr-12">${p.nombre}</h3>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-black text-2xl">$${p.precio.toLocaleString()}</span>
+                            <button onclick="agregarAlCarrito('${p.id}')" class="bg-orange-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-orange-600 shadow-lg shadow-orange-100 transition-all active:scale-90">
+                                <i class="fas fa-plus"></i>
+                            </button>
                         </div>
                     </div>`;
             });
-            grid.innerHTML = html || `<p class="col-span-full text-center text-slate-300 py-10 font-bold italic">No encontramos coincidencias</p>`;
+            grid.innerHTML = html || `<p class="col-span-full text-center text-slate-300 py-10 font-bold italic">No hay resultados</p>`;
         }
 
         function agregarAlCarrito(id) {
             const p = productosData.find(item => item.id === id);
-            if(p.stock <= 0) return alert("Sin existencias");
+            if(p.stock <= 0) return alert("¡Sin stock disponible!");
             const existe = carrito.find(item => item.id === id);
             if(existe) { if(existe.cantidad < p.stock) existe.cantidad++; }
             else { carrito.push({...p, cantidad: 1}); }
@@ -230,21 +230,41 @@
         }
 
         function renderCarrito() {
+            const layout = document.getElementById('pos-layout');
+            const grid = document.getElementById('pos-grid');
+            const cesta = document.getElementById('cesta-pos');
             const lista = document.getElementById('cesta-items');
+            const count = document.getElementById('items-count');
+            
+            if(carrito.length > 0) {
+                // ACTIVAR BALANCEO DE PANTALLA
+                grid.classList.remove('lg:col-span-12');
+                grid.classList.add('lg:col-span-7');
+                cesta.classList.remove('hidden');
+                document.getElementById('search-container').classList.remove('max-w-2xl');
+                document.getElementById('search-container').classList.add('max-w-full');
+            } else {
+                grid.classList.add('lg:col-span-12');
+                grid.classList.remove('lg:col-span-7');
+                cesta.classList.add('hidden');
+                document.getElementById('search-container').classList.add('max-w-2xl');
+            }
+
             let html = "", total = 0;
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
                 html += `
-                    <div class="flex items-center gap-2 bg-slate-50 p-3 rounded-xl">
-                        <div class="flex-1"><h4 class="text-[10px] font-black">${item.nombre}</h4></div>
-                        <div class="flex items-center gap-1">
-                            <button onclick="cambiarCant(${idx},-1)" class="w-5 h-5 rounded-full bg-white border-0 shadow-sm text-[8px] cursor-pointer">-</button>
-                            <span class="text-[10px] font-bold">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx},1)" class="w-5 h-5 rounded-full bg-white border-0 shadow-sm text-[8px] cursor-pointer">+</button>
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-3xl animate-in">
+                        <div class="flex-1 font-black text-blue-900 text-xs">${item.nombre}</div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="cambiarCant(${idx},-1)" class="w-8 h-8 rounded-xl bg-white text-blue-600 shadow-sm font-black border-0 cursor-pointer">-</button>
+                            <span class="text-sm font-black text-blue-600 w-4 text-center">${item.cantidad}</span>
+                            <button onclick="cambiarCant(${idx},1)" class="w-8 h-8 rounded-xl bg-white text-blue-600 shadow-sm font-black border-0 cursor-pointer">+</button>
                         </div>
                     </div>`;
             });
             lista.innerHTML = html;
+            count.innerText = `${carrito.length} ITEMS`;
             document.getElementById('pos-total').innerText = `$${total.toLocaleString()}`;
         }
 
@@ -275,9 +295,9 @@
                     await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
                 }
 
-                alert("Venta Registrada Correctamente");
+                alert("✅ Venta Procesada con Éxito");
                 carrito = []; renderCarrito(); document.getElementById('pos-search').value = ""; filtrarPos("");
-            } catch (error) { alert("Error al procesar"); }
+            } catch (error) { alert("Error crítico en la red."); }
         }
     </script>
 </body>

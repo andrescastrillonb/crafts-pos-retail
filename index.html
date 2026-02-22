@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crafts POS | Retail Intelligence</title>
+    <title>Crafts POS | Logistics Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -17,18 +17,18 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .bg-petrol { background-color: #0f1d24; }
         .sidebar-scroll { max-height: calc(100vh - 380px); overflow-y: auto; }
-        .modal-overlay { background: rgba(15, 29, 36, 0.9); backdrop-filter: blur(8px); }
+        .modal-overlay { background: rgba(15, 29, 36, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="text-slate-900">
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-[#0f1d24]">
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in">
-            <h1 class="text-3xl font-black text-center text-slate-900 mb-8 uppercase tracking-tighter">CRAFTS POS</h1>
-            <div class="space-y-4">
+            <h1 class="text-3xl font-black text-center text-slate-900 mb-8 uppercase">CRAFTS POS</h1>
+            <div class="space-y-4 text-left">
                 <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-[#0f1d24]">
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-[#0f1d24]">
-                <button onclick="iniciarSesion()" class="w-full bg-[#0f1d24] text-white p-5 rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg">Entrar</button>
+                <button onclick="iniciarSesion()" class="w-full bg-[#0f1d24] text-white p-5 rounded-2xl font-bold hover:opacity-90 transition-all">Ingresar</button>
             </div>
             <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold text-center"></p>
         </div>
@@ -38,24 +38,24 @@
         <aside class="w-20 md:w-80 bg-petrol text-white flex flex-col z-20 shadow-2xl">
             <div class="p-8 flex items-center gap-3 border-b border-white/5">
                 <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-sm"></i></div>
-                <div class="hidden md:block">
-                    <p class="font-black text-[10px] tracking-widest text-slate-500 uppercase leading-none">Crafts Colombia</p>
-                    <p id="sidebar-sede" class="font-bold text-white text-sm uppercase italic tracking-tighter">Cargando...</p>
+                <div class="hidden md:block leading-tight">
+                    <p class="font-black text-[10px] tracking-widest text-slate-500 uppercase">Crafts Colombia</p>
+                    <p id="sidebar-sede" class="font-bold text-white text-xs uppercase italic tracking-tighter">Cargando...</p>
                 </div>
             </div>
 
             <nav id="nav-menu" class="p-4 space-y-1"></nav>
 
             <div id="sidebar-cart" class="hidden md:flex flex-1 flex-col p-6 overflow-hidden">
-                <div class="flex justify-between items-center mb-4 px-1">
-                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Mi Cesta</h2>
-                    <span id="items-count" class="bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-black shadow-lg">0</span>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic opacity-60">Cesta Actual</h2>
+                    <span id="items-count" class="bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-black">0</span>
                 </div>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 pr-2 hide-scroll"></div>
                 <div id="cesta-footer" class="mt-auto pt-6 border-t border-white/5 hidden">
-                    <div class="flex justify-between items-baseline mb-4 px-1 text-white">
+                    <div class="flex justify-between items-baseline mb-4 px-1">
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total</span>
-                        <span id="pos-total" class="font-black text-3xl tabular-nums text-orange-500">$0</span>
+                        <span id="pos-total" class="font-black text-2xl text-orange-500 tabular-nums">$0</span>
                     </div>
                     <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/40">Confirmar Cobro</button>
                 </div>
@@ -63,40 +63,38 @@
 
             <div class="p-6 border-t border-white/5">
                 <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-xs">
-                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Salir</span>
+                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block uppercase tracking-widest">Cerrar Sesión</span>
                 </button>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="h-16 bg-slate-900 px-8 flex items-center justify-between z-10 border-b border-white/5 shadow-md">
+            <header class="h-16 bg-slate-900 px-8 flex items-center justify-between z-10 border-b border-white/5">
                 <div class="flex items-center gap-4 text-white">
-                    <span id="user-role-badge" class="text-[8px] bg-white/10 text-slate-400 px-2 py-1 rounded font-black uppercase tracking-widest italic">PERFIL</span>
-                    <span id="user-display" class="font-bold text-xs text-slate-400">Usuario</span>
+                    <span id="user-role-badge" class="text-[8px] bg-white/10 text-slate-400 px-2 py-1 rounded font-black uppercase italic">SISTEMA</span>
+                    <span id="user-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest">Usuario</span>
                 </div>
-                <div id="header-time" class="text-xs font-black text-white tabular-nums tracking-widest uppercase">00:00:00</div>
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div id="header-time" class="text-xs font-black text-white tabular-nums tracking-widest">00:00:00</div>
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
             </header>
-            
-            <section id="view-container" class="flex-1 overflow-y-auto p-12 relative"></section>
+            <section id="view-container" class="flex-1 overflow-y-auto p-12 relative bg-slate-100"></section>
         </main>
     </div>
 
     <div id="product-modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden animate-in">
+        <div class="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in border border-white/20">
             <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10">
                 <div>
-                    <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Centro de Control</h2>
-                    <p class="font-bold text-2xl italic tracking-tighter">Ficha Técnica de Artículo</p>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Logística de Inventario</h2>
+                    <p class="font-bold text-2xl italic tracking-tighter">Identificación de Producto</p>
                 </div>
-                <button onclick="cerrarFicha()" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer"><i class="fas fa-times-circle"></i></button>
+                <button onclick="cerrarFicha()" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
-            <div id="modal-content" class="p-10"></div>
+            <div id="modal-content" class="p-10 max-h-[70vh] overflow-y-auto hide-scroll"></div>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
             authDomain: "crafts-colombia-pos.firebaseapp.com",
@@ -110,7 +108,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentUserData = null, carrito = [], productosData = [];
+        let currentUserData = null, carrito = [], productosData = [], listaCategorias = [];
 
         function updateClock() {
             const now = new Date();
@@ -121,7 +119,7 @@
 
         function iniciarSesion() {
             const email = document.getElementById('login-email').value, pass = document.getElementById('login-pass').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(() => alert("Acceso denegado"));
+            auth.signInWithEmailAndPassword(email, pass).catch(() => alert("Error de credenciales"));
         }
 
         function cerrarSesion() { auth.signOut(); location.reload(); }
@@ -129,12 +127,13 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const doc = await db.collection('usuarios').doc(user.email).get();
-                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Sin Sede' };
+                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Sin Asignar' };
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('user-display').innerText = user.email;
                 document.getElementById('sidebar-sede').innerText = "Sede " + currentUserData.sede;
                 document.getElementById('user-role-badge').innerText = currentUserData.rol;
+                escucharCategorias();
                 renderSidebar(currentUserData.rol);
                 navegar('ventas');
             } else {
@@ -143,9 +142,16 @@
             }
         });
 
+        function escucharCategorias() {
+            db.collection("configuracion").doc("categorias").onSnapshot(doc => {
+                if(doc.exists) listaCategorias = doc.data().lista || [];
+                else db.collection("configuracion").doc("categorias").set({ lista: ["Mochilas", "Sombreros", "Hogar"] });
+            });
+        }
+
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-shopping-cart"></i><span>Nueva Venta</span></button>`;
+            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-search"></i><span>Panel Venta</span></button>`;
             menu += `<button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-history"></i><span>Historial</span></button>`;
             if (rol === 'admin' || rol === 'control') {
                 menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span>Inventario</span></button>`;
@@ -156,7 +162,6 @@
         function navegar(vista) {
             const container = document.getElementById('view-container');
             const cart = document.getElementById('sidebar-cart');
-            
             if (vista === 'ventas') {
                 cart.classList.remove('hidden');
                 container.innerHTML = `
@@ -167,13 +172,9 @@
                         </div>
                         <div class="max-w-2xl mx-auto relative mb-12">
                             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 text-xl"></i>
-                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué pieza artesanal buscas hoy?" 
-                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-200 shadow-xl outline-none text-lg font-medium focus:ring-4 focus:ring-orange-100 transition-all">
+                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué estás buscando hoy?" class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-200 shadow-xl outline-none text-lg font-medium focus:ring-4 focus:ring-orange-100 transition-all">
                         </div>
-                        <div id="top-sellers-module" class="mb-16">
-                            <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 border-b pb-2">Top 4 Más Vendidos</h2>
-                            <div id="top-sellers-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-                        </div>
+                        <div id="top-sellers-module" class="mb-16"><h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 border-b pb-2">Destacados de la Sede</h2><div id="top-sellers-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div></div>
                         <div id="pos-grid" class="space-y-4"></div>
                     </div>`;
                 escucharProductos();
@@ -181,26 +182,22 @@
                 cart.classList.add('hidden');
                 container.innerHTML = `
                     <div class="animate-in max-w-6xl mx-auto pt-10">
-                        <div class="flex justify-between items-end mb-10 border-b pb-8 border-slate-200">
-                            <div>
-                                <h1 class="text-4xl font-black tracking-tighter text-slate-900 italic">CONTROL DE INVENTARIO</h1>
-                                <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Gestión centralizada de stock</p>
-                            </div>
+                        <div class="flex justify-between items-end mb-10 border-b pb-8 border-slate-200 text-slate-900">
+                            <div><h1 class="text-4xl font-black tracking-tighter italic">LOGÍSTICA CENTRAL</h1><p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Administración de existencias y costos</p></div>
                             <div class="flex gap-3">
-                                ${currentUserData.rol === 'admin' ? `<button onclick="nutrirBaseDemo()" class="bg-blue-600 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg"><i class="fas fa-magic mr-2"></i> Nutrir Demo</button>` : ''}
-                                <button onclick="nuevaFicha()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-slate-200"><i class="fas fa-plus mr-2"></i> Nuevo Artículo</button>
+                                ${currentUserData.rol === 'admin' ? `
+                                <button onclick="gestionCategorias()" class="bg-white text-slate-900 border border-slate-200 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">Categorías</button>
+                                <button onclick="nutrirBaseDemo()" class="bg-blue-600 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg">Nutrir Demo</button>` : ''}
+                                <button onclick="nuevaFicha()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-slate-200">Nuevo Artículo</button>
                             </div>
                         </div>
                         <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                     </div>`;
                 escucharInventario();
-            } else if (vista === 'reportes') {
-                cart.classList.add('hidden');
-                container.innerHTML = `<div class="p-20 text-center"><h2 class="text-slate-400 font-black text-2xl uppercase tracking-tighter">Historial Próximamente</h2></div>`;
             }
         }
 
-        // --- GESTIÓN DE PRODUCTOS E INVENTARIO ---
+        // --- GESTIÓN LOGÍSTICA ---
         function escucharProductos() {
             db.collection("productos").onSnapshot(snap => {
                 productosData = [];
@@ -216,15 +213,15 @@
                 snap.forEach(doc => {
                     const p = doc.data();
                     html += `
-                        <div class="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all animate-in">
+                        <div class="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all animate-in group">
                             <div class="flex justify-between items-start mb-6">
-                                <span class="bg-slate-50 text-slate-400 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">${p.categoria || 'Sin Categoría'}</span>
-                                <span class="text-[10px] font-black ${p.stock <= 3 ? 'text-red-500' : 'text-green-500'}">STOCK: ${p.stock}</span>
+                                <span class="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">${p.categoria}</span>
+                                <span class="text-[9px] font-black bg-slate-900 text-white px-2 py-1 rounded-lg uppercase italic tracking-tighter">${p.sede_ubicacion || 'Bodega'}</span>
                             </div>
-                            <h3 class="font-black text-slate-900 text-xl leading-tight mb-8">${p.nombre}</h3>
-                            <div class="flex justify-between items-center">
-                                <p class="text-2xl font-black tracking-tighter">$${p.precio.toLocaleString()}</p>
-                                <button onclick="verFicha('${doc.id}')" class="text-slate-400 hover:text-slate-900"><i class="fas fa-edit"></i></button>
+                            <h3 onclick="verFicha('${doc.id}')" class="font-black text-slate-900 text-xl leading-tight mb-4 cursor-pointer hover:text-orange-500 transition-colors uppercase tracking-tighter">${p.nombre}</h3>
+                            <div class="flex justify-between items-end border-t pt-4 border-slate-50">
+                                <div><p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Precio Venta</p><p class="text-xl font-black tracking-tighter text-slate-900">$${p.precio.toLocaleString()}</p></div>
+                                <div class="text-right"><p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Stock Actual</p><p class="font-black text-lg ${p.stock <= p.stock_ideal ? 'text-red-500' : 'text-green-500'}">${p.stock} / ${p.stock_ideal || 0}</p></div>
                             </div>
                         </div>`;
                 });
@@ -237,11 +234,7 @@
             if(!grid) return;
             let html = "";
             productosData.slice(0, 4).forEach(p => {
-                html += `
-                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-5 rounded-3xl border border-slate-100 hover:shadow-lg transition-all cursor-pointer text-center group">
-                        <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fas fa-star text-xs"></i></div>
-                        <h4 class="text-[10px] font-bold text-slate-800 uppercase truncate">${p.nombre}</h4>
-                    </div>`;
+                html += `<div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-5 rounded-3xl border border-slate-100 hover:shadow-lg transition-all cursor-pointer text-center group"><div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fas fa-star text-xs"></i></div><h4 class="text-[9px] font-bold text-slate-800 uppercase truncate">${p.nombre}</h4></div>`;
             });
             grid.innerHTML = html;
         }
@@ -256,103 +249,110 @@
                     <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-8 animate-in hover:shadow-lg transition-all">
                         <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200 text-3xl"><i class="fas fa-gem"></i></div>
                         <div class="flex-1">
-                            <p class="text-[9px] font-black text-orange-500 uppercase tracking-widest mb-1">${p.categoria || 'Artesanía'}</p>
+                            <p class="text-[9px] font-black text-orange-500 uppercase tracking-widest mb-1 italic">${p.sede_ubicacion || 'Bodega'}</p>
                             <h3 onclick="verFicha('${p.id}')" class="font-black text-slate-800 text-xl leading-none mb-3 cursor-pointer hover:text-orange-500 transition-colors uppercase tracking-tighter">${p.nombre}</h3>
                             <span class="text-[9px] font-black bg-slate-100 text-slate-400 px-3 py-1 rounded-full uppercase tracking-widest italic">Existencias: ${p.stock}</span>
                         </div>
                         <div class="text-right px-8 border-l border-slate-50"><p class="font-black text-3xl text-slate-900 tracking-tighter tabular-nums">$${p.precio.toLocaleString()}</p></div>
-                        <button onclick="agregarAlCarrito('${p.id}')" class="bg-slate-900 text-white px-8 py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-orange-500 transition-all active:scale-95 shadow-xl shadow-slate-200">Agregar</button>
+                        <button onclick="agregarAlCarrito('${p.id}')" class="bg-slate-900 text-white px-8 py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-orange-500 transition-all active:scale-95 shadow-xl">Agregar</button>
                     </div>`;
             });
-            grid.innerHTML = html || `<div class="py-20 text-center text-slate-300 font-bold uppercase tracking-widest text-[10px]">No hay resultados</div>`;
+            grid.innerHTML = html;
         }
 
-        // --- FICHA TÉCNICA Y ACCIONES ---
-        function nuevaFicha() {
-            if(currentUserData.rol === 'vendedor') return alert("Permiso denegado");
-            verFicha(null);
-        }
+        // --- FICHA TÉCNICA AVANZADA ---
+        function nuevaFicha() { if(currentUserData.rol === 'vendedor') return alert("Solo acceso Admin"); verFicha(null); }
 
         function verFicha(id) {
-            const modal = document.getElementById('product-modal');
-            const content = document.getElementById('modal-content');
-            const isAdmin = currentUserData.rol === 'admin';
-            const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: '', stock: '', categoria: 'Mochilas' };
+            const modal = document.getElementById('product-modal'), content = document.getElementById('modal-content'), isAdmin = currentUserData.rol === 'admin';
+            const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: '', stock: '', categoria: '', precio_compra: '', stock_ideal: '', sede_ubicacion: 'Bodega' };
             
             content.innerHTML = `
-                <div class="space-y-6">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nombre del Artículo</label>
-                        <input id="edit-nombre" type="text" value="${p.nombre}" ${!isAdmin ? 'disabled' : ''} class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold outline-none focus:ring-2 focus:ring-slate-900">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Categoría de Producto</label>
-                        <select id="edit-categoria" ${!isAdmin ? 'disabled' : ''} class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold outline-none">
-                            <option value="Mochilas" ${p.categoria === 'Mochilas' ? 'selected' : ''}>Mochilas</option>
-                            <option value="Sombreros" ${p.categoria === 'Sombreros' ? 'selected' : ''}>Sombreros</option>
-                            <option value="Joyería" ${p.categoria === 'Joyería' ? 'selected' : ''}>Joyería</option>
-                            <option value="Decoración" ${p.categoria === 'Decoración' ? 'selected' : ''}>Decoración</option>
-                            <option value="Hogar" ${p.categoria === 'Hogar' ? 'selected' : ''}>Hogar</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Precio Venta</label>
-                            <input id="edit-precio" type="number" value="${p.precio}" ${!isAdmin ? 'disabled' : ''} class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nombre del Artículo</label><input id="edit-nombre" type="text" value="${p.nombre}" ${!isAdmin ? 'disabled' : ''} class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold"></div>
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Categoría</label>
+                            <select id="edit-categoria" ${!isAdmin ? 'disabled' : ''} class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold">
+                                ${listaCategorias.map(c => `<option value="${c}" ${p.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Cantidad Stock</label>
-                            <input id="edit-stock" type="number" value="${p.stock}" ${!isAdmin ? 'disabled' : ''} class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black">
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Ubicación / Sede</label>
+                            <select id="edit-sede" ${!isAdmin ? 'disabled' : ''} class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold">
+                                ${["Bodega", "Crafts 1", "Crafts 2", "Crafts 3", "Crafts 4", "Crafts 5", "Bodega Online"].map(s => `<option value="${s}" ${p.sede_ubicacion === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
                         </div>
                     </div>
-                    <div class="flex gap-4 pt-4">
-                        ${isAdmin ? `<button onclick="guardarCambios('${id}')" class="flex-1 bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-[10px] tracking-widest hover:bg-green-600 transition-all shadow-xl">Guardar Cambios</button>` : ''}
-                        ${isAdmin && id ? `<button onclick="eliminarProducto('${id}')" class="bg-red-50 text-red-500 px-8 py-6 rounded-3xl font-black uppercase text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all">Eliminar</button>` : ''}
+                    <div class="space-y-6 bg-slate-50/50 p-6 rounded-[2.5rem]">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Precio Venta</label><input id="edit-precio" type="number" value="${p.precio}" ${!isAdmin ? 'disabled' : ''} class="w-full p-4 bg-white rounded-2xl border-0 ring-1 ring-slate-100 font-black"></div>
+                            ${isAdmin ? `<div><label class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2 block italic">Precio Compra ($)</label><input id="edit-compra" type="number" value="${p.precio_compra || 0}" class="w-full p-4 bg-white rounded-2xl border-0 ring-1 ring-orange-100 font-black text-orange-600"></div>` : ''}
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Stock Actual</label><input id="edit-stock" type="number" value="${p.stock}" ${!isAdmin ? 'disabled' : ''} class="w-full p-4 bg-white rounded-2xl border-0 ring-1 ring-slate-100 font-black"></div>
+                            <div><label class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2 block">Stock Ideal</label><input id="edit-ideal" type="number" value="${p.stock_ideal || 0}" ${!isAdmin ? 'disabled' : ''} class="w-full p-4 bg-white rounded-2xl border-0 ring-1 ring-blue-50 font-black text-blue-600"></div>
+                        </div>
+                        <div class="pt-4 flex gap-3">
+                            ${isAdmin ? `<button onclick="guardarCambios('${id}')" class="flex-1 bg-slate-900 text-white py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl">Actualizar</button>
+                            ${id ? `<button onclick="eliminarProducto('${id}')" class="bg-red-50 text-red-500 px-6 rounded-3xl font-black"><i class="fas fa-trash-alt"></i></button>` : ''}` : '<p class="text-center w-full text-[10px] text-slate-300 font-black italic">Solo lectura para personal de venta</p>'}
+                        </div>
                     </div>
                 </div>`;
             modal.classList.remove('hidden');
         }
 
-        function cerrarFicha() { document.getElementById('product-modal').classList.add('hidden'); }
-
         async function guardarCambios(id) {
             const data = {
                 nombre: document.getElementById('edit-nombre').value,
+                categoria: document.getElementById('edit-categoria').value,
+                sede_ubicacion: document.getElementById('edit-sede').value,
                 precio: parseInt(document.getElementById('edit-precio').value),
+                precio_compra: parseInt(document.getElementById('edit-compra')?.value || 0),
                 stock: parseInt(document.getElementById('edit-stock').value),
-                categoria: document.getElementById('edit-categoria').value
+                stock_ideal: parseInt(document.getElementById('edit-ideal').value)
             };
             try {
-                if(id === "null") await db.collection("productos").add(data);
+                if(!id || id === "null") await db.collection("productos").add(data);
                 else await db.collection("productos").doc(id).update(data);
-                alert("Base de datos actualizada"); cerrarFicha();
-            } catch (e) { alert("Error de escritura"); }
+                alert("Operación Exitosa"); cerrarFicha();
+            } catch (e) { alert("Error"); }
         }
 
-        async function eliminarProducto(id) {
-            if(confirm("¿Seguro que deseas borrar este producto?")) {
-                await db.collection("productos").doc(id).delete();
-                cerrarFicha();
-            }
+        function cerrarFicha() { document.getElementById('product-modal').classList.add('hidden'); }
+        async function eliminarProducto(id) { if(confirm("¿Eliminar definitivamente?")) { await db.collection("productos").doc(id).delete(); cerrarFicha(); } }
+
+        // --- GESTIÓN DE CATEGORÍAS ---
+        function gestionCategorias() {
+            const modal = document.getElementById('product-modal'), content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-slate-400">Crear Nueva Categoría</h3>
+                    <div class="flex gap-4"><input id="nueva-cat" type="text" class="flex-1 p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold outline-none" placeholder="Nombre (Ej: Accesorios)"><button onclick="addCategoria()" class="bg-slate-900 text-white px-8 rounded-2xl font-black">Agregar</button></div>
+                    <div class="pt-6 border-t"><h3 class="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-4">Existentes</h3><div class="flex flex-wrap gap-2">${listaCategorias.map(c => `<span class="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-bold border border-slate-100">${c}</span>`).join('')}</div></div>
+                </div>`;
+            modal.classList.remove('hidden');
         }
 
-        // --- CARGA DEMO ---
+        async function addCategoria() {
+            const val = document.getElementById('nueva-cat').value;
+            if(!val) return;
+            listaCategorias.push(val);
+            await db.collection("configuracion").doc("categorias").set({ lista: listaCategorias });
+            alert("Categoría añadida"); gestionCategorias();
+        }
+
         async function nutrirBaseDemo() {
             const demos = [
-                { nombre: 'Mochila Wayuu "Sol de La Guajira"', categoria: 'Mochilas', precio: 185000, stock: 5 },
-                { nombre: 'Sombrero Vueltiao (21 vueltas)', categoria: 'Sombreros', precio: 250000, stock: 3 },
-                { nombre: 'Chiva de Barro Galera (Grande)', categoria: 'Decoración', precio: 85000, stock: 8 },
-                { nombre: 'Aretes de Filigrana "Mompox"', categoria: 'Joyería', precio: 120000, stock: 12 },
-                { nombre: 'Hamaca San Jacinto (Premium)', categoria: 'Hogar', precio: 320000, stock: 2 }
+                { nombre: 'Mochila Wayuu Gold', categoria: 'Mochilas', precio: 195000, precio_compra: 85000, stock: 10, stock_ideal: 15, sede_ubicacion: 'Crafts 1' },
+                { nombre: 'Sombrero Imperial', categoria: 'Sombreros', precio: 280000, precio_compra: 120000, stock: 4, stock_ideal: 10, sede_ubicacion: 'Bodega Online' }
             ];
-            for(let p of demos) { await db.collection("productos").add(p); }
-            alert("5 Productos demo creados exitosamente");
+            for(let p of demos) await db.collection("productos").add(p);
+            alert("Base nutrida con campos logísticos");
         }
 
         // --- VENTA ---
         function agregarAlCarrito(id) {
             const p = productosData.find(item => item.id === id);
-            if(p.stock <= 0) return alert("Sin stock");
+            if(p.stock <= 0) return alert("Sin existencias");
             const existe = carrito.find(item => item.id === id);
             if(existe) { if(existe.cantidad < p.stock) existe.cantidad++; }
             else { carrito.push({...p, cantidad: 1}); }
@@ -361,25 +361,13 @@
 
         function renderCarrito() {
             const lista = document.getElementById('cesta-items'), footer = document.getElementById('cesta-footer');
-            if(carrito.length > 0) { footer.classList.remove('hidden'); }
-            else { footer.classList.add('hidden'); }
+            if(carrito.length > 0) footer.classList.remove('hidden'); else footer.classList.add('hidden');
             let html = "", total = 0;
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
-                html += `
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center gap-3 animate-in">
-                        <div class="flex-1 overflow-hidden">
-                            <p class="text-[9px] font-black text-white truncate uppercase tracking-widest">${item.nombre}</p>
-                            <p class="text-[9px] text-slate-500 italic">$${item.precio.toLocaleString()}</p>
-                        </div>
-                        <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl">
-                            <button onclick="cambiarCant(${idx},-1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">-</button>
-                            <span class="text-[10px] font-bold text-orange-500 min-w-[15px] text-center">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx},1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">+</button>
-                        </div>
-                    </div>`;
+                html += `<div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center gap-3 animate-in"><div class="flex-1 overflow-hidden"><p class="text-[9px] font-black text-white truncate uppercase tracking-widest">${item.nombre}</p><p class="text-[9px] text-orange-500 tabular-nums">$${item.precio.toLocaleString()}</p></div><div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl"><button onclick="cambiarCant(${idx},-1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">-</button><span class="text-[10px] font-bold text-white min-w-[15px] text-center">${item.cantidad}</span><button onclick="cambiarCant(${idx},1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">+</button></div></div>`;
             });
-            lista.innerHTML = html || `<p class="text-[10px] text-slate-500 italic text-center py-10">Cesta vacía...</p>`;
+            lista.innerHTML = html || `<p class="text-[10px] text-slate-500 italic text-center py-10 opacity-30">Esperando productos...</p>`;
             document.getElementById('items-count').innerText = carrito.length;
             document.getElementById('pos-total').innerText = `$${total.toLocaleString()}`;
         }
@@ -394,11 +382,12 @@
 
         async function finalizarVenta() {
             if(carrito.length === 0) return;
+            const total = carrito.reduce((sum, i) => sum + (i.precio * i.cantidad), 0);
             try {
+                await db.collection("ventas").add({ fecha: firebase.firestore.FieldValue.serverTimestamp(), vendedor: auth.currentUser.email, sede: currentUserData.sede, total: total });
                 for(let item of carrito) { await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) }); }
-                alert("Venta procesada"); carrito = []; renderCarrito();
-                document.getElementById('pos-search').value = ""; filtrarPos("");
-            } catch (e) { alert("Error"); }
+                alert("✅ Venta Exitosa"); carrito = []; renderCarrito();
+            } catch (e) { alert("Error crítico"); }
         }
     </script>
 </body>

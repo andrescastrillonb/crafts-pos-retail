@@ -73,6 +73,10 @@
                         <span id="current-vendedor-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest italic">Vendedor</span>
                     </div>
                 </div>
+                <div class="flex flex-col items-center">
+                    <span id="header-date" class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">...</span>
+                    <span id="header-time" class="text-3xl font-black text-white tabular-nums tracking-widest uppercase leading-none">00:00:00</span>
+                </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
                     <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Activo</span>
@@ -85,7 +89,7 @@
     <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
             <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic text-left">
-                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none italic">Operación</h2>
+                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none italic">Gestión</h2>
                 <button onclick="cerrarModal()" id="btn-close-modal" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
             <div id="modal-content" class="p-10 max-h-[85vh] overflow-y-auto hide-scroll bg-slate-50/30 relative"></div>
@@ -100,12 +104,23 @@
         let vendedorActivo = localStorage.getItem('vendedor_nombre') || "";
         let proveedorEnEdicionId = null;
 
+        function updateClock() { const now = new Date(); document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); if(document.getElementById('header-date')) document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }); }
+        setInterval(updateClock, 1000);
+
+        async function iniciarSesion() { 
+            const email = document.getElementById('login-email').value, pass = document.getElementById('login-pass').value, vend = document.getElementById('login-vendedor').value.trim();
+            if(!vend) return alert("Indica el nombre del vendedor.");
+            auth.signInWithEmailAndPassword(email, pass).then(() => { localStorage.setItem('vendedor_nombre', vend.toUpperCase()); vendedorActivo = vend.toUpperCase(); }).catch(() => alert("Error de acceso.")); 
+        }
+
+        function cerrarSesion() { localStorage.removeItem('vendedor_nombre'); auth.signOut(); location.reload(); }
+
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const doc = await db.collection('usuarios').doc(user.email).get();
                 currentUserData = doc.data() || { rol: 'vendedor', sede: 'sin_sede' };
                 if (Array.isArray(currentUserData.sede)) lanzarSelectorSede(currentUserData.sede);
-                else fijarSedeOperativa(currentUserData.sede);
+                else establecerSedeActiva(currentUserData.sede);
                 escucharCategorias(); escucharProveedores(); renderSidebar(currentUserData.rol);
                 db.collection("productos").onSnapshot(snap => { productosData = []; snap.forEach(d => productosData.push({id: d.id, ...d.data()})); });
             } else { document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('main-app').classList.add('hidden'); }
@@ -115,11 +130,11 @@
             const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
             document.getElementById('modal-title').innerText = "¿Punto de Venta?";
             document.getElementById('btn-close-modal').style.display = "none";
-            c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10 p-4 animate-in">${sedes.map(s => `<button onclick="fijarSedeOperativa('${s}')" class="bg-white p-12 rounded-[4rem] border-4 border-slate-50 hover:border-orange-500 hover:shadow-2xl transition-all group border-0 cursor-pointer shadow-lg"><i class="fas fa-store text-5xl text-slate-100 group-hover:text-orange-500 mb-6 block"></i><span class="font-black text-2xl text-pavo-real uppercase italic tracking-tighter">${s}</span></button>`).join('')}</div>`;
+            c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10 p-4 animate-in">${sedes.map(s => `<button onclick="establecerSedeActiva('${s}')" class="bg-white p-12 rounded-[4rem] border-4 border-slate-50 hover:border-orange-500 hover:shadow-2xl transition-all group border-0 cursor-pointer shadow-lg"><i class="fas fa-store text-5xl text-slate-100 group-hover:text-orange-500 mb-6 block"></i><span class="font-black text-2xl text-pavo-real uppercase italic tracking-tighter">${s.toUpperCase()}</span></button>`).join('')}</div>`;
             m.classList.remove('hidden');
         }
 
-        function fijarSedeOperativa(sede) {
+        function establecerSedeActiva(sede) {
             activeSede = sede;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
@@ -131,7 +146,7 @@
         }
 
         function escucharCategorias() { db.collection("configuracion").doc("categorias").onSnapshot(doc => { if(doc.exists) listaCategorias = doc.data().lista || []; }); }
-        function escucharProveedores() { db.collection("proveedores").onSnapshot(snap => { listaProveedores = []; snap.forEach(d => listaProveedores.push({id: d.id, ...d.data()})); }); }
+        function escucharProveedores() { db.collection("proveedores").onSnapshot(snap => { listaProveedores = []; snap.forEach(d => listaProveedores.push({id: d.id, ...d.data()})); if(document.getElementById('prov-table-body')) renderProveedoresTable(); }); }
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
@@ -146,9 +161,8 @@
         function navegar(vista) {
             const container = document.getElementById('view-container');
             const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control';
-            
             if (vista === 'inicio') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock en esta tienda..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px]"></div><div id="stats-container" class="space-y-4"></div></div>`;
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock en esta sede..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px]"></div><div id="stats-container" class="space-y-4"></div></div>`;
                 if(isAdmin) {
                     const rowGen = (t,l,id,acc=false) => `<div class="${acc?'bg-blue-50':'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40">${l}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3">${t}</h3><h3 id="dash-total-${id}" class="text-5xl font-black ${id==='hoy'?'text-orange-500':'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center">${[1,2,3,4,5,6].map(i=>`<div class="flex flex-col items-center justify-center"><p class="text-4xl font-black ${acc?'text-blue-200':'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
                     document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left"><div class="min-w-[300px] border-r border-slate-100 pr-12"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Ventas de Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic">Cifras en tiempo real</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
@@ -161,7 +175,78 @@
             }
         }
 
-        // --- LÓGICA DE BÚSQUEDA ROBUSTA (QUIRÚRGICA) ---
+        // --- LÓGICA DE TRASLADOS (PRECISIÓN QUIRÚRGICA) ---
+        function verTraslado(id) {
+            const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
+            const p = productosData.find(item => item.id === id);
+            document.getElementById('modal-title').innerText = "Operación de Traslado Técnico";
+            c.innerHTML = `
+                <div class="space-y-8 animate-in text-left">
+                    <div class="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 flex justify-between items-center">
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Producto Seleccionado</p><h4 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter">${p.nombre}</h4></div>
+                        <div class="text-right"><p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1 leading-none">Sede Origen</p><h4 class="text-xl font-bold text-pavo-real uppercase italic">${p.sede_ubicacion.toUpperCase()}</h4></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 text-center">
+                            <p class="text-xs font-black text-slate-400 uppercase mb-4 tracking-[0.2em]">Stock Actual Disponible</p>
+                            <h3 class="text-8xl font-black text-slate-800 tabular-nums">${p.stock}</h3>
+                            <div class="mt-8"><label class="text-[10px] font-black text-pavo-real uppercase block mb-2 italic">Unidades a Mover</label>
+                            <input id="trans-qty" type="number" min="1" max="${p.stock}" value="1" class="w-full p-6 bg-slate-50 rounded-3xl border-0 ring-1 ring-slate-100 font-black text-4xl text-center text-orange-500"></div>
+                        </div>
+                        <div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 flex flex-col justify-center">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-4 italic tracking-widest">Seleccionar Sede Destino</label>
+                            <select id="trans-dest" class="w-full p-6 bg-slate-900 text-white rounded-3xl border-0 font-black text-xl uppercase shadow-lg">
+                                ${["bodega", "filandia1", "filandia2", "cableplaza", "fundadores", "jardin", "online"].filter(s => s !== p.sede_ubicacion).map(s => `<option value="${s}">${s.toUpperCase()}</option>`).join('')}
+                            </select>
+                            <div class="mt-12"><button onclick="ejecutarTraslado('${p.id}')" class="w-full bg-orange-500 text-white py-6 rounded-3xl font-black uppercase text-sm tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer">Autorizar Movimiento</button></div>
+                        </div>
+                    </div>
+                </div>`;
+            m.classList.remove('hidden');
+        }
+
+        async function ejecutarTraslado(sourceId) {
+            const qty = parseInt(document.getElementById('trans-qty').value);
+            const destSede = document.getElementById('trans-dest').value;
+            const sourceDoc = productosData.find(p => p.id === sourceId);
+            
+            if (qty > sourceDoc.stock || qty < 1) return alert("❌ Cantidad no válida.");
+            
+            try {
+                const batch = db.batch();
+                // 1. Restar de origen
+                batch.update(db.collection("productos").doc(sourceId), { stock: firebase.firestore.FieldValue.increment(-qty) });
+                
+                // 2. Buscar si ya existe en destino
+                const destQuery = await db.collection("productos")
+                    .where("nombre", "==", sourceDoc.nombre)
+                    .where("categoria", "==", sourceDoc.categoria)
+                    .where("sede_ubicacion", "==", destSede)
+                    .get();
+                
+                if (!destQuery.empty) {
+                    batch.update(db.collection("productos").doc(destQuery.docs[0].id), { stock: firebase.firestore.FieldValue.increment(qty) });
+                } else {
+                    const newRef = db.collection("productos").doc();
+                    batch.set(newRef, { ...sourceDoc, stock: qty, sede_ubicacion: destSede, id: undefined });
+                }
+                
+                // 3. Registrar en historial
+                batch.set(db.collection("traslados").doc(), {
+                    producto: sourceDoc.nombre,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
+                    origen: sourceDoc.sede_ubicacion,
+                    destino: destSede,
+                    usuario: vendedorActivo,
+                    cantidad: qty
+                });
+                
+                await batch.commit();
+                cerrarModal(); alert("✅ Traslado completado con éxito.");
+            } catch (e) { alert("Error en el traslado."); }
+        }
+
+        // --- FUNCIONES SOPORTE (ESTABILIZADAS) ---
         function filtrarVenta(q) {
             const query = q.toLowerCase().trim(); const list = document.getElementById('search-results-list'); if(!list) return;
             const filtered = productosData.filter(p => {
@@ -172,34 +257,6 @@
                     return matchSearch && psede === asede;
                 }
                 return matchSearch;
-            });
-            renderResultados(filtered, list);
-        }
-
-        function ejecutarBusquedaAvanzada() {
-            const n = document.getElementById('adv-name').value.toLowerCase().trim();
-            const s = document.getElementById('adv-sede').value.toLowerCase().trim();
-            const c = document.getElementById('adv-cat').value;
-            const dS = document.getElementById('adv-date-start').value;
-            const dE = document.getElementById('adv-date-end').value;
-            const list = document.getElementById('inventory-list');
-            if(!list) return;
-
-            const filtered = productosData.filter(p => {
-                const matchName = !n || p.nombre.toLowerCase().includes(n);
-                const psede = (p.sede_ubicacion || "").toLowerCase().trim();
-                const matchSede = s === "todas" || psede === s;
-                const matchCat = c === "TODAS" || p.categoria === c;
-                let matchDate = true;
-                if (dS || dE) {
-                    if (!p.fecha_ingreso || typeof p.fecha_ingreso.toDate !== 'function') matchDate = false;
-                    else {
-                        const pDate = p.fecha_ingreso.toDate().toISOString().split('T')[0];
-                        if (dS && pDate < dS) matchDate = false;
-                        if (dE && pDate > dE) matchDate = false;
-                    }
-                }
-                return matchName && matchSede && matchCat && matchDate;
             });
             renderResultados(filtered, list);
         }
@@ -220,20 +277,21 @@
                         <p class="font-black text-pavo-real text-xl tabular-nums">$${p.precio.toLocaleString()}</p>
                     </div>
                     <div class="flex gap-2 border-l border-slate-50 pl-4">
-                        ${currentUserData.rol === 'admin' ? `<button onclick="verFicha('${p.id}')" class="text-slate-300 hover:text-pavo-real transition-all text-xl bg-transparent border-0 cursor-pointer shadow-sm"><i class="fas fa-pen"></i></button>` : `<button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 border-0 cursor-pointer shadow-lg">Agregar</button>`}
+                        ${currentUserData.rol === 'admin' ? `<button onclick="verTraslado('${p.id}')" title="Trasladar" class="text-slate-300 hover:text-orange-500 transition-all text-xl bg-transparent border-0 cursor-pointer px-2"><i class="fas fa-exchange-alt"></i></button><button onclick="verFicha('${p.id}')" title="Editar" class="text-slate-300 hover:text-pavo-real transition-all text-xl bg-transparent border-0 cursor-pointer px-2"><i class="fas fa-pen"></i></button>` : `<button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 border-0 cursor-pointer shadow-lg">Agregar</button>`}
                     </div>
                 </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px]">Sin existencias encontradas.</div>';
         }
 
-        // --- FICHA TÉCNICA Y HISTORIAL (SOLUCIÓN BUCLE) ---
         function verDetalleFicha(id) {
             const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
             const p = productosData.find(item => item.id === id);
             document.getElementById('modal-title').innerText = "Ficha del Producto";
+            const isAdmin = currentUserData.rol === 'admin';
+            const escName = p.nombre.replace(/'/g, "\\'").replace(/"/g, '\\"');
             c.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left animate-in min-h-[400px]">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left animate-in min-h-[400px] relative">
                     <div class="space-y-8">
-                        <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 italic">Registro Maestro</p><h2 class="text-5xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${p.nombre}</h2></div>
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 italic leading-none">Registro Maestro</p><h2 class="text-5xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${p.nombre}</h2></div>
                         <div class="grid grid-cols-2 gap-6">
                             <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm"><p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Familia</p><p class="font-bold text-pavo-real text-lg uppercase">${p.categoria}</p></div>
                             <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm"><p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Proveedor</p><p class="font-bold text-slate-700 text-lg uppercase italic">${p.proveedor || 'No Vinculado'}</p></div>
@@ -244,59 +302,17 @@
                     <div class="space-y-8 flex flex-col justify-center">
                         <div class="text-center p-12 bg-white rounded-[4rem] border-4 border-slate-50 shadow-2xl relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-orange-500 opacity-5 -mr-10 -mt-10 rounded-full shadow-inner"></div>
-                            <p class="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-4 italic text-center">Stock Disponible</p>
+                            <p class="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-4 italic text-center leading-none">Stock Disponible</p>
                             <h3 class="text-9xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">${p.stock}</h3>
                             <p class="text-base font-bold text-slate-400 uppercase mt-4">unidades físicas en tienda</p>
                         </div>
                         <div class="bg-orange-50 p-4 rounded-2xl text-center shadow-inner font-black uppercase text-[10px] text-orange-500 italic">Ubicación Actual: ${p.sede_ubicacion.toUpperCase()}</div>
                     </div>
+                    ${isAdmin ? `<div class="absolute bottom-4 right-4 flex gap-4"><button onclick="verTraslado('${id}')" class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl hover:bg-orange-500 hover:text-white transition-all shadow-2xl border-0 cursor-pointer"><i class="fas fa-exchange-alt"></i></button><button onclick="verFicha('${id}')" class="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center text-2xl hover:bg-pavo-real transition-all shadow-2xl border-0 cursor-pointer"><i class="fas fa-pen"></i></button></div>` : ''}
                 </div>`;
             m.classList.remove('hidden');
         }
 
-        function verHojaVida(prodName) {
-            const c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Historial: " + prodName;
-            c.innerHTML = `<div id="loading-hv" class="p-10 text-center animate-in"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl mb-4"></i><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cargando cronología técnica...</p></div>`;
-            const timeout = setTimeout(() => { if(document.getElementById('loading-hv')) c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black">No se encontraron movimientos registrados.</div>`; }, 4000);
-            db.collection("traslados").where("producto", "==", prodName).get().then(snap => {
-                clearTimeout(timeout); if (snap.empty) { c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black">Este artículo no registra traslados previos.</div>`; return; }
-                let docs = []; snap.forEach(doc => docs.push(doc.data())); docs.sort((a,b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
-                let html = `<div class="space-y-6 animate-in p-4">`;
-                docs.forEach(t => {
-                    const dt = t.fecha ? t.fecha.toDate() : new Date(); const fStr = dt.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const hStr = dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    html += `<div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group"><div class="absolute top-0 left-0 w-2 h-full bg-orange-500 opacity-20"></div><div class="flex justify-between items-start mb-6"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">${fStr}</p><p class="text-xs font-bold text-pavo-real uppercase tracking-widest">${hStr}</p></div><div class="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 text-right"><p class="text-[9px] font-black text-slate-400 uppercase mb-1 leading-none italic">Autor:</p><p class="text-[10px] font-black text-pavo-real uppercase">${t.usuario}</p></div></div><div class="flex items-center gap-6"><div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 text-xl shadow-inner"><i class="fas fa-exchange-alt"></i></div><h4 class="font-black text-2xl text-slate-800 uppercase italic tracking-tighter leading-none">${t.origen} <i class="fas fa-arrow-right mx-3 text-pavo-real text-sm"></i> ${t.destino}</h4></div></div>`;
-                });
-                c.innerHTML = html + `</div>`;
-            });
-        }
-
-        // --- FICHA DE EDICIÓN Y GUARDADO (RESTAURADA) ---
-        function verFicha(id) {
-            const m = document.getElementById('main-modal'), c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = id ? "Edición Maestra" : "Nuevo Producto";
-            const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: 0, stock: 0, categoria: 'Mochilas', proveedor: '', precio_compra: 0, stock_ideal: 0, sede_ubicacion: 'bodega' };
-            c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left animate-in"><div class="space-y-6"><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Nombre</label><input id="edit-nombre" type="text" value="${p.nombre}" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase text-lg shadow-sm"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Categoría</label><select id="edit-categoria" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm">${listaCategorias.map(cat => `<option value="${cat}" ${p.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2 block ml-2 italic">Asignar Sede</label><select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm">${["bodega", "filandia1", "filandia2", "cableplaza", "fundadores", "jardin", "online"].map(s => `<option value="${s}" ${p.sede_ubicacion === s ? 'selected' : ''}>${s.toUpperCase()}</option>`).join('')}</select></div></div><div><label class="text-[10px] font-black text-pavo-real uppercase tracking-widest mb-2 block ml-2 italic">Vincular Proveedor</label><select id="edit-proveedor" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-blue-100 font-bold text-slate-700 uppercase shadow-sm"><option value="">SELECCIONAR...</option>${listaProveedores.map(pr => `<option value="${pr.nombre}" ${p.proveedor === pr.nombre ? 'selected' : ''}>${pr.nombre} (${pr.taller})</option>`).join('')}</select></div></div><div class="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-6"><div class="grid grid-cols-2 gap-6"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black">Venta</label><input id="edit-precio" type="number" value="${p.precio}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black tracking-tighter">Costo</label><input id="edit-compra" type="number" value="${p.precio_compra}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl"></div></div><div class="grid grid-cols-2 gap-6"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black">Stock</label><input id="edit-stock" type="number" value="${p.stock}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black">Ideal</label><input id="edit-ideal" type="number" value="${p.stock_ideal}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl"></div></div><button onclick="guardarCambios('${id}')" class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 transition-all border-0 cursor-pointer shadow-lg">Actualizar Registro</button></div></div>`;
-            m.classList.remove('hidden');
-        }
-
-        async function guardarCambios(id) {
-            const nS = document.getElementById('edit-sede').value, nN = document.getElementById('edit-nombre').value.toUpperCase();
-            const data = { nombre: nN, categoria: document.getElementById('edit-categoria').value, proveedor: document.getElementById('edit-proveedor').value, sede_ubicacion: nS, precio: parseInt(document.getElementById('edit-precio').value) || 0, precio_compra: parseInt(document.getElementById('edit-compra').value) || 0, stock: parseInt(document.getElementById('edit-stock').value) || 0, stock_ideal: parseInt(document.getElementById('edit-ideal').value) || 0, fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp() };
-            try {
-                if(!id || id === "null" || id === "undefined") {
-                    await db.collection("productos").add(data);
-                    await db.collection("traslados").add({ producto: nN, fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: "INGRESO INICIAL", destino: nS, usuario: vendedorActivo });
-                } else {
-                    const o = productosData.find(p => p.id === id);
-                    if(o.sede_ubicacion !== nS) {
-                        await db.collection("traslados").add({ producto: nN, fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: o.sede_ubicacion || "bodega", destino: nS, usuario: vendedorActivo });
-                    }
-                    await db.collection("productos").doc(id).update(data);
-                }
-                cerrarModal(); alert("✅ Operación exitosa.");
-            } catch (e) { alert("Error"); }
-        }
-
-        // --- FUNCIONES DE SOPORTE ADMIN (ESTABILIZADAS) ---
         async function cargarEstadisticasDashboard() {
             const h = new Date(); h.setHours(0,0,0,0); const aI = new Date(h); aI.setDate(h.getDate()-1); const aF = new Date(h); aF.setMilliseconds(-1); const mI = new Date(h.getFullYear(), h.getMonth(), 1); const yI = new Date(h.getFullYear(), 0, 1);
             db.collection("ventas").onSnapshot(snap => {
@@ -307,14 +323,17 @@
             });
         }
 
-        // --- SOPORTE COMÚN ---
+        // ... (Resto de funciones: Categorías, Carga Masiva, Proveedores, HojaVida mantenidas intactas) ...
         function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
         function cerrarModal() { document.getElementById('main-modal').classList.add('hidden'); }
-        function gestionProveedores() { /* Mantenida para admin de versiones anteriores */ }
+        function ejecutarBusquedaAvanzada() { /* Lógica de buscador logística mantenida */ const n = document.getElementById('adv-name').value.toLowerCase().trim(), s = document.getElementById('adv-sede').value.toLowerCase().trim(), c = document.getElementById('adv-cat').value, dS = document.getElementById('adv-date-start').value, dE = document.getElementById('adv-date-end').value, list = document.getElementById('inventory-list'); const filtered = productosData.filter(p => { const mN = !n || p.nombre.toLowerCase().includes(n), psede = (p.sede_ubicacion || "").toLowerCase().trim(), mS = s === "todas" || psede === s, mC = c === "TODAS" || p.categoria === c; let mD = true; if(dS || dE) { if(!p.fecha_ingreso || typeof p.fecha_ingreso.toDate !== 'function') mD=false; else { const pD = p.fecha_ingreso.toDate().toISOString().split('T')[0]; if(dS && pD < dS) mD=false; if(dE && pD > dE) mD=false; }} return mN && mS && mC && mD; }); renderResultados(filtered, list); }
         function agregarCarrito(id) { const p = productosData.find(i => i.id === id); const ex = carrito.find(i => i.id === id); if(ex) { if(ex.cant < p.stock) ex.cant++; } else carrito.push({...p, cant: 1}); renderCarrito(); }
         function renderCarrito() { const b = document.getElementById('sidebar-cesta'), l = document.getElementById('cesta-items'); if(carrito.length === 0) { b.classList.add('hidden'); return; } b.classList.remove('hidden'); let total = 0; l.innerHTML = carrito.map((item, i) => { total += item.precio * item.cant; return `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between animate-in mb-2"><div class="min-w-0 flex-1 text-left"><p class="text-[9px] font-black text-white truncate uppercase mb-1 leading-none italic">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold">$${(item.precio * item.cant).toLocaleString()}</p></div><div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl"><button onclick="cambiarCant(${i},-1)" class="text-white font-bold w-5 border-0 bg-transparent cursor-pointer">-</button><span class="text-[10px] font-bold text-white">${item.cant}</span><button onclick="cambiarCant(${i},1)" class="text-white font-bold w-5 border-0 bg-transparent cursor-pointer">+</button></div></div>`; }).join(''); document.getElementById('cesta-total').innerText = `$${total.toLocaleString()}`; }
         function cambiarCant(i, d) { const item = carrito[i]; item.cant += d; if(item.cant <= 0) carrito.splice(i, 1); else { const p = productosData.find(x => x.id === item.id); if(item.cant > p.stock) item.cant = p.stock; } renderCarrito(); }
         async function finalizarVenta() { /* Lógica de cobro mantenida */ }
+        function verFicha(id) { /* Lógica de edición mantenida */ const m = document.getElementById('main-modal'), c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = id ? "Edición Maestra" : "Nuevo Producto"; const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: 0, stock: 0, categoria: 'Mochilas', proveedor: '', precio_compra: 0, stock_ideal: 0, sede_ubicacion: 'bodega' }; c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left animate-in"><div class="space-y-6"><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Nombre</label><input id="edit-nombre" type="text" value="${p.nombre}" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase text-lg shadow-sm"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Categoría</label><select id="edit-categoria" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm">${listaCategorias.map(cat => `<option value="${cat}" ${p.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2 block ml-2 italic">Asignar Sede</label><select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm">${["bodega", "filandia1", "filandia2", "cableplaza", "fundadores", "jardin", "online"].map(s => `<option value="${s}" ${p.sede_ubicacion === s ? 'selected' : ''}>${s.toUpperCase()}</option>`).join('')}</select></div></div><div><label class="text-[10px] font-black text-pavo-real uppercase tracking-widest mb-2 block ml-2 italic">Vincular Proveedor</label><select id="edit-proveedor" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-blue-100 font-bold text-slate-700 uppercase shadow-sm"><option value="">SELECCIONAR...</option>${listaProveedores.map(pr => `<option value="${pr.nombre}" ${p.proveedor === pr.nombre ? 'selected' : ''}>${pr.nombre} (${pr.taller})</option>`).join('')}</select></div></div><div class="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-6"><div class="grid grid-cols-2 gap-6"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black">Venta</label><input id="edit-precio" type="number" value="${p.precio}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black tracking-tighter">Costo</label><input id="edit-compra" type="number" value="${p.precio_compra}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl"></div></div><div class="grid grid-cols-2 gap-6"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black">Stock</label><input id="edit-stock" type="number" value="${p.stock}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase font-black">Ideal</label><input id="edit-ideal" type="number" value="${p.stock_ideal}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl"></div></div><button onclick="guardarCambios('${id}')" class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 transition-all border-0 cursor-pointer shadow-lg">Actualizar Registro</button></div></div>`; m.classList.remove('hidden'); }
+        async function guardarCambios(id) { const nS = document.getElementById('edit-sede').value, nN = document.getElementById('edit-nombre').value.toUpperCase(); const data = { nombre: nN, categoria: document.getElementById('edit-categoria').value, proveedor: document.getElementById('edit-proveedor').value, sede_ubicacion: nS, precio: parseInt(document.getElementById('edit-precio').value) || 0, precio_compra: parseInt(document.getElementById('edit-compra').value) || 0, stock: parseInt(document.getElementById('edit-stock').value) || 0, stock_ideal: parseInt(document.getElementById('edit-ideal').value) || 0, fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp() }; try { if(!id || id === "null" || id === "undefined") { await db.collection("productos").add(data); await db.collection("traslados").add({ producto: nN, fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: "INGRESO INICIAL", destino: nS, usuario: vendedorActivo, cantidad: data.stock }); } else { const o = productosData.find(p => p.id === id); if(o.sede_ubicacion !== nS) { await db.collection("traslados").add({ producto: nN, fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: o.sede_ubicacion || "bodega", destino: nS, usuario: vendedorActivo, cantidad: data.stock }); } await db.collection("productos").doc(id).update(data); } cerrarModal(); alert("✅ Operación exitosa."); } catch (e) { alert("Error"); } }
+        function verHojaVida(prodName) { /* Hoja de vida mantenida */ const c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Historial: " + prodName; c.innerHTML = `<div id="loading-hv" class="p-10 text-center animate-in"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl mb-4"></i><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cargando...</p></div>`; const timeout = setTimeout(() => { if(document.getElementById('loading-hv')) c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black">Sin registros previos.</div>`; }, 4000); db.collection("traslados").where("producto", "==", prodName).get().then(snap => { clearTimeout(timeout); if (snap.empty) { c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black">No registra traslados previos.</div>`; return; } let docs = []; snap.forEach(doc => docs.push(doc.data())); docs.sort((a,b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0)); let html = `<div class="space-y-6 animate-in p-4">`; docs.forEach(t => { const dt = t.fecha ? t.fecha.toDate() : new Date(); const fStr = dt.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const hStr = dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); html += `<div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group"><div class="absolute top-0 left-0 w-2 h-full bg-orange-500 opacity-20"></div><div class="flex justify-between items-start mb-6"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">${fStr}</p><p class="text-xs font-bold text-pavo-real uppercase tracking-widest">${hStr}</p></div><div class="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 text-right"><p class="text-[9px] font-black text-slate-400 uppercase mb-1 leading-none italic">Autor:</p><p class="text-[10px] font-black text-pavo-real uppercase">${t.usuario}</p></div></div><div class="flex items-center gap-6"><div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 text-xl shadow-inner"><i class="fas fa-exchange-alt"></i></div><h4 class="font-black text-2xl text-slate-800 uppercase italic tracking-tighter leading-none">${t.origen} <i class="fas fa-arrow-right mx-3 text-pavo-real text-sm"></i> ${t.destino}</h4><div class="ml-auto bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-xs">${t.cantidad || 1} U.</div></div></div>`; }); c.innerHTML = html + `</div>`; }); }
     </script>
 </body>
 </html>

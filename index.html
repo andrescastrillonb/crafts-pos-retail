@@ -25,7 +25,12 @@
         .nav-active { background-color: rgba(255, 255, 255, 0.1) !important; color: white !important; }
         .sidebar-scroll { max-height: calc(100vh - 550px); overflow-y: auto; }
         input, select { transition: all 0.2s ease; outline: none; }
-        @media print { body * { visibility: hidden; } #ticket-print, #ticket-print * { visibility: visible; } #ticket-print { position: absolute; left: 0; top: 0; width: 80mm; font-family: 'Courier New', monospace; font-size: 12px; padding: 10px; } }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #ticket-print, #ticket-print * { visibility: visible; }
+            #ticket-print { position: absolute; left: 0; top: 0; width: 80mm; font-family: 'Courier New', monospace; font-size: 12px; padding: 10px; }
+        }
     </style>
 </head>
 <body class="text-slate-700">
@@ -143,15 +148,23 @@
                 currentUserData = doc.data() || { rol: 'vendedor', sede: 'sin_sede' };
                 const chosenSede = localStorage.getItem('active_sede_choice');
                 vendedorActivo = (localStorage.getItem('vendedor_nombre') || "").toUpperCase();
-                if(currentUserData.rol === 'admin' || currentUserData.rol === 'control' || (Array.isArray(currentUserData.sede) ? currentUserData.sede : [currentUserData.sede]).some(s => normalizeSede(s) === normalizeSede(chosenSede))) {
+                
+                const isAdmin = (currentUserData.rol === 'admin' || currentUserData.rol === 'control');
+                const userSedes = Array.isArray(currentUserData.sede) ? currentUserData.sede : [currentUserData.sede];
+                if(isAdmin || userSedes.some(s => normalizeSede(s) === normalizeSede(chosenSede))) {
                     activeSede = chosenSede;
                     document.getElementById('login-screen')?.classList.add('hidden');
                     document.getElementById('main-app')?.classList.remove('hidden');
                     document.getElementById('sidebar-sede-name').innerText = activeSede.toUpperCase();
                     document.getElementById('label-sede-top').innerText = "SEDE " + activeSede.toUpperCase();
                     document.getElementById('current-vendedor-display').innerText = vendedorActivo || "OPERARIO";
+                    
                     if(typeof unsubProductos === 'function') unsubProductos();
-                    unsubProductos = db.collection("productos").onSnapshot(snap => { productosData = []; snap.forEach(d => productosData.push({id: d.id, ...d.data()})); filtrarVenta(document.getElementById('global-search')?.value || ""); });
+                    unsubProductos = db.collection("productos").onSnapshot(snap => {
+                        productosData = [];
+                        snap.forEach(d => productosData.push({id: d.id, ...d.data()}));
+                        filtrarVenta(document.getElementById('global-search')?.value || "");
+                    });
                     escucharCategorias(); escucharProveedores(); renderSidebar(currentUserData.rol); navegar('inicio');
                 } else { alert("Acceso no autorizado."); cerrarSesion(); }
             } else { document.getElementById('login-screen')?.classList.remove('hidden'); document.getElementById('main-app')?.classList.add('hidden'); }
@@ -165,7 +178,6 @@
             const isAdm = rol === 'admin' || rol === 'control';
             nav.innerHTML = `<button onclick="navegar('inicio')" data-vista="inicio" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-th-large"></i><span class="hidden md:block">Inicio</span></button>` + 
                 (isAdm ? `<button onclick="navegar('productos')" data-vista="productos" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Logística</span></button><button onclick="navegar('historial')" data-vista="historial" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-history"></i><span class="hidden md:block">Historial</span></button>` : '');
-            const cesta = document.getElementById('sidebar-cesta'); if(cesta) cesta.classList.remove('hidden');
         }
 
         function navegar(vista) {
@@ -173,4 +185,98 @@
             const container = document.getElementById('view-container');
             const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control';
             if (vista === 'inicio') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 leading-none">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center leading-none"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all leading-none"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px] leading-none"></div><div id="stats-container" class="space-y-4 leading-none"></div><div id="turn-history-container" class="mt-20 text-left animate-in leading-none"></div></div>`;
+                if(isAdmin) {
+                    const rowGen = (t,l,id,acc=false) => `<div class="${acc?'bg-blue-50':'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in leading-none"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left leading-none"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40 leading-none">${l}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3 leading-none">${t}</h3><h3 id="dash-total-${id}" class="text-5xl font-black ${id==='hoy'?'text-orange-500':'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center leading-none">${[1,2,3,4,5,6].map(i=>`<div class="flex flex-col items-center justify-center leading-none"><p class="text-4xl font-black ${acc?'text-blue-200':'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
+                    document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Ventas Globales Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic leading-none">Control Maestro</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
+                } else {
+                    document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Mis Ventas Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div></div>`;
+                }
+                cargarEstadisticasDashboard();
+            } else if (vista === 'productos') {
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative leading-none"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center leading-none"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl border-0 cursor-pointer shadow-lg leading-none">Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
+            }
+        }
+
+        // --- HISTORIAL DE VENTAS DEL TURNO (MÓDULO NUEVO) ---
+        function renderHistorialTurno(ventasHoy) {
+            const container = document.getElementById('turn-history-container'); if(!container) return;
+            let html = `<p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6 italic leading-none">Desglose de Ventas hoy</p><div class="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden leading-none"><table class="w-full text-left leading-none"><thead class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 italic"><tr><th class="p-6">Producto</th><th class="p-6 text-center">Unid.</th><th class="p-6 text-right">Subtotal</th><th class="p-6 text-center">Pago</th></tr></thead><tbody class="divide-y divide-slate-50">`;
+            ventasHoy.forEach(v => {
+                v.items.forEach(item => {
+                    html += `<tr class="hover:bg-slate-50 transition-all"><td class="p-6 font-bold text-slate-700 text-xs uppercase leading-none">${item.nombre}</td><td class="p-6 text-center font-black text-xs leading-none">${item.cantidad}</td><td class="p-6 text-right font-black text-pavo-real text-xs leading-none">${money(item.subtotal)}</td><td class="p-6 text-center leading-none"><span class="bg-slate-100 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase text-slate-500">${v.metodo_pago}</span></td></tr>`;
+                });
+            });
+            container.innerHTML = html + `</tbody></table></div>`;
+        }
+
+        // --- CHECKOUT Y TICKET ---
+        function finalizarVenta() {
+            if (!carrito.length) return;
+            const total = carrito.reduce((acc, i) => acc + i.subtotal, 0);
+            const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = "Cerrar Venta";
+            c.innerHTML = `<div class="text-center space-y-10 animate-in leading-none"><p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Total Cobro</p><h2 class="text-8xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">${money(total)}</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 leading-none"><button onclick="confirmarPago('Efectivo')" class="bg-slate-900 text-white p-10 rounded-[3rem] font-black uppercase text-[10px] hover:bg-green-600 transition-all border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-money-bill-wave text-3xl mb-6 block"></i>Efectivo</button><button onclick="confirmarPago('Tarjeta')" class="bg-slate-900 text-white p-10 rounded-[3rem] font-black uppercase text-[10px] hover:bg-blue-600 transition-all border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-credit-card text-3xl mb-6 block"></i>Tarjeta</button><button onclick="confirmarPago('Transferencia')" class="bg-slate-900 text-white p-10 rounded-[3rem] font-black uppercase text-[10px] hover:bg-orange-500 transition-all border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-mobile-alt text-3xl mb-6 block"></i>Transferencia</button></div></div>`;
+            m.classList.remove('hidden');
+        }
+
+        async function confirmarPago(metodo) {
+            const total = carrito.reduce((acc, i) => acc + i.subtotal, 0);
+            try {
+                const batch = db.batch(); const vRef = db.collection("ventas").doc();
+                const vData = { fecha: firebase.firestore.FieldValue.serverTimestamp(), vendedor: vendedorActivo, sede: activeSede, total, metodo_pago: metodo, items: carrito };
+                batch.set(vRef, vData);
+                carrito.forEach(i => { batch.update(db.collection("productos").doc(i.id), { stock: firebase.firestore.FieldValue.increment(-i.cantidad) }); });
+                await batch.commit(); alert("✅ Venta Completada"); imprimirTicket(vData); carrito = []; renderCarrito(); cerrarModal(); navegar('inicio');
+            } catch (e) { alert("Error"); }
+        }
+
+        function imprimirTicket(v) {
+            const t = document.getElementById('ticket-print');
+            const itH = v.items.map(i => `<tr><td>${i.nombre}</td><td align="right">x${i.cantidad}</td><td align="right">${money(i.subtotal)}</td></tr>`).join('');
+            t.innerHTML = `<div style="text-align:center;"><h2 style="margin-bottom:5px;">CRAFTS COLOMBIA</h2><p style="text-transform:uppercase; font-size:10px;">SEDE: ${activeSede}</p><hr><p style="font-size:10px;">Vendedor: ${vendedorActivo}<br>Fecha: ${new Date().toLocaleString()}</p><hr><table width="100%" style="font-size:10px;">${itH}</table><hr><h3 style="text-align:right;">TOTAL: ${money(v.total)}</h3><p style="text-align:center; font-size:9px;">Pago: ${v.metodo_pago}<br>¡Gracias por su compra!</p></div>`;
+            window.print();
+        }
+
+        // --- ESTADÍSTICAS Y NORMALIZACIÓN ---
+        async function cargarEstadisticasDashboard() {
+            if (typeof unsubVentasStats === 'function') unsubVentasStats();
+            const h = new Date(); h.setHours(0,0,0,0);
+            unsubVentasStats = db.collection("ventas").onSnapshot(snap => {
+                let totals = { hoy: 0 }; let turnVents = [];
+                let mapS = { "filandia1": "1", "filandia2": "2", "cableplaza": "3", "fundadores": "4", "jardin": "5", "online": "6" };
+                let bV = { hoy: {} }; [1,2,3,4,5,6].forEach(i => bV.hoy[i]=0);
+                snap.forEach(doc => {
+                    const v = doc.data(); const f = v.fecha?.toDate() || new Date(); const t = safeNum(v.total); const sV = normalizeSede(v.sede);
+                    if(f >= h) {
+                        if(currentUserData.rol === 'admin' || sV === normalizeSede(activeSede)) { totals.hoy += t; turnVents.push(v); }
+                        const n = mapS[sV]; if(n) bV.hoy[n] += t;
+                    }
+                });
+                if(document.getElementById(`dash-total-hoy`)) document.getElementById(`dash-total-hoy`).innerText = money(totals.hoy);
+                if(currentUserData.rol === 'admin') { [1,2,3,4,5,6].forEach(i => { if(document.getElementById(`val-hoy-${i}`)) document.getElementById(`val-hoy-${i}`).innerText = money(bV.hoy[i]); }); }
+                renderHistorialTurno(turnVents);
+            });
+        }
+
+        // --- SOPORTE ---
+        function filtrarVenta(q) {
+            const query = safeStr(q).toLowerCase().trim(); const list = document.getElementById('search-results-list'); if(!list) return;
+            const filtered = productosData.filter(p => {
+                const matchSearch = !query || safeStr(p.nombre).toLowerCase().includes(query) || safeStr(p.categoria).toLowerCase().includes(query);
+                return currentUserData.rol === 'admin' ? matchSearch : (matchSearch && normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(activeSede));
+            });
+            renderResultados(filtered, list);
+        }
+
+        function renderResultados(data, container) {
+            container.innerHTML = data.map(p => `<div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none"><div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl leading-none"><i class="fas fa-gem"></i></div><div class="flex-1 text-left leading-none"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p><h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3></div><div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none"><span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span><p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p></div><div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none"><p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p></div><div class="flex gap-2 border-l border-slate-50 pl-4 leading-none"><button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none">Agregar</button></div></div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
+        }
+
+        function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
+        function cerrarModal() { document.getElementById('main-modal')?.classList.add('hidden'); }
+        // Inicial
+        updateClock(); renderCarrito();
+    </script>
+</body>
+</html>

@@ -51,9 +51,7 @@
                     <p id="sidebar-sede-name" class="font-bold text-white text-[10px] uppercase">Sede...</p>
                 </div>
             </div>
-            
             <nav id="nav-menu" class="p-4 mt-10 space-y-2 flex-1 hide-scroll"></nav>
-
             <div id="sidebar-cesta" class="hidden p-4 border-t border-white/5 animate-in">
                 <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Cesta de Venta</p>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 hide-scroll"></div>
@@ -62,11 +60,8 @@
                     <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Finalizar</button>
                 </div>
             </div>
-
             <div class="p-4 border-t border-white/5 text-center">
-                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-3 p-3 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-[10px] uppercase tracking-widest">
-                    <i class="fas fa-power-off"></i><span class="hidden md:block ml-2">Salir</span>
-                </button>
+                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-3 p-3 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-[10px] uppercase tracking-widest"><i class="fas fa-power-off"></i><span class="hidden md:block ml-2">Salir</span></button>
             </div>
         </aside>
 
@@ -84,7 +79,7 @@
                 </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
-                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">SISTEMA ACTIVO</span>
+                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">SISTEMA ACTIVO</span>
                 </div>
             </header>
             <section id="view-container" class="flex-1 overflow-y-auto p-12 relative bg-slate-50"></section>
@@ -94,10 +89,10 @@
     <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
             <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic">
-                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none">Consulta</h2>
+                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none">Gestión</h2>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
-            <div id="modal-content" class="p-10 max-h-[80vh] overflow-y-auto hide-scroll bg-slate-50/30 relative"></div>
+            <div id="modal-content" class="p-10 max-h-[85vh] overflow-y-auto hide-scroll bg-slate-50/30 relative"></div>
         </div>
     </div>
 
@@ -153,53 +148,58 @@
                         <h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1>
                         <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-12">SEDE ${currentUserData.sede}</p>
                         
-                        <div class="max-w-2xl mx-auto relative mb-12">
-                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i>
-                            <input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Buscar por nombre o categoría..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all">
+                        <div class="max-w-2xl mx-auto relative mb-12 flex items-center">
+                            <button onclick="ejecutarBusquedaManual()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Buscar producto en esta tienda..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all">
                         </div>
 
                         <div class="mb-12">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-left ml-4">Favoritos / Más Vendidos en Sede</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-left ml-4">Los 10 Más Vendidos (Acceso Rápido)</p>
                             <div id="top-products-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
                         </div>
 
-                        <div id="search-results-list" class="space-y-4 mb-12 text-left"></div>
+                        <div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px]"></div>
 
                         <div class="bg-white p-8 md:p-12 rounded-[4rem] stat-row flex flex-col md:flex-row gap-12 border-orange-200 border-2 animate-in text-left">
                             <div class="min-w-[280px] border-b md:border-b-0 md:border-r border-slate-100 pb-8 md:pb-0 md:pr-12">
-                                <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno de ${vendedorActivo}</p>
-                                <h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Total Ventas Hoy</h3>
+                                <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno: ${vendedorActivo}</p>
+                                <h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Ventas Acumuladas</h3>
                                 <h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3>
                             </div>
                             <div class="flex-1">
                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic leading-none">Relación de Artículos Vendidos en el Turno</p>
-                                <div id="shift-sales-list" class="max-h-[200px] overflow-y-auto space-y-3 hide-scroll pr-2">
-                                    <p class="text-slate-300 italic text-sm">No hay ventas registradas aún...</p>
+                                <div id="shift-sales-list" class="max-h-[250px] overflow-y-auto space-y-3 hide-scroll pr-2 italic">
+                                    <p class="text-slate-300 italic text-sm uppercase font-black">Esperando primera venta...</p>
                                 </div>
                             </div>
                         </div>
                     </div>`;
-                cargarEstadisticasDashboard();
+                cargarEstadisticasVendedor();
             }
-            // Mantenemos las otras vistas sin cambios para asegurar integridad...
-            else if (vista === 'productos') { /* ... (Lógica de logística existente) ... */ }
         }
 
-        // --- MOTOR DE BÚSQUEDA Y RANKING (PRECISIÓN QUIRÚRGICA) ---
+        // --- LÓGICA DE BÚSQUEDA Y FILTRADO (QUIRÚRGICA) ---
+        function ejecutarBusquedaManual() {
+            const inputVal = document.getElementById('global-search').value;
+            filtrarVenta(inputVal || ""); // Si está vacío, despliega todo.
+        }
+
         function filtrarVenta(q) {
             const query = q.toLowerCase().trim();
             const list = document.getElementById('search-results-list');
             if(!list) return;
-            if(!query) { list.innerHTML = ''; return; }
 
+            // REGLA DE ORO: Filtrar por Sede del Vendedor (Búsqueda Parcial para evitar errores de string)
             const filtered = productosData.filter(p => {
-                const matchSearch = p.nombre.toLowerCase().includes(query) || (p.categoria && p.categoria.toLowerCase().includes(query));
-                // Regla Vendedor: Solo ve su sede
-                if(currentUserData.rol !== 'admin') {
-                    return matchSearch && p.sede_ubicacion === currentUserData.sede;
-                }
-                return matchSearch;
+                const matchSede = p.sede_ubicacion && p.sede_ubicacion.toLowerCase().includes(currentUserData.sede.toLowerCase());
+                const matchSearch = !query || p.nombre.toLowerCase().includes(query) || (p.categoria && p.categoria.toLowerCase().includes(query));
+                
+                if(currentUserData.rol === 'admin') return matchSearch;
+                return matchSede && matchSearch;
             });
+
             renderResultados(filtered, list);
         }
 
@@ -211,7 +211,7 @@
                         <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl"><i class="fas fa-gem"></i></div>
                         <div class="flex-1">
                             <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${p.categoria}</p>
-                            <h3 class="font-black text-slate-600 text-lg uppercase truncate leading-tight">${p.nombre}</h3>
+                            <h3 onclick="verDetalleFicha('${p.id}')" class="font-black text-slate-600 text-lg uppercase truncate leading-tight cursor-pointer hover:text-pavo-real transition-all">${p.nombre}</h3>
                         </div>
                         <div class="text-center min-w-[140px] border-l border-slate-50 pl-4">
                             <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg">${p.sede_ubicacion}</span>
@@ -225,131 +225,62 @@
                         </div>
                     </div>`;
             });
-            container.innerHTML = html || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px]">Sin existencias en esta sede.</div>';
+            container.innerHTML = html || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px]">No se encontraron productos vinculados a esta sede.</div>';
         }
 
-        async function cargarEstadisticasDashboard() {
-            const hoyStart = new Date(); hoyStart.setHours(0,0,0,0);
+        async function cargarEstadisticasVendedor() {
+            const hoy = new Date(); hoy.setHours(0,0,0,0);
             
             db.collection("ventas").where("sede", "==", currentUserData.sede)
               .onSnapshot(snap => {
-                let totalHoy = 0;
-                let itemsTurno = [];
-                let rankingCount = {};
+                let totalHoy = 0, itemsVendidos = [], ranking = {};
 
                 snap.forEach(doc => {
                     const v = doc.data();
                     const fecha = v.fecha ? v.fecha.toDate() : new Date();
                     
-                    // Solo ventas de hoy
-                    if(fecha >= hoyStart) {
+                    if(fecha >= hoy) {
                         totalHoy += v.total || 0;
                         v.items.forEach(item => {
-                            itemsTurno.push({ ...item, hora: fecha.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}) });
-                            rankingCount[item.nombre] = (rankingCount[item.nombre] || 0) + item.cant;
+                            itemsVendidos.push({ ...item, hora: fecha.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}) });
+                            ranking[item.nombre] = (ranking[item.nombre] || 0) + item.cant;
                         });
                     }
                 });
 
-                // Actualizar valor total
-                const totalEl = document.getElementById('dash-total-hoy');
-                if(totalEl) totalEl.innerText = `$${totalHoy.toLocaleString()}`;
-
-                // Actualizar relación de artículos vendidos hoy
-                const shiftList = document.getElementById('shift-sales-list');
-                if(shiftList) {
-                    if(itemsTurno.length > 0) {
-                        shiftList.innerHTML = itemsTurno.reverse().map(item => `
-                            <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-pavo-real text-white text-[9px] px-2 py-1 rounded font-black">${item.cant}</span>
-                                    <p class="font-bold text-xs text-slate-600 uppercase truncate max-w-[150px]">${item.nombre}</p>
-                                </div>
-                                <p class="text-[10px] font-black text-orange-500 tabular-nums">$${item.sub.toLocaleString()}</p>
+                document.getElementById('dash-total-hoy').innerText = `$${totalHoy.toLocaleString()}`;
+                
+                const list = document.getElementById('shift-sales-list');
+                if(itemsVendidos.length > 0) {
+                    list.innerHTML = itemsVendidos.reverse().map(i => `
+                        <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-pavo-real text-white text-[9px] px-2 py-1 rounded font-black">${i.cant}</span>
+                                <p class="font-bold text-xs text-slate-600 uppercase truncate max-w-[150px]">${i.nombre}</p>
                             </div>
-                        `).join('');
-                    } else {
-                        shiftList.innerHTML = '<p class="text-slate-300 italic text-sm">Sin ventas registradas en el turno...</p>';
-                    }
+                            <p class="text-[10px] font-black text-orange-500 tabular-nums italic">$${i.sub.toLocaleString()}</p>
+                        </div>`).join('');
                 }
 
-                // Generar Ranking "Top 10" para acceso directo
-                const topGrid = document.getElementById('top-products-grid');
-                if(topGrid) {
-                    const sortedRanking = Object.entries(rankingCount)
-                        .sort(([,a],[,b]) => b - a)
-                        .slice(0, 10);
-
-                    topGrid.innerHTML = sortedRanking.map(([name]) => {
-                        const prod = productosData.find(p => p.nombre === name);
-                        if(!prod) return '';
-                        return `
-                            <button onclick="agregarCarrito('${prod.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all text-left group">
-                                <div class="w-8 h-8 bg-slate-50 rounded-xl mb-2 flex items-center justify-center text-slate-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                                    <i class="fas fa-bolt text-xs"></i>
-                                </div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Populares</p>
-                                <p class="font-bold text-[11px] text-pavo-real uppercase truncate">${name}</p>
-                            </button>
-                        `;
-                    }).join('') || '<p class="text-slate-200 italic text-xs col-span-full">El ranking aparecerá con las primeras ventas del día.</p>';
-                }
+                // Generar Ranking Top 10
+                const grid = document.getElementById('top-products-grid');
+                const sorted = Object.entries(ranking).sort(([,a],[,b]) => b - a).slice(0, 10);
+                grid.innerHTML = sorted.map(([name]) => {
+                    const p = productosData.find(x => x.nombre === name);
+                    if(!p) return '';
+                    return `<button onclick="agregarCarrito('${p.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all text-left group">
+                        <div class="w-8 h-8 bg-orange-50 rounded-xl mb-2 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="fas fa-bolt text-xs"></i></div>
+                        <p class="font-bold text-[10px] text-pavo-real uppercase truncate">${name}</p>
+                    </button>`;
+                }).join('') || '<p class="text-slate-200 text-xs col-span-full italic">Los favoritos aparecerán después de las primeras ventas.</p>';
             });
         }
 
         // --- FUNCIONES DE SOPORTE MANTENIDAS ---
-        function agregarCarrito(id) {
-            const p = productosData.find(item => item.id === id);
-            const ex = carrito.find(item => item.id === id);
-            if(ex) { if(ex.cant < p.stock) ex.cant++; } else carrito.push({ ...p, cant: 1 });
-            renderCarrito();
-        }
-
-        function renderCarrito() {
-            const b = document.getElementById('sidebar-cesta'), l = document.getElementById('cesta-items');
-            if(carrito.length === 0) { b.classList.add('hidden'); return; }
-            b.classList.remove('hidden');
-            let html = "", total = 0;
-            carrito.forEach((item, i) => {
-                total += item.precio * item.cant;
-                html += `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between border border-white/5 animate-in mb-2"><div class="min-w-0 flex-1 text-left"><p class="text-[9px] font-black text-white truncate uppercase mb-1 leading-none italic">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold">$${(item.precio * item.cant).toLocaleString()}</p></div><div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl"><button onclick="cambiarCant(${i},-1)" class="text-white font-bold w-5 border-0 bg-transparent cursor-pointer">-</button><span class="text-[10px] font-bold text-white">${item.cant}</span><button onclick="cambiarCant(${i},1)" class="text-white font-bold w-5 border-0 bg-transparent cursor-pointer">+</button></div></div>`;
-            });
-            l.innerHTML = html;
-            document.getElementById('cesta-total').innerText = `$${total.toLocaleString()}`;
-        }
-
-        function cambiarCant(i, d) {
-            const item = carrito[i]; item.cant += d;
-            if(item.cant <= 0) carrito.splice(i, 1);
-            else { const prod = productosData.find(p => p.id === item.id); if(item.cant > prod.stock) item.cant = prod.stock; }
-            renderCarrito();
-        }
-
-        async function finalizarVenta() {
-            if(carrito.length === 0) return;
-            try {
-                const total = carrito.reduce((s, i) => s + (i.precio * i.cant), 0);
-                const batch = db.batch();
-                const ventaRef = db.collection("ventas").doc();
-                batch.set(ventaRef, {
-                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    vendedor: vendedorActivo,
-                    sede: currentUserData.sede,
-                    total: total,
-                    items: carrito.map(i => ({nombre: i.nombre, cant: i.cant, sub: i.precio * i.cant}))
-                });
-                carrito.forEach(item => {
-                    const pRef = db.collection("productos").doc(item.id);
-                    batch.update(pRef, { stock: firebase.firestore.FieldValue.increment(-item.cant) });
-                    const tRef = db.collection("traslados").doc();
-                    batch.set(tRef, { producto: item.nombre, fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: currentUserData.sede, destino: "CLIENTE (VENTA)", usuario: vendedorActivo });
-                });
-                await batch.commit();
-                alert("✅ Venta registrada en el turno.");
-                carrito = []; renderCarrito(); navegar('inicio');
-            } catch (e) { alert("Error al cobrar."); }
-        }
-
+        function agregarCarrito(id) { const p = productosData.find(i => i.id === id); const ex = carrito.find(i => i.id === id); if(ex) { if(ex.cant < p.stock) ex.cant++; } else carrito.push({...p, cant: 1}); renderCarrito(); }
+        function renderCarrito() { const b = document.getElementById('sidebar-cesta'), l = document.getElementById('cesta-items'); if(carrito.length === 0) { b.classList.add('hidden'); return; } b.classList.remove('hidden'); let html = "", total = 0; carrito.forEach((item, i) => { total += item.precio * item.cant; html += `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between border border-white/5 animate-in mb-2"><div class="min-w-0 flex-1 text-left"><p class="text-[9px] font-black text-white truncate uppercase mb-1 leading-none italic">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold">$${(item.precio * item.cant).toLocaleString()}</p></div><div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl"><button onclick="cambiarCant(${i},-1)" class="text-white font-bold w-5 border-0 bg-transparent cursor-pointer">-</button><span class="text-[10px] font-bold text-white">${item.cant}</span><button onclick="cambiarCant(${i},1)" class="text-white font-bold w-5 border-0 bg-transparent cursor-pointer">+</button></div></div>`; }); l.innerHTML = html; document.getElementById('cesta-total').innerText = `$${total.toLocaleString()}`; }
+        function cambiarCant(i, d) { const item = carrito[i]; item.cant += d; if(item.cant <= 0) carrito.splice(i, 1); else { const p = productosData.find(x => x.id === item.id); if(item.cant > p.stock) item.cant = p.stock; } renderCarrito(); }
+        async function finalizarVenta() { if(carrito.length === 0) return; try { const total = carrito.reduce((s, i) => s + (i.precio * i.cant), 0); const batch = db.batch(); const ventaRef = db.collection("ventas").doc(); batch.set(ventaRef, { fecha: firebase.firestore.FieldValue.serverTimestamp(), vendedor: vendedorActivo, sede: currentUserData.sede, total: total, items: carrito.map(i => ({nombre: i.nombre, cant: i.cant, sub: i.precio * i.cant})) }); carrito.forEach(item => { const pRef = db.collection("productos").doc(item.id); batch.update(pRef, { stock: firebase.firestore.FieldValue.increment(-item.cant) }); }); await batch.commit(); alert("✅ Venta Completada"); carrito = []; renderCarrito(); navegar('inicio'); } catch (e) { alert("Error al cobrar."); } }
         function cerrarModal() { document.getElementById('main-modal').classList.add('hidden'); }
     </script>
 </body>

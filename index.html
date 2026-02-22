@@ -15,7 +15,6 @@
         .animate-in { animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        /* Color Petróleo Personalizado */
         .bg-petrol { background-color: #0f1d24; }
         .sidebar-scroll { max-height: calc(100vh - 350px); overflow-y: auto; }
     </style>
@@ -24,7 +23,7 @@
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-[#0f1d24]">
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in">
-            <h1 class="text-3xl font-black tracking-tight text-center text-slate-900 mb-8">CRAFTS POS</h1>
+            <h1 class="text-3xl font-black tracking-tight text-center text-slate-900 mb-8 uppercase">CRAFTS POS</h1>
             <div class="space-y-4">
                 <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-[#0f1d24]">
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-[#0f1d24]">
@@ -37,10 +36,10 @@
     <div id="main-app" class="hidden flex min-h-screen">
         <aside class="w-20 md:w-80 bg-petrol text-white flex flex-col z-20 shadow-2xl">
             <div class="p-8 flex items-center gap-3 border-b border-white/5">
-                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-sm"></i></div>
+                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-900/40"><i class="fas fa-gem text-white text-sm"></i></div>
                 <div class="hidden md:block">
                     <p class="font-black text-[10px] tracking-widest text-slate-500 uppercase leading-none">Crafts Colombia</p>
-                    <p class="font-bold text-white text-sm uppercase">Sede Central</p>
+                    <p id="sidebar-sede" class="font-bold text-white text-sm uppercase">Cargando...</p>
                 </div>
             </div>
 
@@ -49,7 +48,7 @@
             <div class="hidden md:flex flex-1 flex-col p-6 overflow-hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cesta de Venta</h2>
-                    <span id="items-count" class="bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-black">0</span>
+                    <span id="items-count" class="bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-black shadow-lg">0</span>
                 </div>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 pr-2 hide-scroll">
                     <p class="text-[10px] text-slate-500 italic text-center py-10">Agrega artesanías...</p>
@@ -57,9 +56,9 @@
                 <div id="cesta-footer" class="mt-auto pt-6 border-t border-white/5 hidden">
                     <div class="flex justify-between items-baseline mb-4">
                         <span class="text-[10px] font-bold text-slate-500 uppercase">Total</span>
-                        <span id="pos-total" class="font-black text-2xl text-orange-500">$0</span>
+                        <span id="pos-total" class="font-black text-2xl text-orange-500 tabular-nums">$0</span>
                     </div>
-                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg shadow-orange-900/40">
+                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/20">
                         Confirmar Cobro
                     </button>
                 </div>
@@ -81,7 +80,7 @@
                 <div id="header-time" class="text-xs font-black text-white tabular-nums tracking-widest uppercase">00:00:00</div>
                 <div class="flex items-center gap-2">
                     <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[9px] font-black text-slate-500 uppercase">Online</span>
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Online</span>
                 </div>
             </header>
             
@@ -122,10 +121,11 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const doc = await db.collection('usuarios').doc(user.email).get();
-                currentUserData = doc.data() || { rol: 'vendedor', sede: '...' };
+                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Sin sede' };
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('user-display').innerText = user.email;
+                document.getElementById('sidebar-sede').innerText = "Sede " + currentUserData.sede;
                 document.getElementById('user-role-badge').innerText = currentUserData.rol;
                 renderSidebar(currentUserData.rol);
                 navegar('ventas');
@@ -138,7 +138,7 @@
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
             let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-shopping-cart"></i><span>Nueva Venta</span></button>`;
-            if (rol === 'admin') {
+            if (rol === 'admin' || rol === 'control') {
                 menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span>Inventario</span></button>`;
             }
             nav.innerHTML = menu;
@@ -163,6 +163,8 @@
                         <div id="pos-grid" class="space-y-4"></div>
                     </div>`;
                 escucharProductos();
+            } else if (vista === 'productos') {
+                container.innerHTML = `<div class="p-20 text-center"><h2 class="text-slate-300 font-black text-2xl uppercase tracking-widest">Control de Stock</h2><p class="text-slate-400 italic mt-2">Pronto integraremos la gestión completa aquí.</p></div>`;
             }
         }
 
@@ -189,11 +191,11 @@
                             <h3 class="font-black text-slate-800 text-xl leading-none mb-3">${p.nombre}</h3>
                             <div class="flex items-center gap-4">
                                 <span class="text-[9px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase tracking-widest">Disp: ${p.stock}</span>
-                                <p class="text-[11px] text-slate-400 italic">Producto artesanal de alta calidad</p>
+                                <p class="text-[11px] text-slate-400 italic">Artesanía de alta calidad</p>
                             </div>
                         </div>
                         <div class="text-right px-8 border-l border-slate-50">
-                            <p class="font-black text-3xl text-slate-900 tracking-tighter">$${p.precio.toLocaleString()}</p>
+                            <p class="font-black text-3xl text-slate-900 tracking-tighter tabular-nums">$${p.precio.toLocaleString()}</p>
                         </div>
                         <button onclick="agregarAlCarrito('${p.id}')" class="bg-slate-900 text-white px-8 py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-orange-500 transition-all active:scale-95 shadow-xl shadow-slate-200">
                             Agregar
@@ -224,11 +226,11 @@
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center gap-3 animate-in">
                         <div class="flex-1 overflow-hidden">
                             <p class="text-[10px] font-black text-white truncate uppercase tracking-wider">${item.nombre}</p>
-                            <p class="text-[9px] text-slate-500">$${item.precio.toLocaleString()}</p>
+                            <p class="text-[9px] text-slate-500 italic">$${item.precio.toLocaleString()}</p>
                         </div>
-                        <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl">
+                        <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl shadow-inner">
                             <button onclick="cambiarCant(${idx},-1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">-</button>
-                            <span class="text-[10px] font-bold text-orange-500 min-w-[15px] text-center">${item.cantidad}</span>
+                            <span class="text-[10px] font-bold text-orange-500 min-w-[15px] text-center tabular-nums">${item.cantidad}</span>
                             <button onclick="cambiarCant(${idx},1)" class="w-7 h-7 rounded-lg bg-white/5 text-white border-0 cursor-pointer text-[10px]">+</button>
                         </div>
                     </div>`;
@@ -252,7 +254,7 @@
                 for(let item of carrito) {
                     await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
                 }
-                alert("Venta procesada con éxito");
+                alert("✅ Venta procesada con éxito");
                 carrito = []; renderCarrito(); document.getElementById('pos-search').value = ""; filtrarPos("");
             } catch (e) { alert("Error crítico de red"); }
         }

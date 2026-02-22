@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crafts POS | Enterprise Management</title>
     
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1041/1041916.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-petrol">
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10">
-            <h1 class="text-3xl font-black text-center text-slate-500 mb-8 uppercase tracking-tighter">CRAFTS POS</h1>
+            <h1 class="text-3xl font-black text-center text-slate-500 mb-8 tracking-tighter uppercase">CRAFTS POS</h1>
             <div class="space-y-4">
                 <input id="login-email" type="email" placeholder="Usuario" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
@@ -71,7 +71,7 @@
                 </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
-                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">ESTADO ACTIVO</span>
+                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">SISTEMA ONLINE</span>
                 </div>
             </header>
             
@@ -108,7 +108,7 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('inicio')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-chart-pie"></i><span class="hidden md:block">Inicio</span></button>`;
+            let menu = `<button onclick="navegar('inicio')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-chart-pie"></i><span class="hidden md:block">Inicio</span></button>`;
             if (rol === 'admin' || rol === 'control') {
                 menu += `
                 <button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Inventario</span></button>
@@ -133,35 +133,35 @@
                         </div>
 
                         <div class="space-y-12">
-                            <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2">
-                                <div class="min-w-[280px] border-r border-slate-100 pr-12">
+                            <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center border-orange-200 border-2">
+                                <div class="min-w-[300px] border-r border-slate-100 pr-12">
                                     <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic leading-none">Operación Real-Time</p>
                                     <h3 class="text-sm font-black text-pavo-real uppercase tracking-[0.2em] mb-3">Ventas de Hoy</h3>
                                     <h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3>
                                 </div>
-                                <div class="flex-1 grid grid-cols-3 lg:grid-cols-6 gap-x-10">
-                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">1</p><span id="val-hoy-1" class="font-black text-2xl text-slate-800 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">2</p><span id="val-hoy-2" class="font-black text-2xl text-slate-800 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">3</p><span id="val-hoy-3" class="font-black text-2xl text-slate-800 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">4</p><span id="val-hoy-4" class="font-black text-2xl text-slate-800 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">5</p><span id="val-hoy-5" class="font-black text-2xl text-slate-800 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2 opacity-30">6</p><span id="val-hoy-6" class="font-black text-2xl text-slate-800 tabular-nums tracking-tighter">$0</span></div>
+                                <div class="flex-1 flex justify-between px-10 items-center">
+                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">1</p><span id="val-hoy-1" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">2</p><span id="val-hoy-2" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">3</p><span id="val-hoy-3" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">4</p><span id="val-hoy-4" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2">5</p><span id="val-hoy-5" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-pavo-real mb-2 opacity-20">6</p><span id="val-hoy-6" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
                                 </div>
                             </div>
 
-                            <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12">
-                                <div class="min-w-[280px] border-r border-slate-100 pr-12">
+                            <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center">
+                                <div class="min-w-[300px] border-r border-slate-100 pr-12">
                                     <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 italic leading-none">Cierre Anterior</p>
                                     <h3 class="text-sm font-black text-pavo-real uppercase tracking-[0.2em] mb-3 italic">Ventas Ayer</h3>
                                     <h3 id="dash-total-ayer" class="text-5xl font-black text-pavo-real tabular-nums leading-none tracking-tighter">$0</h3>
                                 </div>
-                                <div class="flex-1 grid grid-cols-3 lg:grid-cols-6 gap-x-10 opacity-70">
-                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">1</p><span id="val-ayer-1" class="font-black text-2xl text-slate-600 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">2</p><span id="val-ayer-2" class="font-black text-2xl text-slate-600 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">3</p><span id="val-ayer-3" class="font-black text-2xl text-slate-600 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">4</p><span id="val-ayer-4" class="font-black text-2xl text-slate-600 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">5</p><span id="val-ayer-5" class="font-black text-2xl text-slate-600 tabular-nums tracking-tighter">$0</span></div>
-                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2 opacity-30">6</p><span id="val-ayer-6" class="font-black text-2xl text-slate-600 tabular-nums tracking-tighter">$0</span></div>
+                                <div class="flex-1 flex justify-between px-10 items-center opacity-70">
+                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">1</p><span id="val-ayer-1" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">2</p><span id="val-ayer-2" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">3</p><span id="val-ayer-3" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">4</p><span id="val-ayer-4" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2">5</p><span id="val-ayer-5" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
+                                    <div class="text-center"><p class="text-5xl font-black text-slate-400 mb-2 opacity-20">6</p><span id="val-ayer-6" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
                                 </div>
                             </div>
 
@@ -171,21 +171,21 @@
                                         <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 italic leading-none">Global Mes</p>
                                         <h3 id="dash-total-mes" class="text-5xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">$0</h3>
                                     </div>
-                                    <div class="flex-1"><span class="text-[11px] font-black text-pavo-real uppercase tracking-[0.2em] italic">Rendimiento Operativo</span><p class="text-sm font-medium text-slate-400 mt-2 leading-snug italic">Consolidado total de todas las sedes.</p></div>
+                                    <div class="flex-1"><span class="text-[11px] font-black text-pavo-real uppercase tracking-[0.2em] italic">Desempeño Mensual</span><p class="text-sm font-medium text-slate-400 mt-2 italic leading-snug">Consolidado total de todas las sedes del país.</p></div>
                                 </div>
                                 <div class="bg-blue-50 p-12 rounded-[4rem] stat-row flex items-center gap-10 border border-blue-100">
                                     <div class="min-w-[180px] border-r border-blue-200 pr-10">
-                                        <p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-2 italic leading-none">Métrica Año</p>
+                                        <p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-2 italic leading-none">Acumulado Año</p>
                                         <h3 id="dash-total-año" class="text-5xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">$0</h3>
                                     </div>
-                                    <div class="flex-1"><span class="text-[11px] font-black text-green-600 uppercase tracking-[0.2em] italic">+0.0% Tendencia</span><p class="text-sm font-medium text-slate-400 mt-2 leading-snug italic">Acumulado año fiscal 2026.</p></div>
+                                    <div class="flex-1"><span class="text-[11px] font-black text-green-600 uppercase tracking-[0.2em] italic">Proyección Fiscal</span><p class="text-sm font-medium text-slate-400 mt-2 italic leading-snug">Cifra acumulada año fiscal 2026.</p></div>
                                 </div>
                             </div>
                         </div>
                     </div>`;
                 cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="p-20 text-center"><h1 class="text-3xl font-black text-slate-300 uppercase tracking-widest italic">Sección Inventario</h1><p class="text-slate-400 mt-2 italic font-medium tracking-tight leading-snug">Gestiona existencias y ubicaciones en el panel especializado.</p></div>`;
+                container.innerHTML = `<div class="p-20 text-center"><h1 class="text-3xl font-black text-slate-300 uppercase tracking-widest italic">Inventario Central</h1><p class="text-slate-400 mt-2 italic font-medium">Control de stock y logística centralizada.</p></div>`;
             }
         }
 
@@ -198,7 +198,6 @@
 
             db.collection("ventas").onSnapshot(snap => {
                 let totalHoy = 0, totalAyer = 0, totalMes = 0, totalAño = 0;
-                // Mapeo: 1: Filandia 1, 2: Cable Plaza, 3: Jardín, 4: Filandia 2, 5: Fundadores, 6: Online
                 let mapSedes = { "Filandia 1": "1", "Cable Plaza": "2", "Jardín": "3", "Filandia 2": "4", "Fundadores": "5", "Online": "6" };
                 let valHoy = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
                 let valAyer = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };

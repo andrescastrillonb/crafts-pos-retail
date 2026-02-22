@@ -3,81 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crafts POS | Sistema Central</title>
+    <title>Crafts POS | Retail Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .animate-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .transition-layout { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .animate-in { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .transition-all-custom { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-white text-slate-900">
+<body>
 
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-slate-900">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md animate-in text-center">
-            <div class="w-20 h-20 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-orange-100">
-                <i class="fas fa-gem text-white text-3xl"></i>
-            </div>
-            <h1 class="text-3xl font-black tracking-tight mb-2 text-slate-900">Crafts POS</h1>
-            <p class="text-slate-400 mb-8 font-medium italic text-sm">Crafts Colombia S.A.S</p>
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-[#0f172a]">
+        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in text-center">
+            <h1 class="text-3xl font-extrabold tracking-tighter mb-8 text-slate-900">Crafts POS</h1>
             <div class="space-y-4 text-left">
-                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none">
-                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 outline-none">
-                <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg">Ingresar</button>
+                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none focus:ring-2 focus:ring-slate-900 transition-all">
+                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none focus:ring-2 focus:ring-slate-900 transition-all">
+                <button onclick="iniciarSesion()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all">Ingresar al sistema</button>
             </div>
-            <p id="login-error" class="text-red-500 text-xs mt-4 hidden font-bold"></p>
+            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-semibold"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex min-h-screen">
-        <aside class="w-20 md:w-64 bg-[#f0f7ff] border-r border-blue-100 flex flex-col z-20">
-            <div class="p-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-100"><i class="fas fa-gem text-white text-sm"></i></div>
-                <div class="hidden md:block">
-                    <p class="font-black text-[10px] tracking-widest text-blue-400 uppercase leading-none">Crafts</p>
-                    <p class="font-bold text-blue-900 text-sm italic">Colombia</p>
+        <aside class="w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col z-20">
+            <div class="p-8 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-xs"></i></div>
+                    <span class="hidden md:block font-extrabold text-slate-900 tracking-tighter">CRAFTS CO.</span>
                 </div>
             </div>
-            <nav id="nav-menu" class="mt-4 px-4 space-y-2 flex-1"></nav>
-            <div class="p-4 mb-4">
-                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 text-red-400 border-0 bg-transparent cursor-pointer font-bold transition-all">
-                    <i class="fas fa-power-off"></i><span class="hidden md:block">Cerrar Sesión</span>
+            <nav id="nav-menu" class="px-4 space-y-2 flex-1"></nav>
+            <div class="p-6">
+                <button onclick="cerrarSesion()" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 text-slate-400 border-0 bg-transparent cursor-pointer font-bold transition-all">
+                    <i class="fas fa-sign-out-alt"></i><span class="hidden md:block">Salir</span>
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
-            <header class="h-20 bg-slate-800 border-b border-slate-700 px-8 flex items-center justify-between z-10 text-white shadow-md">
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between z-10">
                 <div class="flex items-center gap-4">
-                    <span id="user-role-badge" class="text-[9px] bg-orange-500 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest">ROL</span>
-                    <span id="user-display" class="font-bold text-slate-300 text-xs truncate max-w-[150px]">Usuario</span>
+                    <span id="user-role-badge" class="text-[9px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest">Admin</span>
+                    <span id="user-display" class="font-medium text-slate-400 text-xs">usuario@crafts.com</span>
                 </div>
-                
-                <div class="hidden md:flex flex-col items-center">
-                    <span id="header-date" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">FECHA</span>
-                    <span id="header-time" class="text-sm font-black text-white tracking-tighter">00:00:00</span>
+                <div class="flex flex-col items-center">
+                    <span id="header-time" class="text-sm font-bold text-slate-900 tabular-nums">00:00:00</span>
                 </div>
-
-                <div class="flex items-center gap-3 bg-slate-700/50 px-4 py-2 rounded-xl border border-slate-600">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
-                    <span class="text-[10px] font-black text-slate-300 tracking-widest uppercase italic">Sistema Activo</span>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Online</span>
                 </div>
             </header>
             
-            <section id="view-container" class="flex-1 overflow-y-auto p-8"></section>
+            <section id="view-container" class="flex-1 overflow-y-auto p-12 bg-slate-50/50"></section>
         </main>
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
             authDomain: "crafts-colombia-pos.firebaseapp.com",
@@ -91,26 +81,20 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentUserData = null;
-        let carrito = [];
-        let productosData = [];
+        let currentUserData = null, carrito = [], productosData = [];
 
         function updateClock() {
             const now = new Date();
-            const options = { weekday: 'long', day: 'numeric', month: 'short' };
-            if(document.getElementById('header-date')) {
-                document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', options);
+            if(document.getElementById('header-time'))
                 document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            }
         }
         setInterval(updateClock, 1000);
 
         function iniciarSesion() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(e => {
-                document.getElementById('login-error').innerText = "Acceso Denegado";
+            const email = document.getElementById('login-email').value, pass = document.getElementById('login-pass').value;
+            auth.signInWithEmailAndPassword(email, pass).catch(() => {
                 document.getElementById('login-error').classList.remove('hidden');
+                document.getElementById('login-error').innerText = "Credenciales incorrectas";
             });
         }
 
@@ -126,7 +110,6 @@
                 document.getElementById('user-role-badge').innerText = currentUserData.rol;
                 renderSidebar(currentUserData.rol);
                 navegar('ventas');
-                updateClock();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
@@ -135,10 +118,9 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-blue-600 text-white border-0 text-left cursor-pointer shadow-lg shadow-blue-200 font-bold transition-all hover:scale-105 active:scale-95"><i class="fas fa-cash-register"></i><span class="hidden md:block">Vender</span></button><div class="h-8"></div>`;
+            let menu = `<button onclick="navegar('ventas')" class="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-900 text-white border-0 text-left cursor-pointer font-bold"><i class="fas fa-shopping-cart"></i><span class="hidden md:block">Ventas</span></button>`;
             if (rol === 'admin' || rol === 'control') {
-                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-50 text-blue-400 hover:text-blue-900 border-0 bg-transparent text-left cursor-pointer transition-all font-bold"><i class="fas fa-boxes w-5"></i><span class="hidden md:block">Inventario</span></button>
-                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-50 text-blue-400 hover:text-blue-900 border-0 bg-transparent text-left cursor-pointer transition-all font-bold"><i class="fas fa-chart-line w-5"></i><span class="hidden md:block">Reportes</span></button>`;
+                menu += `<button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer font-bold transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Inventario</span></button>`;
             }
             nav.innerHTML = menu;
         }
@@ -147,46 +129,37 @@
             const container = document.getElementById('view-container');
             if (vista === 'ventas') {
                 container.innerHTML = `
-                    <div id="pos-layout" class="animate-in max-w-7xl mx-auto flex flex-col items-center pt-40 transition-layout">
-                        <div id="banner-pos" class="text-center mb-12">
-                            <h1 class="text-6xl font-black tracking-tighter text-blue-600 mb-2 italic">Crafts Colombia</h1>
-                            <div class="inline-block text-orange-500 px-6 py-2 rounded-full text-[14px] font-black uppercase tracking-[0.5em]">Sede ${currentUserData.sede}</div>
+                    <div id="pos-layout" class="animate-in max-w-6xl mx-auto flex flex-col items-center pt-20 transition-all-custom">
+                        <div class="text-center mb-10">
+                            <h1 class="text-5xl font-extrabold tracking-tighter text-indigo-600 mb-2">Crafts Colombia</h1>
+                            <p class="text-orange-400 font-bold uppercase tracking-[0.3em] text-xs">Sede ${currentUserData.sede}</p>
                         </div>
 
-                        <div id="search-container" class="w-full max-w-2xl relative mb-16 transition-layout">
-                            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-blue-200">
-                                <i class="fas fa-search text-xl"></i>
-                            </div>
-                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="¿Qué pieza artesanal buscas?" 
-                                class="w-full pl-16 pr-6 py-7 bg-white rounded-full border-0 shadow-2xl shadow-blue-50 outline-none text-xl font-medium ring-1 ring-blue-50 focus:ring-4 focus:ring-blue-100 transition-all">
+                        <div id="search-container" class="w-full max-w-2xl relative mb-12 transition-all-custom">
+                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input id="pos-search" onkeyup="filtrarPos(this.value)" type="text" placeholder="Buscar producto..." 
+                                class="w-full pl-16 pr-6 py-6 bg-white rounded-full border-0 shadow-sm outline-none text-lg ring-1 ring-slate-100 focus:ring-2 focus:ring-slate-900 transition-all">
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full px-4">
-                            <div id="pos-grid" class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-layout"></div>
+                        <div id="top-sellers" class="w-full mb-12">
+                            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Más vendidos en ${currentUserData.sede}</h2>
+                            <div id="top-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 overflow-x-auto hide-scroll"></div>
+                        </div>
 
-                            <div id="cesta-pos" class="hidden lg:col-span-5 bg-white p-10 rounded-[3.5rem] shadow-2xl border border-blue-50 flex flex-col h-[70vh] sticky top-8 animate-in">
-                                <div class="flex justify-between items-center mb-8">
-                                    <h2 class="text-xl font-black text-blue-900 uppercase tracking-widest italic">Mi Cesta</h2>
-                                    <span id="items-count" class="bg-orange-500 text-white text-[10px] px-3 py-1 rounded-full font-black">0 ITEMS</span>
-                                </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 w-full">
+                            <div id="pos-grid" class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+                            <div id="cesta-pos" class="hidden lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-col h-[65vh] sticky top-8 animate-in">
+                                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Resumen de Venta</h2>
                                 <div id="cesta-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
-                                <div class="border-t mt-8 pt-8 space-y-6">
-                                    <div class="flex justify-between items-center text-4xl font-black text-blue-900"><span>Total</span><span id="pos-total" class="text-blue-600">$0</span></div>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <select id="metodo-pago" class="col-span-2 p-5 bg-slate-50 rounded-2xl border-0 font-bold text-sm text-slate-500 outline-none ring-1 ring-slate-100">
-                                            <option value="Efectivo">💵 Efectivo</option>
-                                            <option value="Nequi">📱 Nequi / Transf.</option>
-                                            <option value="Tarjeta">💳 Tarjeta</option>
-                                        </select>
-                                        <button onclick="finalizarVenta()" class="col-span-2 bg-blue-600 text-white py-6 rounded-3xl font-black hover:bg-orange-500 shadow-xl transition-all uppercase tracking-widest text-xs">Finalizar Cobro</button>
-                                    </div>
+                                <div class="border-t mt-6 pt-6 space-y-4">
+                                    <div class="flex justify-between items-baseline text-slate-900"><span class="font-medium text-sm">TOTAL</span><span id="pos-total" class="font-extrabold text-3xl tabular-nums">$0</span></div>
+                                    <button onclick="finalizarVenta()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all uppercase text-xs tracking-widest">Confirmar Venta</button>
                                 </div>
                             </div>
                         </div>
                     </div>`;
                 escucharProductos();
-            } else {
-                container.innerHTML = `<div class="flex items-center justify-center h-full text-blue-100 font-black text-4xl uppercase tracking-tighter italic">Módulo Reservado</div>`;
             }
         }
 
@@ -194,31 +167,46 @@
             db.collection("productos").onSnapshot(snap => {
                 productosData = [];
                 snap.forEach(doc => productosData.push({ id: doc.id, ...doc.data() }));
+                renderTopSellers();
             });
+        }
+
+        function renderTopSellers() {
+            const grid = document.getElementById('top-grid');
+            if(!grid) return;
+            // Simulamos los 10 más vendidos tomando los primeros 10 por ahora
+            let html = "";
+            productosData.slice(0, 10).forEach(p => {
+                html += `
+                    <div onclick="agregarAlCarrito('${p.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 hover:border-indigo-600 transition-all cursor-pointer group text-center shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-indigo-600 group-hover:text-white transition-all"><i class="fas fa-star text-[10px]"></i></div>
+                        <h4 class="text-[10px] font-bold text-slate-600 truncate uppercase">${p.nombre}</h4>
+                    </div>`;
+            });
+            grid.innerHTML = html;
         }
 
         function filtrarPos(query) {
             const grid = document.getElementById('pos-grid');
+            const topModule = document.getElementById('top-sellers');
             const q = query.toLowerCase();
-            if(!q) { grid.innerHTML = ""; return; }
+            
+            if(!q) { grid.innerHTML = ""; topModule.classList.remove('hidden'); return; }
+            topModule.classList.add('hidden');
             
             let html = "";
             productosData.filter(p => p.nombre.toLowerCase().includes(q)).forEach(p => {
                 html += `
-                    <div class="bg-white p-8 rounded-[3rem] border border-blue-50 hover:shadow-2xl transition-all group animate-in relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-6">
-                            <span class="text-[10px] font-black px-3 py-1 rounded-full ${p.stock <= 3 ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}">Disp: ${p.stock}</span>
-                        </div>
-                        <h3 class="font-black text-blue-900 leading-tight mb-6 text-xl pr-16 italic">${p.nombre}</h3>
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 hover:shadow-lg transition-all animate-in group relative overflow-hidden">
+                        <span class="absolute top-6 right-6 text-[9px] font-bold text-slate-300 uppercase">Stock: ${p.stock}</span>
+                        <h3 class="font-bold text-slate-800 text-lg mb-6 leading-tight">${p.nombre}</h3>
                         <div class="flex justify-between items-center">
-                            <span class="text-blue-600 font-black text-3xl">$${p.precio.toLocaleString()}</span>
-                            <button onclick="agregarAlCarrito('${p.id}')" class="bg-orange-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-blue-600 shadow-lg shadow-orange-100 transition-all active:scale-90">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                            <span class="text-slate-900 font-extrabold text-2xl">$${p.precio.toLocaleString()}</span>
+                            <button onclick="agregarAlCarrito('${p.id}')" class="bg-orange-400 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-orange-500 shadow-lg shadow-orange-100 transition-all active:scale-90"><i class="fas fa-plus"></i></button>
                         </div>
                     </div>`;
             });
-            grid.innerHTML = html || `<p class="col-span-full text-center text-slate-300 py-10 font-bold italic">No se encontraron piezas</p>`;
+            grid.innerHTML = html || `<p class="col-span-full text-center text-slate-300 py-20 font-medium italic">Sin resultados para "${query}"</p>`;
         }
 
         function agregarAlCarrito(id) {
@@ -231,36 +219,28 @@
         }
 
         function renderCarrito() {
-            const grid = document.getElementById('pos-grid');
-            const cesta = document.getElementById('cesta-pos');
-            const lista = document.getElementById('cesta-items');
-            
+            const grid = document.getElementById('pos-grid'), cesta = document.getElementById('cesta-pos'), lista = document.getElementById('cesta-items');
             if(carrito.length > 0) {
-                grid.classList.remove('lg:col-span-12');
-                grid.classList.add('lg:col-span-7');
+                grid.classList.replace('lg:col-span-12', 'lg:col-span-8');
                 cesta.classList.remove('hidden');
-                document.getElementById('search-container').classList.add('max-w-full');
             } else {
-                grid.classList.add('lg:col-span-12');
-                grid.classList.remove('lg:col-span-7');
+                grid.classList.replace('lg:col-span-8', 'lg:col-span-12');
                 cesta.classList.add('hidden');
             }
-
             let html = "", total = 0;
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
                 html += `
-                    <div class="flex items-center gap-4 bg-blue-50/50 p-5 rounded-[2rem] animate-in border border-blue-50">
-                        <div class="flex-1 font-black text-blue-900 text-sm">${item.nombre}</div>
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div class="flex-1 font-bold text-slate-700 text-xs uppercase">${item.nombre}</div>
                         <div class="flex items-center gap-3">
-                            <button onclick="cambiarCant(${idx},-1)" class="w-10 h-10 rounded-xl bg-white text-blue-600 shadow-sm font-black border-0 cursor-pointer">-</button>
-                            <span class="text-md font-black text-orange-500 w-4 text-center">${item.cantidad}</span>
-                            <button onclick="cambiarCant(${idx},1)" class="w-10 h-10 rounded-xl bg-white text-blue-600 shadow-sm font-black border-0 cursor-pointer">+</button>
+                            <button onclick="cambiarCant(${idx},-1)" class="w-8 h-8 rounded-xl bg-white text-slate-400 shadow-sm border-0 cursor-pointer hover:text-red-500 transition-colors">-</button>
+                            <span class="text-xs font-bold text-slate-900">${item.cantidad}</span>
+                            <button onclick="cambiarCant(${idx},1)" class="w-8 h-8 rounded-xl bg-white text-slate-400 shadow-sm border-0 cursor-pointer hover:text-indigo-600 transition-colors">+</button>
                         </div>
                     </div>`;
             });
             lista.innerHTML = html;
-            document.getElementById('items-count').innerText = `${carrito.length} ITEMS`;
             document.getElementById('pos-total').innerText = `$${total.toLocaleString()}`;
         }
 
@@ -274,26 +254,14 @@
 
         async function finalizarVenta() {
             if(carrito.length === 0) return;
-            const metodo = document.getElementById('metodo-pago').value;
-            const total = carrito.reduce((sum, i) => sum + (i.precio * i.cantidad), 0);
-            
             try {
-                await db.collection("ventas").add({
-                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    vendedor: auth.currentUser.email,
-                    sede: currentUserData.sede,
-                    metodo_pago: metodo,
-                    total: total,
-                    items: carrito.map(i => ({nombre: i.nombre, cant: i.cantidad}))
-                });
-
                 for(let item of carrito) {
                     await db.collection("productos").doc(item.id).update({ stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
                 }
-
-                alert("✅ Venta Completada");
-                carrito = []; renderCarrito(); document.getElementById('pos-search').value = ""; filtrarPos("");
-            } catch (error) { alert("Error de conexión"); }
+                alert("Venta completada");
+                carrito = []; renderCarrito();
+                document.getElementById('pos-search').value = ""; filtrarPos("");
+            } catch (e) { alert("Error al procesar"); }
         }
     </script>
 </body>

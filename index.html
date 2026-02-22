@@ -34,7 +34,7 @@
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10 text-center leading-none">
             <h1 class="text-3xl font-black text-slate-500 mb-8 uppercase tracking-tighter italic">CRAFTS POS</h1>
             <div class="space-y-4 text-left">
-                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium uppercase" />
+                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium uppercase text-left" />
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium" />
                 <input id="login-vendedor" type="text" placeholder="Operario en Turno" class="w-full p-4 bg-orange-50 rounded-2xl border-0 ring-1 ring-orange-200 focus:ring-2 focus:ring-orange-400 font-bold uppercase text-pavo-real" />
 
@@ -99,7 +99,7 @@
     </div>
 
     <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6 leading-none">
-        <div class="bg-white w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
+        <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
             <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic text-left">
                 <h2 id="modal-title" class="font-black text-2xl tracking-tighter uppercase leading-none italic">Gestión</h2>
                 <button onclick="cerrarModal()" id="btn-close-modal" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
@@ -121,7 +121,12 @@
         const safeUpper = v => safeStr(v).toUpperCase();
         const safeNum = v => Number(v || 0);
         const money = v => `$${safeNum(v).toLocaleString('es-CO')}`;
-        const normalizeSede = v => safeStr(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+
+        // ✅ NORMALIZACIÓN ULTRA-ROBUSTA (Finlandia -> Filandia)
+        const normalizeSede = v => {
+            let s = safeStr(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+            return s.replace('finlandia', 'filandia'); // Puente de seguridad
+        };
 
         function updateClock() { const now = new Date(); if (document.getElementById('header-time')) document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); if (document.getElementById('header-date')) document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }); }
         setInterval(updateClock, 1000);
@@ -143,7 +148,6 @@
                 const chosenSede = localStorage.getItem('active_sede_choice');
                 vendedorActivo = (localStorage.getItem('vendedor_nombre') || "").toUpperCase();
                 
-                // REGLA DE ACCESO MAESTRA
                 const isAdmin = (currentUserData.rol === 'admin' || currentUserData.rol === 'control');
                 const userSedes = Array.isArray(currentUserData.sede) ? currentUserData.sede : [currentUserData.sede];
                 const hasAccess = isAdmin || userSedes.some(s => normalizeSede(s) === normalizeSede(chosenSede));
@@ -182,7 +186,8 @@
                 menu += `<button onclick="navegar('historial')" data-vista="historial" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-history"></i><span class="hidden md:block">Historial</span></button>`;
             }
             nav.innerHTML = menu;
-            const cesta = document.getElementById('sidebar-cesta'); if(cesta) { if(isAdm) cesta.classList.add('hidden'); else cesta.classList.remove('hidden'); }
+            // ✅ CORRECCIÓN QUIRÚRGICA: Cesta visible para todos (Nicole y Andrés)
+            const cesta = document.getElementById('sidebar-cesta'); if(cesta) cesta.classList.remove('hidden');
         }
 
         function navegar(vista) {
@@ -196,17 +201,46 @@
                 if(isAdmin) {
                     const rowGen = (t,l,id,acc=false) => `<div class="${acc?'bg-blue-50':'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in leading-none"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left leading-none"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40 leading-none">${l}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3 leading-none">${t}</h3><h3 id="dash-total-${id}" class="text-5xl font-black ${id==='hoy'?'text-orange-500':'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center leading-none">${[1,2,3,4,5,6].map(i=>`<div class="flex flex-col items-center justify-center leading-none"><p class="text-4xl font-black ${acc?'text-blue-200':'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
                     document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Ventas de Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic leading-none">Cifras Globales</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
-                    cargarEstadisticasDashboard();
                 } else {
                     document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Mis Ventas Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div></div>`;
-                    cargarEstadisticasDashboard();
                 }
+                cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
                 container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre o Referencia</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede Destino</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS LAS SEDES</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer shadow-lg leading-none"><i class="fas fa-search-plus"></i> Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
             }
         }
 
-        // --- BÚSQUEDA NORMALIZADA ---
+        // --- CESTA (QUIRÚRGICAMENTE RECONECTADO) ---
+        function agregarCarrito(id) {
+            const p = productosData.find(x => x.id === id);
+            if(!p || safeNum(p.stock) <= 0) return alert("Sin stock.");
+            
+            const existing = carrito.find(i => i.id === id);
+            if(existing) {
+                if(existing.cantidad + 1 > safeNum(p.stock)) return alert("Límite stock.");
+                existing.cantidad++;
+                existing.subtotal = existing.cantidad * existing.precio;
+            } else {
+                carrito.push({id: p.id, nombre: p.nombre, precio: safeNum(p.precio), cantidad: 1, subtotal: safeNum(p.precio)});
+            }
+            renderCarrito();
+        }
+
+        function renderCarrito() {
+            const b = document.getElementById('sidebar-cesta'), l = document.getElementById('cesta-items'); if(!l) return;
+            if (carrito.length === 0) { b.classList.add('hidden'); return; }
+            b.classList.remove('hidden');
+            let total = 0;
+            l.innerHTML = carrito.map((item, i) => {
+                total += item.subtotal;
+                return `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between mb-2 animate-in leading-none"><div class="min-w-0 flex-1 text-left leading-none"><p class="text-[9px] font-black text-white truncate uppercase mb-1 italic leading-none">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold leading-none">${money(item.subtotal)}</p></div><button onclick="quitarDelCarrito(${i})" class="text-slate-500 hover:text-red-500 text-xs bg-transparent border-0 cursor-pointer">x</button></div>`;
+            }).join('');
+            document.getElementById('cesta-total').innerText = money(total);
+        }
+
+        function quitarDelCarrito(i) { carrito.splice(i, 1); renderCarrito(); }
+
+        // --- SOPORTE COMÚN ---
         function filtrarVenta(q) {
             const query = safeStr(q).toLowerCase().trim(); const list = document.getElementById('search-results-list'); if(!list) return;
             const filtered = productosData.filter(p => {
@@ -215,21 +249,6 @@
                     return matchSearch && normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(activeSede);
                 }
                 return matchSearch;
-            });
-            renderResultados(filtered, list);
-        }
-
-        function ejecutarBusquedaAvanzada() {
-            const n = safeStr(document.getElementById('adv-name')?.value).toLowerCase().trim();
-            const s = normalizeSede(document.getElementById('adv-sede')?.value || "TODAS");
-            const c = safeStr(document.getElementById('adv-cat')?.value || "TODAS");
-            const list = document.getElementById('inventory-list'); if(!list) return;
-            const filtered = productosData.filter(p => {
-                const matchName = !n || safeStr(p.nombre).toLowerCase().includes(n);
-                const psede = normalizeSede(p.sede_ubicacion || p.sede);
-                const matchSede = s === "todas" || psede === s;
-                const matchCat = c === "TODAS" || safeStr(p.categoria) === c;
-                return matchName && matchSede && matchCat;
             });
             renderResultados(filtered, list);
         }
@@ -243,7 +262,7 @@
                         <h3 onclick="verDetalleFicha('${p.id}')" class="font-black text-slate-600 text-lg uppercase truncate cursor-pointer hover:text-pavo-real transition-all leading-none">${safeUpper(p.nombre)}</h3>
                     </div>
                     <div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none">
-                        <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(p.sede_ubicacion || p.sede)}</span>
+                        <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
                         <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
                     </div>
                     <div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none">
@@ -255,66 +274,9 @@
                 </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
         }
 
-        // --- TRASLADOS ---
-        function verTraslado(id) {
-            const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
-            const p = productosData.find(item => item.id === id); if(!p) return;
-            document.getElementById('modal-title').innerText = "Operación de Traslado Técnico";
-            c.innerHTML = `<div class="space-y-8 animate-in text-left leading-none"><div class="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 flex justify-between items-center leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Producto</p><h4 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(p.nombre)}</h4></div><div class="text-right leading-none"><p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">Origen</p><h4 class="text-xl font-bold text-pavo-real uppercase italic leading-none">${safeUpper(p.sede_ubicacion || p.sede)}</h4></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-10 leading-none"><div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 text-center leading-none"><p class="text-xs font-black text-slate-400 uppercase mb-4 leading-none">Stock Disponible</p><h3 class="text-8xl font-black text-slate-800 tabular-nums leading-none">${safeNum(p.stock)}</h3><div class="mt-8 leading-none"><label class="text-[10px] font-black text-pavo-real uppercase block mb-2 italic leading-none">Unidades a Mover</label><input id="trans-qty" type="number" min="1" max="${p.stock}" value="1" class="w-full p-6 bg-slate-50 rounded-3xl border-0 ring-1 ring-slate-100 font-black text-4xl text-center text-orange-500 leading-none"></div></div><div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 flex flex-col justify-center leading-none"><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-4 italic tracking-widest leading-none">Punto Destino</label><select id="trans-dest" class="w-full p-6 bg-slate-900 text-white rounded-3xl border-0 font-black text-xl uppercase shadow-lg leading-none">${SEDES.filter(s => normalizeSede(s) !== normalizeSede(p.sede_ubicacion || p.sede)).map(s => `<option value="${s}">${safeUpper(s)}</option>`).join('')}</select><div class="mt-12 leading-none"><button onclick="ejecutarTraslado('${p.id}')" class="w-full bg-orange-500 text-white py-6 rounded-3xl font-black uppercase text-sm tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer leading-none">Autorizar</button></div></div></div></div>`;
-            m.classList.remove('hidden');
-        }
-
-        async function ejecutarTraslado(sourceId) {
-            const qty = parseInt(document.getElementById('trans-qty').value);
-            const destSede = document.getElementById('trans-dest').value;
-            const sourceDoc = productosData.find(p => p.id === sourceId);
-            if (qty > sourceDoc.stock || qty < 1) return alert("❌ Cantidad no válida.");
-            try {
-                const batch = db.batch();
-                batch.update(db.collection("productos").doc(sourceId), { stock: firebase.firestore.FieldValue.increment(-qty) });
-                const destQuery = await db.collection("productos").where("nombre", "==", safeStr(sourceDoc.nombre)).where("categoria", "==", safeStr(sourceDoc.categoria)).where("sede_ubicacion", "==", destSede).get();
-                if (!destQuery.empty) batch.update(db.collection("productos").doc(destQuery.docs[0].id), { stock: firebase.firestore.FieldValue.increment(qty) });
-                else {
-                    const newRef = db.collection("productos").doc();
-                    const clone = {...sourceDoc}; delete clone.id; clone.stock = qty; clone.sede_ubicacion = destSede;
-                    batch.set(newRef, clone);
-                }
-                batch.set(db.collection("traslados").doc(), { producto: safeUpper(sourceDoc.nombre), fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: safeStr(sourceDoc.sede_ubicacion || sourceDoc.sede || "bodega"), destino: destSede, usuario: vendedorActivo, cantidad: qty });
-                await batch.commit(); cerrarModal(); alert("✅ Traslado completado.");
-            } catch (e) { alert("Error"); }
-        }
-
-        // --- ESTADÍSTICAS DASHBOARD ---
-        async function cargarEstadisticasDashboard() {
-            if (typeof unsubVentasStats === 'function') unsubVentasStats();
-            const h = new Date(); h.setHours(0,0,0,0); const aI = new Date(h); aI.setDate(h.getDate()-1); const aF = new Date(h); aF.setMilliseconds(-1); const mI = new Date(h.getFullYear(), h.getMonth(), 1); const yI = new Date(h.getFullYear(), 0, 1);
-            unsubVentasStats = db.collection("ventas").onSnapshot(snap => {
-                let totals = { hoy: 0, ayer: 0, mes: 0, año: 0 };
-                let mapSedes = { "filandia1": "1", "filandia2": "2", "cableplaza": "3", "fundadores": "4", "jardin": "5", "online": "6" };
-                let bVals = { hoy: {}, ayer: {}, mes: {}, año: {} }; [1,2,3,4,5,6].forEach(i => { bVals.hoy[i]=0; bVals.ayer[i]=0; bVals.mes[i]=0; bVals.año[i]=0; });
-                snap.forEach(doc => {
-                    const v = doc.data(); const f = v.fecha?.toDate() || new Date(); const t = safeNum(v.total); const sV = normalizeSede(v.sede);
-                    if(currentUserData.rol !== 'admin' && sV !== normalizeSede(activeSede)) return;
-                    const n = mapSedes[sV] || null;
-                    if(f >= h) { totals.hoy += t; if(n) bVals.hoy[n] += t; }
-                    if(f >= aI && f <= aF) { totals.ayer += t; if(n) bVals.ayer[n] += t; }
-                    if(f >= mI) { totals.mes += t; if(n) bVals.mes[n] += t; }
-                    if(f >= yI) { totals.año += t; if(n) bVals.año[n] += t; }
-                });
-                ['hoy','ayer','mes','año'].forEach(k => { const el = document.getElementById(`dash-total-${k}`); if(el) el.innerText = money(totals[k]); });
-                if(currentUserData.rol === 'admin') { [1,2,3,4,5,6].forEach(i => { ['hoy','ayer','mes','año'].forEach(p => { const bEl = document.getElementById(`val-${p}-${i}`); if(bEl) bEl.innerText = money(bVals[p][i]); }); }); }
-            });
-        }
-
-        // --- SOPORTE ---
+        async function cargarEstadisticasDashboard() { if (typeof unsubVentasStats === 'function') unsubVentasStats(); const h = new Date(); h.setHours(0,0,0,0); const aI = new Date(h); aI.setDate(h.getDate()-1); const aF = new Date(h); aF.setMilliseconds(-1); const mI = new Date(h.getFullYear(), h.getMonth(), 1); const yI = new Date(h.getFullYear(), 0, 1); unsubVentasStats = db.collection("ventas").onSnapshot(snap => { let totals = { hoy: 0, ayer: 0, mes: 0, año: 0 }; let mapSedes = { "filandia1": "1", "filandia2": "2", "cableplaza": "3", "fundadores": "4", "jardin": "5", "online": "6" }; let bVals = { hoy: {}, ayer: {}, mes: {}, año: {} }; [1,2,3,4,5,6].forEach(i => { bVals.hoy[i]=0; bVals.ayer[i]=0; bVals.mes[i]=0; bVals.año[i]=0; }); snap.forEach(doc => { const v = doc.data(); const f = v.fecha?.toDate() || new Date(); const t = safeNum(v.total); const sV = normalizeSede(v.sede); if(currentUserData.rol !== 'admin' && sV !== normalizeSede(activeSede)) return; const n = mapSedes[sV] || null; if(f >= h) { totals.hoy += t; if(n) bVals.hoy[n] += t; } if(f >= aI && f <= aF) { totals.ayer += t; if(n) bVals.ayer[n] += t; } if(f >= mI) { totals.mes += t; if(n) bVals.mes[n] += t; } if(f >= yI) { totals.año += t; if(n) bVals.año[n] += t; } }); ['hoy','ayer','mes','año'].forEach(k => { const el = document.getElementById(`dash-total-${k}`); if(el) el.innerText = money(totals[k]); }); if(currentUserData.rol === 'admin') { [1,2,3,4,5,6].forEach(i => { ['hoy','ayer','mes','año'].forEach(p => { const bEl = document.getElementById(`val-${p}-${i}`); if(bEl) bEl.innerText = money(bVals[p][i]); }); }); } }); }
         function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
         function cerrarModal() { document.getElementById('main-modal')?.classList.add('hidden'); }
-        function verDetalleFicha(id) { /* Ficha técnica mantenida */ const m = document.getElementById('main-modal'), c = document.getElementById('modal-content'); const p = productosData.find(item => item.id === id); document.getElementById('modal-title').innerText = "Ficha del Producto"; const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control'; const escName = safeStr(p.nombre).replace(/'/g, "\\'").replace(/"/g, '\\"'); c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left animate-in min-h-[400px] relative leading-none"><div class="space-y-8 leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 italic leading-none">Registro Maestro</p><h2 class="text-5xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(p.nombre)}</h2></div><div class="grid grid-cols-2 gap-6 leading-none"><div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm leading-none"><p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Familia</p><p class="font-bold text-pavo-real text-lg uppercase leading-none">${safeUpper(p.categoria)}</p></div><div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm leading-none"><p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Operario</p><p class="font-bold text-slate-700 text-lg uppercase italic leading-none">${safeUpper(vendedorActivo)}</p></div></div><div class="p-8 bg-petrol rounded-[3rem] text-white shadow-2xl leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Precio de Venta</p><p class="text-5xl font-black tabular-nums tracking-tighter leading-none">${money(p.precio)}</p></div></div><button onclick="verHojaVida('${escName}')" class="text-[11px] font-black text-pavo-real uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer flex items-center gap-3"><i class="fas fa-history"></i> Hoja de Vida</button></div><div class="space-y-8 flex flex-col justify-center leading-none"><div class="text-center p-12 bg-white rounded-[4rem] border-4 border-slate-50 shadow-2xl relative overflow-hidden leading-none"><div class="absolute top-0 right-0 w-24 h-24 bg-orange-500 opacity-5 -mr-10 -mt-10 rounded-full shadow-inner leading-none"></div><p class="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-4 italic text-center leading-none">Stock Disponible</p><h3 class="text-9xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">${safeNum(p.stock)}</h3><p class="text-base font-bold text-slate-400 uppercase mt-4 leading-none">unidades físicas</p></div><div class="bg-orange-50 p-4 rounded-2xl text-center shadow-inner font-black uppercase text-[10px] text-orange-500 italic leading-none">Ubicación: ${safeUpper(p.sede_ubicacion || p.sede)}</div></div>${isAdmin ? `<div class="absolute bottom-4 right-4 flex gap-4 leading-none"><button onclick="verTraslado('${id}')" class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl hover:bg-orange-500 hover:text-white transition-all shadow-2xl border-0 cursor-pointer leading-none"><i class="fas fa-exchange-alt"></i></button><button onclick="verFicha('${id}')" class="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center text-2xl hover:bg-pavo-real transition-all shadow-2xl border-0 cursor-pointer leading-none"><i class="fas fa-pen"></i></button></div>` : ''}</div>`; m.classList.remove('hidden'); }
-        function verHojaVida(prodName) { /* Hoja vida mantenida */ const c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Historial: " + prodName; c.innerHTML = `<div id="loading-hv" class="p-10 text-center animate-in"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl mb-4"></i><p class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Cargando...</p></div>`; const timeout = setTimeout(() => { if(document.getElementById('loading-hv')) c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black leading-none">Sin registros.</div>`; }, 4000); db.collection("traslados").where("producto", "==", safeUpper(prodName)).get().then(snap => { clearTimeout(timeout); if (snap.empty) { c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black leading-none">Sin traslados previos.</div>`; return; } let docs = []; snap.forEach(doc => docs.push(doc.data())); docs.sort((a,b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0)); let html = `<div class="space-y-6 animate-in p-4 text-left leading-none">`; docs.forEach(t => { const dt = t.fecha?.toDate() || new Date(); const fStr = dt.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const hStr = dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); html += `<div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group leading-none"><div class="absolute top-0 left-0 w-2 h-full bg-orange-500 opacity-20"></div><div class="flex justify-between items-start mb-6 leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic leading-none">${fStr}</p><p class="text-xs font-bold text-pavo-real uppercase tracking-widest leading-none">${hStr}</p></div><div class="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 text-right leading-none"><p class="text-[9px] font-black text-slate-400 uppercase mb-1 leading-none italic">Autor:</p><p class="text-[10px] font-black text-pavo-real uppercase leading-none">${safeUpper(t.usuario)}</p></div></div><div class="flex items-center gap-6 leading-none"><div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 text-xl shadow-inner leading-none"><i class="fas fa-exchange-alt"></i></div><h4 class="font-black text-2xl text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(t.origen)} <i class="fas fa-arrow-right mx-3 text-pavo-real text-sm"></i> ${safeUpper(t.destino)}</h4><div class="ml-auto bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-xs leading-none">${safeNum(t.cantidad)} U.</div></div></div>`; }); c.innerHTML = html + `</div>`; }); }
-        function verFicha(id) { /* Re-conectada Maestra */ const m = document.getElementById('main-modal'), c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = id ? "Edición Maestra" : "Nuevo Producto"; const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: 0, stock: 0, categoria: 'Mochilas', proveedor: '', precio_compra: 0, stock_ideal: 0, sede_ubicacion: 'bodega' }; c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left animate-in leading-none"><div class="space-y-6 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block ml-2 leading-none">Nombre</label><input id="edit-nombre" type="text" value="${safeStr(p.nombre)}" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase text-lg shadow-sm leading-none"></div><div class="grid grid-cols-2 gap-4 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block ml-2 leading-none">Categoría</label><select id="edit-categoria" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none">${listaCategorias.map(cat => `<option value="${cat}" ${p.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-orange-500 uppercase mb-2 block ml-2 italic leading-none">Asignar Sede</label><select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm leading-none">${SEDES.map(s => `<option value="${s}" ${normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(s) ? 'selected' : ''}>${s.toUpperCase()}</option>`).join('')}</select></div></div></div><div class="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-6 leading-none"><div class="grid grid-cols-2 gap-6 leading-none"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Venta</label><input id="edit-precio" type="number" value="${safeNum(p.precio)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl leading-none"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Costo</label><input id="edit-compra" type="number" value="${safeNum(p.precio_compra)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl leading-none"></div></div><div class="grid grid-cols-2 gap-6 leading-none"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Stock</label><input id="edit-stock" type="number" value="${safeNum(p.stock)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl leading-none"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Ideal</label><input id="edit-ideal" type="number" value="${safeNum(p.stock_ideal)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl leading-none"></div></div><button onclick="guardarCambios('${id}')" class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 transition-all border-0 cursor-pointer shadow-lg leading-none">Actualizar Registro</button></div></div>`; m.classList.remove('hidden'); }
-        function agregarCarrito(id) { const p = productosData.find(x => x.id === id); if(!p || safeNum(p.stock) <= 0) return alert("Sin stock."); const ex = carrito.find(i => i.id === id); if(ex) { if(ex.cantidad + 1 > safeNum(p.stock)) return alert("Límite stock."); ex.cantidad++; ex.subtotal = ex.cantidad * ex.precio; } else { carrito.push({id: p.id, nombre: p.nombre, precio: safeNum(p.precio), cantidad: 1, subtotal: safeNum(p.precio)}); } renderCarrito(); }
-        // Inicial
-        updateClock(); renderCarrito();
     </script>
 </body>
 </html>

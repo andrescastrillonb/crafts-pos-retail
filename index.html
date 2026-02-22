@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crafts Colombia POS | Enterprise</title>
+    <title>Crafts POS | Panel Central</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
     <style>
         body { font-family: 'Inter', sans-serif; }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
@@ -18,24 +16,18 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-
     <div class="flex min-h-screen">
         <aside class="w-20 md:w-64 bg-slate-900 text-white transition-all duration-300">
             <div class="p-6 flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-gem text-white text-sm"></i>
-                </div>
-                <span class="font-bold text-lg tracking-tight hidden md:block">Crafts POS</span>
+                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><i class="fas fa-gem text-white text-sm"></i></div>
+                <span class="font-bold text-lg hidden md:block tracking-tight">Crafts POS</span>
             </div>
-
             <nav class="mt-6 px-4 space-y-2">
-                <button onclick="navegar('dashboard')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 transition text-gray-400 hover:text-white border-0 bg-transparent text-left cursor-pointer">
-                    <i class="fas fa-chart-line w-5"></i>
-                    <span class="hidden md:block">Dashboard</span>
+                <button onclick="location.reload()" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-gray-400 hover:text-white border-0 bg-transparent text-left cursor-pointer">
+                    <i class="fas fa-chart-line w-5"></i><span class="hidden md:block">Dashboard</span>
                 </button>
-                <button onclick="navegar('inventario')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 transition text-gray-400 hover:text-white border-0 bg-transparent text-left cursor-pointer">
-                    <i class="fas fa-boxes w-5"></i>
-                    <span class="hidden md:block">Inventario</span>
+                <button onclick="navegar('inventario')" class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800 text-gray-400 hover:text-white border-0 bg-transparent text-left cursor-pointer">
+                    <i class="fas fa-boxes w-5"></i><span class="hidden md:block">Inventario</span>
                 </button>
             </nav>
         </aside>
@@ -43,25 +35,19 @@
         <main class="flex-1 flex flex-col">
             <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
                 <p class="font-bold text-slate-600">Admin Central / Andrés</p>
-                <div id="status-db" class="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold text-slate-400">
-                    CONECTANDO...
-                </div>
+                <div id="status-db" class="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold text-slate-400 tracking-widest">CONECTANDO...</div>
             </header>
 
             <section class="p-8" id="view-container">
                 <div class="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 text-center animate-fade-in">
-                    <h3 class="text-2xl font-black text-gray-800">Sistema Conectado</h3>
-                    <p class="text-gray-400 mt-2">Tus credenciales de Firebase han sido validadas.</p>
-                    <button onclick="navegar('inventario')" class="mt-6 bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
-                        Ir al Inventario
-                    </button>
+                    <h3 class="text-2xl font-black text-gray-800">Sistema Activo</h3>
+                    <p class="text-gray-400 mt-2">Bienvenido al núcleo de Tiendas Crafts.</p>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-        // 1. Configuración Real (Tus datos inyectados)
         const firebaseConfig = {
             apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
             authDomain: "crafts-colombia-pos.firebaseapp.com",
@@ -71,68 +57,71 @@
             appId: "1:924957968575:web:12be975b2346dcdf585e0a"
         };
 
-        // 2. Inicialización
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Verificar conexión
-        db.collection('test').limit(1).get()
-            .then(() => {
-                document.getElementById('status-db').innerText = "ONLINE";
-                document.getElementById('status-db').className = "text-[10px] bg-green-100 px-3 py-1 rounded-full font-bold text-green-600";
-            })
-            .catch(() => {
-                document.getElementById('status-db').innerText = "ERROR DE CONFIG";
-                document.getElementById('status-db').className = "text-[10px] bg-red-100 px-3 py-1 rounded-full font-bold text-red-600";
-            });
+        db.collection('productos').limit(1).get().then(() => {
+            document.getElementById('status-db').innerText = "ONLINE";
+            document.getElementById('status-db').className = "text-[10px] bg-green-100 px-3 py-1 rounded-full font-bold text-green-600 tracking-widest";
+        });
 
-        // 3. Navegación
         function navegar(seccion) {
             const contenedor = document.getElementById('view-container');
-            
             if (seccion === 'inventario') {
                 contenedor.innerHTML = `
-                    <div class="animate-fade-in max-w-4xl mx-auto">
+                    <div class="animate-fade-in max-w-5xl mx-auto">
                         <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-8">
-                            <h2 class="text-2xl font-black mb-6">Nuevo Producto</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input id="nombre" type="text" placeholder="Nombre (ej. Jarra de Barro)" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <h2 class="text-xl font-black mb-6">Registrar Artesanía</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <input id="nombre" type="text" placeholder="Producto" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                                 <input id="precio" type="number" placeholder="Precio ($)" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                                <input id="stock" type="number" placeholder="Cantidad Inicial" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                                <button onclick="guardar()" class="bg-slate-900 text-white p-4 rounded-2xl font-bold hover:bg-blue-600 transition">
-                                    Guardar en la Nube
-                                </button>
+                                <input id="stock" type="number" placeholder="Stock" class="p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <button onclick="guardar()" class="bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 transition">Guardar</button>
                             </div>
+                        </div>
+                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 border-b border-gray-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                    <tr><th class="p-6">Nombre</th><th class="p-6 text-center">Precio</th><th class="p-6 text-center">Stock</th></tr>
+                                </thead>
+                                <tbody id="tabla-productos" class="divide-y divide-gray-50">
+                                    <tr><td colspan="3" class="p-10 text-center text-slate-300">Cargando existencias...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 `;
-            } else {
-                location.reload();
+                escucharInventario();
             }
         }
 
-        // 4. Lógica de Guardado Real
-        async function guardar() {
-            const nombre = document.getElementById('nombre').value;
-            const precio = document.getElementById('precio').value;
-            const stock = document.getElementById('stock').value;
-
-            if(!nombre || !precio) return alert("Por favor llena los campos principales");
-
-            try {
-                await db.collection("productos").add({
-                    nombre: nombre,
-                    precio: Number(precio),
-                    stock: Number(stock),
-                    creado: firebase.firestore.FieldValue.serverTimestamp()
+        function escucharInventario() {
+            db.collection("productos").orderBy("creado", "desc").onSnapshot((snapshot) => {
+                const tbody = document.getElementById('tabla-productos');
+                if (!tbody) return;
+                let html = "";
+                snapshot.forEach((doc) => {
+                    const p = doc.data();
+                    html += `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-6 font-bold text-slate-700">${p.nombre}</td>
+                            <td class="p-6 text-center font-semibold text-blue-600">$${Number(p.precio).toLocaleString()}</td>
+                            <td class="p-6 text-center"><span class="bg-slate-100 px-3 py-1 rounded-full font-bold text-slate-600">${p.stock}</span></td>
+                        </tr>`;
                 });
-                alert("✅ ¡Producto registrado exitosamente!");
-                document.getElementById('nombre').value = "";
-                document.getElementById('precio').value = "";
-                document.getElementById('stock').value = "";
-            } catch (e) {
-                alert("Error al guardar: " + e.message);
-            }
+                tbody.innerHTML = html || '<tr><td colspan="3" class="p-10 text-center text-slate-400">No hay productos registrados aún.</td></tr>';
+            });
+        }
+
+        async function guardar() {
+            const n = document.getElementById('nombre').value;
+            const p = document.getElementById('precio').value;
+            const s = document.getElementById('stock').value;
+            if(!n || !p) return alert("Completa los datos");
+            try {
+                await db.collection("productos").add({ nombre: n, precio: Number(p), stock: Number(s), creado: firebase.firestore.FieldValue.serverTimestamp() });
+                document.getElementById('nombre').value = ""; document.getElementById('precio').value = ""; document.getElementById('stock').value = "";
+            } catch (e) { alert("Error: " + e.message); }
         }
     </script>
 </body>

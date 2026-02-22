@@ -10,10 +10,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .animate-in { animation: slideUp 0.3s ease-out; }
@@ -23,19 +25,19 @@
         .text-pavo-real { color: #004B8D; }
         .bg-pavo-real { background-color: #004B8D; }
         .modal-overlay { background: rgba(15, 29, 36, 0.95); backdrop-filter: blur(10px); }
-        .stat-row { transition: all 0.3s ease; border: 1px solid #f1f5f9; }
-        .stat-row:hover { transform: scale(1.005); background-color: #ffffff; box-shadow: 0 15px 45px -15px rgba(0,75,141,0.12); }
+        .stat-row, .action-module { transition: all 0.3s ease; border: 1px solid #f1f5f9; }
+        .stat-row:hover, .action-module:hover { transform: scale(1.005); background-color: #ffffff; box-shadow: 0 15px 45px -15px rgba(0,75,141,0.12); }
     </style>
 </head>
 <body class="text-slate-700">
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-petrol">
-        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10">
-            <h1 class="text-3xl font-black text-center text-slate-500 mb-8 tracking-tighter uppercase">CRAFTS POS</h1>
+        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in">
+            <h1 class="text-3xl font-black text-center text-slate-500 mb-8 uppercase tracking-tighter">CRAFTS POS</h1>
             <div class="space-y-4">
-                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
-                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400 font-medium">
-                <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs">Acceder al Sistema</button>
+                <input id="login-email" type="email" placeholder="Usuario" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400">
+                <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-slate-400">
+                <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs">Ingresar</button>
             </div>
         </div>
     </div>
@@ -45,13 +47,13 @@
             <div class="p-6 flex items-center gap-3 border-b border-white/5">
                 <div class="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-gem text-white text-xs"></i></div>
                 <div class="hidden md:block leading-tight">
-                    <p class="font-black text-[9px] tracking-widest text-slate-500 uppercase leading-none mb-1">Central Console</p>
-                    <p class="font-bold text-white text-[10px] uppercase italic tracking-tighter">Administrador</p>
+                    <p class="font-black text-[9px] tracking-widest text-slate-500 uppercase">Management</p>
+                    <p class="font-bold text-white text-[10px] uppercase italic">Admin Central</p>
                 </div>
             </div>
             <nav id="nav-menu" class="p-4 mt-10 space-y-2 flex-1 hide-scroll"></nav>
             <div class="p-4 border-t border-white/5 text-center">
-                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-3 p-3 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-[10px] uppercase tracking-widest">
+                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-3 p-3 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-[10px] uppercase">
                     <i class="fas fa-power-off"></i><span class="hidden md:block">Salir</span>
                 </button>
             </div>
@@ -61,22 +63,32 @@
             <header class="h-28 bg-slate-900 px-10 flex items-center justify-between z-10 border-b border-white/5 shadow-md">
                 <div class="flex items-center gap-6 text-white text-left">
                     <div class="flex flex-col">
-                        <span class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1 italic">DASHBOARD</span>
+                        <span class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1">CENTRAL HUB</span>
                         <span id="user-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest italic">Usuario</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-center">
-                    <span id="header-date" class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">...</span>
+                    <span id="header-date" class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">...</span>
                     <span id="header-time" class="text-3xl font-black text-white tabular-nums tracking-widest uppercase leading-none">00:00:00</span>
                 </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
-                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">SISTEMA ONLINE</span>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg"></div>
+                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">SISTEMA ACTIVO</span>
                 </div>
             </header>
             
             <section id="view-container" class="flex-1 overflow-y-auto p-12 relative bg-slate-50"></section>
         </main>
+    </div>
+
+    <div id="main-modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
+            <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10">
+                <h2 id="modal-title" class="font-bold text-2xl italic tracking-tighter uppercase">Acción</h2>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer"><i class="fas fa-times-circle"></i></button>
+            </div>
+            <div id="modal-content" class="p-10 max-h-[75vh] overflow-y-auto hide-scroll"></div>
+        </div>
     </div>
 
     <script>
@@ -108,11 +120,11 @@
 
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            let menu = `<button onclick="navegar('inicio')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-chart-pie"></i><span class="hidden md:block">Inicio</span></button>`;
+            let menu = `<button onclick="navegar('inicio')" class="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 text-white border-0 text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest"><i class="fas fa-th-large"></i><span class="hidden md:block">Inicio</span></button>`;
             if (rol === 'admin' || rol === 'control') {
                 menu += `
                 <button onclick="navegar('productos')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Inventario</span></button>
-                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-history"></i><span class="hidden md:block">Reportes</span></button>`;
+                <button onclick="navegar('reportes')" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:text-white border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-chart-pie"></i><span class="hidden md:block">Reportes</span></button>`;
             }
             nav.innerHTML = menu;
         }
@@ -124,19 +136,14 @@
                     <div class="animate-in max-w-7xl mx-auto pt-4">
                         <div class="text-center mb-16">
                             <h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none">Crafts Colombia</h1>
-                            <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-sm italic">Panel de Control Administrativo</p>
+                            <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic">Panel de Control Administrativo</p>
                         </div>
-
-                        <div class="max-w-2xl mx-auto relative mb-20">
-                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i>
-                            <input type="text" placeholder="Buscador global..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all">
-                        </div>
-
-                        <div class="space-y-12">
+                        <div class="max-w-2xl mx-auto relative mb-20"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i><input type="text" placeholder="Buscador global..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div>
+                        <div class="space-y-10">
                             <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center border-orange-200 border-2">
-                                <div class="min-w-[300px] border-r border-slate-100 pr-12">
-                                    <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic leading-none">Operación Real-Time</p>
-                                    <h3 class="text-sm font-black text-pavo-real uppercase tracking-[0.2em] mb-3">Hoy</h3>
+                                <div class="min-w-[280px] border-r border-slate-100 pr-12">
+                                    <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Real-Time</p>
+                                    <h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3">Ventas de Hoy</h3>
                                     <h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3>
                                 </div>
                                 <div class="flex-1 flex justify-between px-10 items-center">
@@ -148,11 +155,10 @@
                                     <div class="text-center flex-1"><p class="text-5xl font-black text-pavo-real mb-2 opacity-20">6</p><span id="val-hoy-6" class="font-black text-2xl text-slate-800 tabular-nums">$0</span></div>
                                 </div>
                             </div>
-
                             <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center">
-                                <div class="min-w-[300px] border-r border-slate-100 pr-12">
+                                <div class="min-w-[280px] border-r border-slate-100 pr-12">
                                     <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 italic leading-none">Cierre Anterior</p>
-                                    <h3 class="text-sm font-black text-pavo-real uppercase tracking-[0.2em] mb-3 italic">Ayer</h3>
+                                    <h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3 italic">Ventas Ayer</h3>
                                     <h3 id="dash-total-ayer" class="text-5xl font-black text-pavo-real tabular-nums leading-none tracking-tighter">$0</h3>
                                 </div>
                                 <div class="flex-1 flex justify-between px-10 items-center opacity-70">
@@ -164,76 +170,108 @@
                                     <div class="text-center flex-1"><p class="text-5xl font-black text-slate-400 mb-2 opacity-20">6</p><span id="val-ayer-6" class="font-black text-2xl text-slate-600 tabular-nums">$0</span></div>
                                 </div>
                             </div>
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-10">
-                                    <div class="min-w-[180px] border-r border-slate-100 pr-10">
-                                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 italic leading-none">Global Mes</p>
-                                        <h3 id="dash-total-mes" class="text-5xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">$0</h3>
-                                    </div>
-                                    <div class="flex-1"><span class="text-[11px] font-black text-pavo-real uppercase tracking-[0.2em] italic">Desempeño Mensual</span><p class="text-sm font-medium text-slate-400 mt-2 italic leading-snug">Consolidado total nacional.</p></div>
-                                </div>
-                                <div class="bg-blue-50 p-12 rounded-[4rem] stat-row flex items-center gap-10 border border-blue-100 shadow-xl shadow-blue-900/5">
-                                    <div class="min-w-[180px] border-r border-blue-200 pr-10">
-                                        <p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-2 italic leading-none">Acumulado Año</p>
-                                        <h3 id="dash-total-año" class="text-5xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">$0</h3>
-                                    </div>
-                                    <div class="flex-1"><span class="text-[11px] font-black text-green-600 uppercase tracking-[0.2em] italic">+0.0% Tendencia</span><p class="text-sm font-medium text-slate-400 mt-2 italic leading-snug">Año fiscal 2026.</p></div>
-                                </div>
+                                <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-10"><div class="min-w-[180px] border-r border-slate-100 pr-10"><p class="text-xs font-black text-slate-400 uppercase mb-2 italic">Global Mes</p><h3 id="dash-total-mes" class="text-5xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">$0</h3></div><div class="flex-1 text-sm font-medium text-slate-400 italic">Rendimiento Operativo Nacional.</div></div>
+                                <div class="bg-blue-50 p-12 rounded-[4rem] stat-row flex items-center gap-10 border border-blue-100"><div class="min-w-[180px] border-r border-blue-200 pr-10"><p class="text-xs font-black text-blue-400 uppercase mb-2 italic">Histórico Año</p><h3 id="dash-total-año" class="text-5xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">$0</h3></div><div class="flex-1 text-sm font-black text-green-600 italic tracking-widest">+0.0% Tendencia 2026.</div></div>
                             </div>
                         </div>
                     </div>`;
                 cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="p-20 text-center"><h1 class="text-4xl font-black text-slate-200 uppercase tracking-widest italic">Inventario Central</h1></div>`;
+                container.innerHTML = `
+                    <div class="animate-in max-w-7xl mx-auto pt-4">
+                        <div class="text-center mb-16">
+                            <h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none">Logística Central</h1>
+                            <p class="text-orange-500 font-bold uppercase tracking-[0.3em] text-xs italic">Gestión de Existencias y Costos</p>
+                        </div>
+                        <div class="max-w-2xl mx-auto relative mb-12"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i><input id="inv-search" onkeyup="filtrarInventario(this.value)" type="text" placeholder="Buscar por producto, sede o categoría..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                            <button onclick="nuevaFicha()" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl shadow-orange-900/10"><div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-plus"></i></div><div class="text-left"><h3 class="font-black text-xl uppercase tracking-tighter mb-1 italic">Nuevo Artículo</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Creación Individual</p></div></button>
+                            <button onclick="gestionCategorias()" class="bg-white p-8 rounded-[2.5rem] action-module flex items-center gap-6 group"><div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl text-pavo-real"><i class="fas fa-tags"></i></div><div class="text-left"><h3 class="font-black text-pavo-real text-xl uppercase tracking-tighter mb-1 italic">Categorías</h3><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Administrar Etiquetas</p></div></button>
+                            <button onclick="modalCargaMasiva()" class="bg-white p-8 rounded-[2.5rem] action-module flex items-center gap-6 group"><div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl text-pavo-real"><i class="fas fa-file-excel"></i></div><div class="text-left"><h3 class="font-black text-pavo-real text-xl uppercase tracking-tighter mb-1 italic">Carga Masiva</h3><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Importar Excel</p></div></button>
+                        </div>
+                        <div id="inventory-list" class="space-y-3"></div>
+                    </div>`;
+                escucharInventario();
             }
         }
 
+        // --- LÓGICA DE DATOS ---
         async function cargarEstadisticasDashboard() {
             const hoy = new Date(); hoy.setHours(0,0,0,0);
             const ayerInicio = new Date(hoy); ayerInicio.setDate(hoy.getDate() - 1);
             const ayerFin = new Date(hoy); ayerFin.setMilliseconds(-1);
             const mesInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
             const añoInicio = new Date(hoy.getFullYear(), 0, 1);
-
             db.collection("ventas").onSnapshot(snap => {
                 let totalHoy = 0, totalAyer = 0, totalMes = 0, totalAño = 0;
                 let mapSedes = { "Filandia 1": "1", "Cable Plaza": "2", "Jardín": "3", "Filandia 2": "4", "Fundadores": "5", "Online": "6" };
                 let valHoy = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
                 let valAyer = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
-
                 snap.forEach(doc => {
-                    const v = doc.data();
-                    const fecha = v.fecha ? v.fecha.toDate() : new Date();
-                    const total = v.total || 0;
-                    const numSede = mapSedes[v.sede] || null;
-
-                    if(fecha >= hoy) {
-                        totalHoy += total;
-                        if(numSede) valHoy[numSede] += total;
-                    } else if(fecha >= ayerInicio && fecha <= ayerFin) {
-                        totalAyer += total;
-                        if(numSede) valAyer[numSede] += total;
-                    }
+                    const v = doc.data(), fecha = v.fecha ? v.fecha.toDate() : new Date(), total = v.total || 0, numSede = mapSedes[v.sede] || null;
+                    if(fecha >= hoy) { totalHoy += total; if(numSede) valHoy[numSede] += total; }
+                    else if(fecha >= ayerInicio && fecha <= ayerFin) { totalAyer += total; if(numSede) valAyer[numSede] += total; }
                     if(fecha >= mesInicio) totalMes += total;
                     if(fecha >= añoInicio) totalAño += total;
                 });
-
                 if(document.getElementById('dash-total-hoy')) {
                     document.getElementById('dash-total-hoy').innerText = `$${totalHoy.toLocaleString()}`;
                     document.getElementById('dash-total-ayer').innerText = `$${totalAyer.toLocaleString()}`;
                     document.getElementById('dash-total-mes').innerText = `$${totalMes.toLocaleString()}`;
                     document.getElementById('dash-total-año').innerText = `$${totalAño.toLocaleString()}`;
-                    
                     for(let i=1; i<=6; i++) {
-                        const h = document.getElementById('val-hoy-'+i);
-                        const a = document.getElementById('val-ayer-'+i);
+                        const h = document.getElementById('val-hoy-'+i), a = document.getElementById('val-ayer-'+i);
                         if(h) h.innerText = `$${valHoy[i].toLocaleString()}`;
                         if(a) a.innerText = `$${valAyer[i].toLocaleString()}`;
                     }
                 }
             });
         }
+
+        function escucharInventario() {
+            db.collection("productos").onSnapshot(snap => {
+                productosData = []; snap.forEach(doc => productosData.push({ id: doc.id, ...doc.data() }));
+                const list = document.getElementById('inventory-list'); if(!list) return;
+                let html = "";
+                productosData.forEach(p => {
+                    const alerta = p.stock <= (p.stock_ideal || 0);
+                    html += `
+                        <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in">
+                            <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-lg"><i class="fas fa-gem"></i></div>
+                            <div class="flex-1">
+                                <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${p.categoria}</p>
+                                <h3 class="font-black text-pavo-real text-lg uppercase truncate leading-tight">${p.nombre}</h3>
+                            </div>
+                            <div class="text-center min-w-[120px] border-l border-slate-50 pl-4"><span class="bg-pavo-real text-white text-[9px] px-3 py-1 rounded-full font-black uppercase italic">${p.sede_ubicacion}</span></div>
+                            <div class="text-center min-w-[100px] border-l border-slate-50 pl-4"><p class="font-black text-base ${alerta ? 'text-red-500' : 'text-pavo-real'} tabular-nums leading-none">${p.stock} / ${p.stock_ideal}</p></div>
+                            <div class="text-right min-w-[120px] border-l border-slate-50 pl-4"><p class="font-black text-pavo-real text-lg tabular-nums leading-none">$${p.precio.toLocaleString()}</p></div>
+                            <div class="flex gap-2 border-l border-slate-50 pl-4"><button onclick="verFicha('${p.id}')" class="text-slate-300 hover:text-pavo-real transition-all text-xl"><i class="fas fa-edit"></i></button></div>
+                        </div>`;
+                });
+                list.innerHTML = html;
+            });
+        }
+
+        function filtrarInventario(q) { const query = q.toLowerCase(); escucharInventario_Manual(productosData.filter(p => p.nombre.toLowerCase().includes(query) || (p.sede_ubicacion && p.sede_ubicacion.toLowerCase().includes(query)))); }
+        function escucharInventario_Manual(data) { const list = document.getElementById('inventory-list'); if(!list) return; let html = ""; data.forEach(p => { const alerta = p.stock <= (p.stock_ideal || 0); html += `<div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in"><div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-lg"><i class="fas fa-gem"></i></div><div class="flex-1"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${p.categoria}</p><h3 class="font-black text-pavo-real text-lg uppercase truncate leading-tight">${p.nombre}</h3></div><div class="text-center min-w-[120px] border-l border-slate-50 pl-4"><span class="bg-pavo-real text-white text-[9px] px-3 py-1 rounded-full font-black uppercase italic">${p.sede_ubicacion}</span></div><div class="text-center min-w-[100px] border-l border-slate-50 pl-4"><p class="font-black text-base ${alerta ? 'text-red-500' : 'text-pavo-real'} tabular-nums leading-none">${p.stock} / ${p.stock_ideal}</p></div><div class="text-right min-w-[120px] border-l border-slate-50 pl-4"><p class="font-black text-pavo-real text-lg tabular-nums leading-none">$${p.precio.toLocaleString()}</p></div><div class="flex gap-2 border-l border-slate-50 pl-4"><button onclick="verFicha('${p.id}')" class="text-slate-300 hover:text-pavo-real transition-all text-xl"><i class="fas fa-edit"></i></button></div></div>`; }); list.innerHTML = html; }
+
+        // --- MODALES Y ACCIONES ---
+        function cerrarModal() { document.getElementById('main-modal').classList.add('hidden'); }
+        function nuevaFicha() { verFicha(null); }
+        function verFicha(id) {
+            const modal = document.getElementById('main-modal'), content = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = "Ficha Técnica";
+            const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: '', stock: '', categoria: 'Mochilas', precio_compra: '', stock_ideal: '', sede_ubicacion: 'Bodega' };
+            content.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10"><div class="space-y-6"><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nombre Oficial</label><input id="edit-nombre" type="text" value="${p.nombre}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase"></div><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Categoría</label><select id="edit-categoria" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real">${listaCategorias.map(c => `<option value="${c}" ${p.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Sede Destino</label><select id="edit-sede" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real">${["Bodega", "Filandia 1", "Filandia 2", "Cable Plaza", "Fundadores", "Jardín", "Online"].map(s => `<option value="${s}" ${p.sede_ubicacion === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div></div><div class="bg-slate-50/50 p-8 rounded-[3rem] border border-slate-100 space-y-6"><div class="grid grid-cols-2 gap-5"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Venta</label><input id="edit-precio" type="number" value="${p.precio}" class="w-full p-4 bg-white rounded-xl border-0 ring-1 ring-slate-100 font-black text-pavo-real"></div><div><label class="text-[10px] font-black text-orange-500 uppercase mb-2 block italic">Costo</label><input id="edit-compra" type="number" value="${p.precio_compra}" class="w-full p-4 bg-white rounded-xl border-0 ring-1 ring-orange-100 font-black text-orange-600"></div></div><div class="grid grid-cols-2 gap-5"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Actual</label><input id="edit-stock" type="number" value="${p.stock}" class="w-full p-4 bg-white rounded-xl border-0 ring-1 ring-slate-100 font-black text-pavo-real"></div><div><label class="text-[10px] font-black text-blue-400 uppercase mb-2 block italic">Ideal</label><input id="edit-ideal" type="number" value="${p.stock_ideal}" class="w-full p-4 bg-white rounded-xl border-0 ring-1 ring-blue-50 font-black text-blue-600"></div></div><div class="pt-6 flex gap-3"><button onclick="guardarCambios('${id}')" class="flex-1 bg-slate-900 text-white py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-green-600 transition-all">Actualizar Ficha</button></div></div></div>`;
+            modal.classList.remove('hidden');
+        }
+        async function guardarCambios(id) { const data = { nombre: document.getElementById('edit-nombre').value, categoria: document.getElementById('edit-categoria').value, sede_ubicacion: document.getElementById('edit-sede').value, precio: parseInt(document.getElementById('edit-precio').value), precio_compra: parseInt(document.getElementById('edit-compra').value), stock: parseInt(document.getElementById('edit-stock').value), stock_ideal: parseInt(document.getElementById('edit-ideal').value) }; try { if(!id || id === "null") await db.collection("productos").add(data); else await db.collection("productos").doc(id).update(data); alert("Guardado"); cerrarModal(); } catch (e) { alert("Error"); } }
+        function gestionCategorias() { const modal = document.getElementById('main-modal'), content = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Categorías"; content.innerHTML = `<div class="space-y-6"><div class="flex gap-4"><input id="nueva-cat" type="text" class="flex-1 p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase" placeholder="Nombre..."><button onclick="addCategoria()" class="bg-slate-900 text-white px-8 rounded-2xl font-black">Añadir</button></div><div class="pt-6 border-t flex flex-wrap gap-2">${listaCategorias.map(c => `<span class="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-bold border border-slate-100 text-pavo-real uppercase">${c}</span>`).join('')}</div></div>`; modal.classList.remove('hidden'); }
+        async function addCategoria() { const val = document.getElementById('nueva-cat').value; if(!val) return; listaCategorias.push(val); await db.collection("configuracion").doc("categorias").set({ lista: listaCategorias }); alert("Añadida"); gestionCategorias(); }
+        function modalCargaMasiva() { const modal = document.getElementById('main-modal'), content = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Carga Excel"; content.innerHTML = `<div class="space-y-8"><div class="bg-blue-50 p-6 rounded-[2rem] text-[10px] border border-blue-100 uppercase font-bold italic">Encabezados: nombre, categoria, precio, costo, stock, ideal, sede</div><div class="border-4 border-dashed border-slate-100 p-16 rounded-[3rem] text-center"><i class="fas fa-cloud-upload-alt text-5xl text-slate-200 mb-6"></i><br><input type="file" id="excel-input" accept=".xlsx" class="hidden" onchange="procesarExcel(event)"><button onclick="document.getElementById('excel-input').click()" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px]">Cargar Archivo</button></div><div id="excel-preview" class="hidden"><button onclick="confirmarSubida()" class="w-full bg-blue-600 text-white py-6 rounded-3xl font-black uppercase text-xs">Confirmar Subida</button></div></div>`; modal.classList.remove('hidden'); }
+        let datosExcel = []; function procesarExcel(e) { const file = e.target.files[0], reader = new FileReader(); reader.onload = (evt) => { const bstr = evt.target.result, wb = XLSX.read(bstr, { type: 'binary' }), ws = wb.Sheets[wb.SheetNames[0]], data = XLSX.utils.sheet_to_json(ws); datosExcel = data.map(item => ({ nombre: item.nombre || "Sin Nombre", categoria: item.categoria || "Mochilas", precio: parseInt(item.precio) || 0, precio_compra: parseInt(item.costo) || 0, stock: parseInt(item.stock) || 0, stock_ideal: parseInt(item.ideal) || 0, sede_ubicacion: item.sede || "Bodega" })); document.getElementById('excel-preview').classList.remove('hidden'); }; reader.readAsBinaryString(file); }
+        async function confirmarSubida() { if(datosExcel.length === 0) return; try { const batch = db.batch(); datosExcel.forEach(p => { const ref = db.collection("productos").doc(); batch.set(ref, p); }); await batch.commit(); alert("Carga Exitosa"); cerrarModal(); } catch (err) { alert("Error"); } }
     </script>
 </body>
 </html>

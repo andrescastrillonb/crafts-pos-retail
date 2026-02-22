@@ -194,7 +194,7 @@
             const container = document.getElementById('view-container');
             const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control';
             if (vista === 'inicio') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 leading-none">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center leading-none"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all leading-none"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px] leading-none"></div><div id="stats-container" class="space-y-4 leading-none"></div><div id="turn-history-container" class="mt-20 text-left animate-in leading-none"></div></div>`;
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 leading-none">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center leading-none"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock para venta..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all leading-none"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px] leading-none"></div><div id="stats-container" class="space-y-4 leading-none"></div><div id="turn-history-container" class="mt-20 text-left animate-in leading-none"></div></div>`;
                 if(isAdmin) {
                     const rowGen = (t,l,id,acc=false) => `<div class="${acc?'bg-blue-50':'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in leading-none"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left leading-none"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40 leading-none">${l}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3 leading-none">${t}</h3><h3 id="dash-total-${id}" class="text-5xl font-black ${id==='hoy'?'text-orange-500':'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center leading-none">${[1,2,3,4,5,6].map(i=>`<div class="flex flex-col items-center justify-center leading-none"><p class="text-4xl font-black ${acc?'text-blue-200':'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
                     document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Ventas Globales Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic leading-none">Control Maestro</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
@@ -203,13 +203,12 @@
                 }
                 cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative leading-none"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center leading-none"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl border-0 cursor-pointer hover:bg-blue-800 transition-all leading-none">Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
-                // Al cargar la vista de logística, ejecutar una búsqueda inicial para mostrar todos los productos
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Gestión y Traslados</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative leading-none"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre del Producto</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center leading-none"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl border-0 cursor-pointer hover:bg-blue-800 transition-all leading-none">Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
                 ejecutarBusquedaAvanzada();
             }
         }
 
-        // --- MÓDULO LOGÍSTICA (BÚSQUEDA AVANZADA) NUEVO ---
+        // --- MÓDULO LOGÍSTICA (BÚSQUEDA Y FICHA DEL PRODUCTO) ---
         function ejecutarBusquedaAvanzada() {
             const nameQ = safeStr(document.getElementById('adv-name')?.value).toLowerCase().trim();
             const sedeQ = safeStr(document.getElementById('adv-sede')?.value);
@@ -222,35 +221,147 @@
                 const matchName = !nameQ || safeStr(p.nombre).toLowerCase().includes(nameQ);
                 const matchSede = sedeQ === "TODAS" || normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(sedeQ);
                 const matchCat = catQ === "TODAS" || safeUpper(p.categoria) === safeUpper(catQ);
-                
                 return matchName && matchSede && matchCat;
             });
 
             renderInventario(filtered, list);
         }
 
+        // Diferente a Tienda: Aquí sale el botón "Gestionar" que llama a verFicha()
         function renderInventario(data, container) {
             container.innerHTML = data.map(p => `
-            <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none shadow-sm border border-slate-100">
-                <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 text-xl leading-none"><i class="fas fa-box"></i></div>
+            <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none shadow-sm border border-slate-200">
+                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-pavo-real text-xl leading-none"><i class="fas fa-box-open"></i></div>
                 <div class="flex-1 text-left leading-none">
-                    <p class="text-[8px] font-black text-pavo-real uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
-                    <h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3>
+                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
+                    <h3 class="font-black text-slate-700 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3>
                 </div>
-                <div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none">
+                <div class="text-center min-w-[140px] border-l border-slate-100 pl-4 leading-none">
                     <span class="bg-slate-100 text-slate-600 text-[11px] px-4 py-2 rounded-full font-black uppercase italic leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
                     <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
                 </div>
-                <div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none">
+                <div class="text-right min-w-[120px] border-l border-slate-100 pl-4 leading-none">
                     <p class="font-black text-slate-500 text-xl tabular-nums leading-none">${money(p.precio)}</p>
                 </div>
-                <div class="flex gap-2 border-l border-slate-50 pl-4 leading-none">
-                    <button onclick="verFicha('${p.id}')" class="bg-pavo-real text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg hover:bg-blue-800 transition-all leading-none">Gestionar</button>
+                <div class="flex gap-2 border-l border-slate-100 pl-4 leading-none">
+                    <button onclick="verFicha('${p.id}')" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg hover:bg-black transition-all leading-none"><i class="fas fa-cog mr-2"></i>Gestionar</button>
                 </div>
             </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">No se encontraron existencias con esos filtros.</div>';
         }
 
-        // --- CESTA DE VENTA Y CARRITO ---
+        // OPERACIÓN QUIRÚRGICA: CREACIÓN/EDICIÓN DE PRODUCTO CON BOTONES LATERALES
+        function verFicha(id) {
+            const prod = id ? productosData.find(p => p.id === id) : null;
+            const isNew = !prod;
+            const m = document.getElementById('main-modal');
+            const c = document.getElementById('modal-content');
+
+            document.getElementById('modal-title').innerText = isNew ? "NUEVO ITEM DE INVENTARIO" : "GESTIÓN DE PRODUCTO";
+
+            const opcionesCategorias = listaCategorias.length > 0 
+                ? listaCategorias.map(cat => `<option value="${cat}" ${prod && prod.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('')
+                : `<option value="General">General (Añade categorías desde el menú principal)</option>`;
+
+            // Menú lateral derecho
+            const botonesLaterales = isNew ? '' : `
+                <div class="flex flex-col gap-4 border-l border-slate-200 pl-8 min-w-[200px]">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Acciones</p>
+                    <button onclick="guardarProducto('${id}')" class="w-full bg-pavo-real text-white py-5 rounded-2xl font-black text-[10px] uppercase shadow-lg hover:bg-blue-800 transition-all flex items-center justify-center gap-2"><i class="fas fa-save"></i> Guardar Cambios</button>
+                    <button onclick="modalTraslado('${id}')" class="w-full bg-orange-500 text-white py-5 rounded-2xl font-black text-[10px] uppercase shadow-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-2 mt-2"><i class="fas fa-truck-loading"></i> Trasladar</button>
+                    <button onclick="eliminarProducto('${id}')" class="w-full bg-red-50 text-red-500 py-5 rounded-2xl font-black text-[10px] uppercase shadow-inner border border-red-200 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 mt-auto"><i class="fas fa-trash"></i> Eliminar Item</button>
+                </div>
+            `;
+
+            c.innerHTML = `
+                <div class="flex gap-10">
+                    <div class="flex-1 space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="col-span-2">
+                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block italic ml-2">Nombre del Producto</label>
+                                <input id="form-nombre" type="text" value="${prod ? prod.nombre : ''}" placeholder="Ej. Mochila Wayuu..." class="w-full p-5 bg-white rounded-2xl border-0 ring-1 ring-slate-200 font-bold text-slate-700 uppercase" />
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block italic ml-2">Categoría</label>
+                                <select id="form-cat" class="w-full p-5 bg-white rounded-2xl border-0 ring-1 ring-slate-200 font-bold text-slate-700 uppercase">
+                                    <option value="">Seleccione...</option>
+                                    ${opcionesCategorias}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block italic ml-2">Sede / Ubicación Actual</label>
+                                <select id="form-sede" class="w-full p-5 bg-white rounded-2xl border-0 ring-1 ring-slate-200 font-bold text-slate-700 uppercase">
+                                    <option value="bodega" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'bodega' ? 'selected' : ''}>BODEGA CENTRAL</option>
+                                    <option value="filandia1" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'filandia1' ? 'selected' : ''}>FILANDIA 1</option>
+                                    <option value="filandia2" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'filandia2' ? 'selected' : ''}>FILANDIA 2</option>
+                                    <option value="cableplaza" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'cableplaza' ? 'selected' : ''}>CABLE PLAZA</option>
+                                    <option value="fundadores" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'fundadores' ? 'selected' : ''}>FUNDADORES</option>
+                                    <option value="jardin" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'jardin' ? 'selected' : ''}>JARDÍN</option>
+                                    <option value="online" ${prod && normalizeSede(prod.sede_ubicacion || prod.sede) === 'online' ? 'selected' : ''}>ONLINE</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block italic ml-2">Precio de Venta (COP)</label>
+                                <input id="form-precio" type="number" value="${prod ? prod.precio : ''}" placeholder="0" class="w-full p-5 bg-white rounded-2xl border-0 ring-1 ring-slate-200 font-black text-pavo-real text-xl tabular-nums" />
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block italic ml-2">Stock / Cantidad</label>
+                                <input id="form-stock" type="number" value="${prod ? prod.stock : ''}" placeholder="0" class="w-full p-5 bg-white rounded-2xl border-0 ring-1 ring-slate-200 font-black text-orange-500 text-xl tabular-nums" />
+                            </div>
+                        </div>
+                        ${isNew ? `<div class="pt-6"><button onclick="guardarProducto(null)" class="w-full bg-orange-500 text-white p-6 rounded-[2rem] font-black text-sm uppercase shadow-xl hover:bg-orange-600 transition-all flex items-center justify-center gap-3"><i class="fas fa-plus-circle text-2xl"></i> Crear Nuevo Producto</button></div>` : ''}
+                    </div>
+                    ${botonesLaterales}
+                </div>
+            `;
+            m.classList.remove('hidden');
+        }
+
+        async function guardarProducto(id) {
+            const nombre = document.getElementById('form-nombre').value.trim();
+            const categoria = document.getElementById('form-cat').value;
+            const precio = safeNum(document.getElementById('form-precio').value);
+            const stock = safeNum(document.getElementById('form-stock').value);
+            const sede = document.getElementById('form-sede').value;
+
+            if(!nombre || !categoria || precio <= 0) return alert("Completa el nombre, categoría y precio.");
+
+            const data = {
+                nombre: nombre.toUpperCase(),
+                categoria: categoria.toUpperCase(),
+                precio: precio,
+                stock: stock,
+                sede_ubicacion: sede,
+                ultima_modificacion: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if(id) {
+                    await db.collection("productos").doc(id).update(data);
+                    alert("✅ Producto actualizado correctamente.");
+                } else {
+                    await db.collection("productos").add(data);
+                    alert("✅ Producto creado exitosamente.");
+                }
+                cerrarModal();
+            } catch(e) {
+                console.error("Error al guardar:", e);
+                alert("Ocurrió un error al guardar. Revisa la conexión.");
+            }
+        }
+
+        function eliminarProducto(id) {
+            if(confirm("⚠️ ¿Estás completamente seguro de que deseas ELIMINAR este producto? Esta acción no se puede deshacer.")) {
+                db.collection("productos").doc(id).delete()
+                  .then(() => { alert("Producto eliminado."); cerrarModal(); })
+                  .catch(e => { console.error(e); alert("Error al eliminar."); });
+            }
+        }
+
+        function modalTraslado(id) {
+            alert("🛠️ La función de TRASLADO ENTRE SEDES requiere una lógica de historial especializada. ¿Quieres que la construyamos en la siguiente Operación Quirúrgica?");
+        }
+
+        // --- CESTA DE VENTA Y CARRITO (TIENDA / INICIO) ---
         function agregarCarrito(id) {
             const prod = productosData.find(p => p.id === id);
             if(!prod) return;
@@ -260,59 +371,26 @@
                 if(itemEnCesta.cantidad < prod.stock) {
                     itemEnCesta.cantidad++;
                     itemEnCesta.subtotal = itemEnCesta.cantidad * itemEnCesta.precio;
-                } else {
-                    alert("Stock máximo alcanzado para este producto.");
-                }
+                } else { alert("Stock máximo alcanzado para este producto."); }
             } else {
-                if(prod.stock > 0) {
-                    carrito.push({ ...prod, cantidad: 1, subtotal: prod.precio });
-                } else {
-                    alert("Producto sin stock en esta sede.");
-                }
+                if(prod.stock > 0) { carrito.push({ ...prod, cantidad: 1, subtotal: prod.precio }); } 
+                else { alert("Producto sin stock en esta sede."); }
             }
             renderCarrito();
         }
 
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            renderCarrito();
-        }
+        function eliminarDelCarrito(index) { carrito.splice(index, 1); renderCarrito(); }
 
         function renderCarrito() {
-            const container = document.getElementById('cesta-items');
-            const totalEl = document.getElementById('cesta-total');
-            const sidebarCesta = document.getElementById('sidebar-cesta');
-            
+            const container = document.getElementById('cesta-items'); const totalEl = document.getElementById('cesta-total'); const sidebarCesta = document.getElementById('sidebar-cesta');
             if(!container || !totalEl || !sidebarCesta) return;
-
-            if (carrito.length === 0) {
-                sidebarCesta.classList.add('hidden');
-                totalEl.innerText = "$0";
-                container.innerHTML = "";
-                return;
-            }
-
-            sidebarCesta.classList.remove('hidden');
-            let html = "";
-            let granTotal = 0;
-
+            if (carrito.length === 0) { sidebarCesta.classList.add('hidden'); totalEl.innerText = "$0"; container.innerHTML = ""; return; }
+            sidebarCesta.classList.remove('hidden'); let html = ""; let granTotal = 0;
             carrito.forEach((item, index) => {
                 granTotal += item.subtotal;
-                html += `
-                <div class="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center text-left transition-all hover:bg-white/10">
-                    <div class="truncate flex-1 pr-2 leading-tight">
-                        <p class="text-[10px] font-bold text-white uppercase truncate mb-1">${item.nombre}</p>
-                        <p class="text-[9px] text-slate-400 font-medium">${money(item.precio)} x ${item.cantidad}</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-black text-orange-400 text-xs">${money(item.subtotal)}</span>
-                        <button onclick="eliminarDelCarrito(${index})" class="text-slate-500 hover:text-red-400 bg-transparent border-0 cursor-pointer transition-colors"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>`;
+                html += `<div class="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center text-left transition-all hover:bg-white/10"><div class="truncate flex-1 pr-2 leading-tight"><p class="text-[10px] font-bold text-white uppercase truncate mb-1">${item.nombre}</p><p class="text-[9px] text-slate-400 font-medium">${money(item.precio)} x ${item.cantidad}</p></div><div class="flex items-center gap-3"><span class="font-black text-orange-400 text-xs">${money(item.subtotal)}</span><button onclick="eliminarDelCarrito(${index})" class="text-slate-500 hover:text-red-400 bg-transparent border-0 cursor-pointer transition-colors"><i class="fas fa-trash-alt"></i></button></div></div>`;
             });
-
-            container.innerHTML = html;
-            totalEl.innerText = money(granTotal);
+            container.innerHTML = html; totalEl.innerText = money(granTotal);
         }
 
         // --- HISTORIAL DE VENTAS DEL TURNO ---
@@ -320,9 +398,7 @@
             const container = document.getElementById('turn-history-container'); if(!container) return;
             let html = `<p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6 italic leading-none">Desglose de Ventas hoy</p><div class="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden leading-none"><table class="w-full text-left leading-none"><thead class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 italic"><tr><th class="p-6">Producto</th><th class="p-6 text-center">Unid.</th><th class="p-6 text-right">Subtotal</th><th class="p-6 text-center">Pago</th></tr></thead><tbody class="divide-y divide-slate-50">`;
             ventasHoy.forEach(v => {
-                v.items.forEach(item => {
-                    html += `<tr class="hover:bg-slate-50 transition-all"><td class="p-6 font-bold text-slate-700 text-xs uppercase leading-none">${item.nombre}</td><td class="p-6 text-center font-black text-xs leading-none">${item.cantidad}</td><td class="p-6 text-right font-black text-pavo-real text-xs leading-none">${money(item.subtotal)}</td><td class="p-6 text-center leading-none"><span class="bg-slate-100 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase text-slate-500">${v.metodo_pago}</span></td></tr>`;
-                });
+                v.items.forEach(item => { html += `<tr class="hover:bg-slate-50 transition-all"><td class="p-6 font-bold text-slate-700 text-xs uppercase leading-none">${item.nombre}</td><td class="p-6 text-center font-black text-xs leading-none">${item.cantidad}</td><td class="p-6 text-right font-black text-pavo-real text-xs leading-none">${money(item.subtotal)}</td><td class="p-6 text-center leading-none"><span class="bg-slate-100 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase text-slate-500">${v.metodo_pago}</span></td></tr>`; });
             });
             container.innerHTML = html + `</tbody></table></div>`;
         }
@@ -345,16 +421,8 @@
                 batch.set(vRef, vData);
                 carrito.forEach(i => { batch.update(db.collection("productos").doc(i.id), { stock: firebase.firestore.FieldValue.increment(-i.cantidad) }); });
                 await batch.commit(); 
-                alert("✅ Venta Completada"); 
-                imprimirTicket(vData); 
-                carrito = []; 
-                renderCarrito(); 
-                cerrarModal(); 
-                navegar('inicio');
-            } catch (e) { 
-                console.error("Error confirmando pago:", e);
-                alert("Ocurrió un error al procesar la venta. Revisa tu conexión a internet."); 
-            }
+                alert("✅ Venta Completada"); imprimirTicket(vData); carrito = []; renderCarrito(); cerrarModal(); navegar('inicio');
+            } catch (e) { console.error("Error confirmando pago:", e); alert("Ocurrió un error al procesar la venta. Revisa tu conexión a internet."); }
         }
 
         function imprimirTicket(v) {
@@ -385,7 +453,7 @@
             });
         }
 
-        // --- SOPORTE ---
+        // --- BÚSQUEDA TIENDA (INICIO) ---
         function filtrarVenta(q) {
             const query = safeStr(q).toLowerCase().trim(); const list = document.getElementById('search-results-list'); if(!list) return;
             const filtered = productosData.filter(p => {
@@ -396,15 +464,14 @@
         }
 
         function renderResultados(data, container) {
-            container.innerHTML = data.map(p => `<div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none"><div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl leading-none"><i class="fas fa-gem"></i></div><div class="flex-1 text-left leading-none"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p><h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3></div><div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none"><span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span><p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p></div><div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none"><p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p></div><div class="flex gap-2 border-l border-slate-50 pl-4 leading-none"><button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none">Agregar</button></div></div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
+            container.innerHTML = data.map(p => `<div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none shadow-sm"><div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl leading-none"><i class="fas fa-gem"></i></div><div class="flex-1 text-left leading-none"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p><h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3></div><div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none"><span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span><p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p></div><div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none"><p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p></div><div class="flex gap-2 border-l border-slate-50 pl-4 leading-none"><button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none hover:bg-orange-600 transition-all">Agregar</button></div></div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
         }
 
         function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
         function cerrarModal() { document.getElementById('main-modal')?.classList.add('hidden'); }
         
         // Inicial
-        updateClock(); 
-        renderCarrito();
+        updateClock(); renderCarrito();
     </script>
 </body>
 </html>

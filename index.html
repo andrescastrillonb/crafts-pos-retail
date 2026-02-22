@@ -152,7 +152,25 @@
 
         function safeStr(v) { return (v ?? "").toString(); }
         function safeUpper(v) { return safeStr(v).toUpperCase(); }
-        function normalizeSede(v) { return safeStr(v).toLowerCase().replace(/\s/g, ''); }
+
+        // ✅ PATCH: normalización robusta + alias (Finlandia -> Filandia)
+        function normalizeSede(v) {
+            let s = safeStr(v)
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita tildes
+                .replace(/[\s_-]/g, ''); // quita espacios, guiones y underscores
+
+            const aliases = {
+                "finlandia1": "filandia1",
+                "finlandia2": "filandia2",
+                "filandia01": "filandia1",
+                "filandia02": "filandia2",
+                "cableplaza1": "cableplaza"
+            };
+
+            return aliases[s] || s;
+        }
+
         function safeNum(v) { return Number(v || 0); }
         function money(v) { return `$${safeNum(v).toLocaleString('es-CO')}`; }
 
@@ -249,11 +267,9 @@
                         productosData = [];
                         snap.forEach(d => productosData.push({ id: d.id, ...d.data() }));
 
-                        // si la vista actual es inicio con buscador, refresca resultados
                         const searchInput = document.getElementById('global-search');
                         if (searchInput) filtrarVenta(searchInput.value);
 
-                        // si existe listado inventario, refresca búsqueda avanzada
                         const invList = document.getElementById('inventory-list');
                         if (invList && (document.getElementById('adv-name') || document.getElementById('adv-sede'))) {
                             ejecutarBusquedaAvanzada();
@@ -339,7 +355,6 @@
             nav.innerHTML = menu;
             highlightNav('inicio');
 
-            // Mostrar cesta para usuarios no admin/control (vendedores)
             const cesta = document.getElementById('sidebar-cesta');
             if (cesta) {
                 if (rol === 'admin' || rol === 'control') cesta.classList.add('hidden');
@@ -522,13 +537,13 @@
                 return;
             }
 
-            // Fallback
             container.innerHTML = `<div class="animate-in p-10 text-center text-slate-400 font-black uppercase">Vista no implementada.</div>`;
         }
 
         // ==============================
         // Búsqueda / render productos
         // ==============================
+        // ✅ PATCH: acepta p.sede_ubicacion O p.sede (datos antiguos)
         function filtrarVenta(q) {
             const query = safeStr(q).toLowerCase().trim();
             const list = document.getElementById('search-results-list');
@@ -540,7 +555,7 @@
                 const matchSearch = !query || nombre.includes(query) || categoria.includes(query);
 
                 if (currentUserData?.rol !== 'admin' && currentUserData?.rol !== 'control') {
-                    const psede = normalizeSede(p.sede_ubicacion);
+                    const psede = normalizeSede(p.sede_ubicacion || p.sede);
                     const asede = normalizeSede(activeSede);
                     return matchSearch && psede === asede;
                 }
@@ -551,6 +566,7 @@
             renderResultados(filtered, list);
         }
 
+        // ✅ PATCH: acepta p.sede_ubicacion O p.sede (datos antiguos)
         function ejecutarBusquedaAvanzada() {
             const n = safeStr(document.getElementById('adv-name')?.value).toLowerCase().trim();
             const s = normalizeSede(document.getElementById('adv-sede')?.value || "TODAS");
@@ -561,7 +577,7 @@
             const filtered = productosData.filter(p => {
                 const nombre = safeStr(p.nombre).toLowerCase();
                 const matchName = !n || nombre.includes(n);
-                const psede = normalizeSede(p.sede_ubicacion);
+                const psede = normalizeSede(p.sede_ubicacion || p.sede);
                 const matchSede = s === "todas" || psede === s;
                 const matchCat = c === "TODAS" || safeStr(p.categoria) === c;
                 return matchName && matchSede && matchCat;
@@ -570,13 +586,17 @@
             renderResultados(filtered, list);
         }
 
+        // ✅ PATCH: visualiza sede normalizada y soporta sede legacy
         function renderResultados(data, container) {
             if (!container) return;
 
             container.innerHTML = data.map(p => {
                 const nombre = safeUpper(p.nombre || 'SIN NOMBRE');
                 const categoria = safeUpper(p.categoria || 'SIN CATEGORÍA');
-                const sede = safeUpper(p.sede_ubicacion || 'BODEGA');
+
+                const sedeRaw = p.sede_ubicacion || p.sede || 'BODEGA';
+                const sede = safeUpper(normalizeSede(sedeRaw));
+
                 const stock = safeNum(p.stock);
                 const precio = safeNum(p.precio);
                 const isAdminView = currentUserData?.rol === 'admin' || currentUserData?.rol === 'control';
@@ -635,7 +655,7 @@
 
             if (!p) return alert("Producto no encontrado.");
 
-            const origenSede = safeStr(p.sede_ubicacion || "bodega");
+            const origenSede = safeStr(p.sede_ubicacion || p.sede || "bodega");
             const stockActual = safeNum(p.stock);
 
             document.getElementById('modal-title').innerText = "Operación de Traslado Técnico";
@@ -698,37 +718,45 @@
 
                 const batch = db.batch();
 
-                // Descuenta en origen
                 batch.update(db.collection("productos").doc(sourceId), {
                     stock: firebase.firestore.FieldValue.increment(-qty)
                 });
 
-                // Busca producto equivalente en destino
-                const destQuery = await db.collection("productos")
+                // ✅ PATCH: búsqueda destino robusta (soporta docs con sede o sede_ubicacion)
+                let destQuery = await db.collection("productos")
                     .where("nombre", "==", safeStr(sourceDoc.nombre))
                     .where("categoria", "==", safeStr(sourceDoc.categoria))
                     .where("sede_ubicacion", "==", destSede)
                     .get();
 
+                if (destQuery.empty) {
+                    destQuery = await db.collection("productos")
+                        .where("nombre", "==", safeStr(sourceDoc.nombre))
+                        .where("categoria", "==", safeStr(sourceDoc.categoria))
+                        .where("sede", "==", destSede)
+                        .get();
+                }
+
                 if (!destQuery.empty) {
                     batch.update(db.collection("productos").doc(destQuery.docs[0].id), {
-                        stock: firebase.firestore.FieldValue.increment(qty)
+                        stock: firebase.firestore.FieldValue.increment(qty),
+                        sede_ubicacion: destSede // migra/estandariza
                     });
                 } else {
                     const newRef = db.collection("productos").doc();
                     const clone = { ...sourceDoc };
                     delete clone.id;
+                    delete clone.sede;
                     clone.stock = qty;
                     clone.sede_ubicacion = destSede;
                     clone.fecha_ingreso = firebase.firestore.FieldValue.serverTimestamp();
                     batch.set(newRef, clone);
                 }
 
-                // Log de traslado
                 batch.set(db.collection("traslados").doc(), {
                     producto: safeUpper(sourceDoc.nombre),
                     fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    origen: safeStr(sourceDoc.sede_ubicacion || "bodega"),
+                    origen: safeStr(sourceDoc.sede_ubicacion || sourceDoc.sede || "bodega"),
                     destino: destSede,
                     usuario: vendedorActivo || "SISTEMA",
                     cantidad: qty
@@ -770,7 +798,6 @@
                         const t = safeNum(v.total);
                         const sedeVenta = normalizeSede(v.sede);
 
-                        // vendedores ven solo su sede
                         const canCountThis = (currentUserData?.rol === 'admin' || currentUserData?.rol === 'control')
                             ? true
                             : sedeVenta === normalizeSede(activeSede);
@@ -800,7 +827,6 @@
                 },
                 (err) => {
                     console.error("Error estadísticas:", err);
-                    // no alert aquí para evitar spam
                 }
             );
         }
@@ -849,7 +875,7 @@
                             <div>
                                 <label class="text-[10px] font-black text-orange-500 uppercase mb-2 block ml-2 italic">Asignar Sede</label>
                                 <select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm">
-                                    ${SEDES.map(s => `<option value="${s}" ${safeStr(p.sede_ubicacion) === s ? 'selected' : ''}>${safeUpper(s)}</option>`).join('')}
+                                    ${SEDES.map(s => `<option value="${s}" ${normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(s) ? 'selected' : ''}>${safeUpper(s)}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
@@ -926,18 +952,17 @@
                     const original = productosData.find(p => p.id === id);
                     if (!original) return alert("No se encontró el producto a editar.");
 
-                    if (safeStr(original.sede_ubicacion) !== nS) {
+                    if (normalizeSede(original.sede_ubicacion || original.sede) !== normalizeSede(nS)) {
                         await db.collection("traslados").add({
                             producto: nombre,
                             fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                            origen: safeStr(original.sede_ubicacion || "bodega"),
+                            origen: safeStr(original.sede_ubicacion || original.sede || "bodega"),
                             destino: nS,
                             usuario: vendedorActivo || "SISTEMA",
                             cantidad: data.stock
                         });
                     }
 
-                    // NO sobreescribir fecha_ingreso
                     await db.collection("productos").doc(id).update(data);
                 }
 
@@ -999,7 +1024,7 @@
                             <p class="text-base font-bold text-slate-400 uppercase mt-4 leading-none">unidades físicas</p>
                         </div>
                         <div class="bg-orange-50 p-4 rounded-2xl text-center shadow-inner font-black uppercase text-[10px] text-orange-500 italic">
-                            Ubicación Actual: ${safeUpper(p.sede_ubicacion || 'BODEGA')}
+                            Ubicación Actual: ${safeUpper(p.sede_ubicacion || p.sede || 'BODEGA')}
                         </div>
                     </div>
 
@@ -1157,7 +1182,7 @@
         }
 
         // ==============================
-        // Cesta / ventas básicas (stubs funcionales)
+        // Cesta / ventas básicas
         // ==============================
         function renderCarrito() {
             const itemsEl = document.getElementById('cesta-items');
@@ -1185,11 +1210,12 @@
             totalEl.innerText = money(total);
         }
 
+        // ✅ PATCH: valida contra sede_ubicacion o sede (legacy)
         function agregarCarrito(id) {
             const p = productosData.find(x => x.id === id);
             if (!p) return alert("Producto no encontrado.");
 
-            if (normalizeSede(p.sede_ubicacion) !== normalizeSede(activeSede)) {
+            if (normalizeSede(p.sede_ubicacion || p.sede) !== normalizeSede(activeSede)) {
                 return alert("Este producto no pertenece a la sede activa.");
             }
 
@@ -1228,7 +1254,6 @@
             try {
                 const batch = db.batch();
 
-                // registrar venta
                 const ventaRef = db.collection("ventas").doc();
                 batch.set(ventaRef, {
                     fecha: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1244,7 +1269,6 @@
                     }))
                 });
 
-                // descontar stock
                 carrito.forEach(item => {
                     batch.update(db.collection("productos").doc(item.id), {
                         stock: firebase.firestore.FieldValue.increment(-safeNum(item.cantidad))
@@ -1275,7 +1299,7 @@
         }
 
         // ==============================
-        // Stubs para funciones faltantes (evitan crash)
+        // Stubs para funciones faltantes
         // ==============================
         function gestionCategorias() {
             const m = document.getElementById('main-modal');

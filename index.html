@@ -11,7 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .animate-in { animation: slideUp 0.3s ease-out; }
@@ -26,6 +25,14 @@
         .nav-active { background-color: rgba(255, 255, 255, 0.1) !important; color: white !important; }
         .sidebar-scroll { max-height: calc(100vh - 550px); overflow-y: auto; }
         input, select { transition: all 0.2s ease; outline: none; }
+        
+        /* ESTILO PARA EL TICKET DE IMPRESIÓN */
+        @media print {
+            body * { visibility: hidden; }
+            #ticket-print, #ticket-print * { visibility: visible; }
+            #ticket-print { position: absolute; left: 0; top: 0; width: 80mm; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: black; background: white; padding: 10px; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body class="text-slate-700">
@@ -33,11 +40,10 @@
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-petrol">
         <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10 text-center leading-none">
             <h1 class="text-3xl font-black text-slate-500 mb-8 uppercase tracking-tighter italic">CRAFTS POS</h1>
-            <div class="space-y-4 text-left">
-                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium uppercase text-left" />
+            <div class="space-y-4 text-left leading-none">
+                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium uppercase" />
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium" />
                 <input id="login-vendedor" type="text" placeholder="Operario en Turno" class="w-full p-4 bg-orange-50 rounded-2xl border-0 ring-1 ring-orange-200 focus:ring-2 focus:ring-orange-400 font-bold uppercase text-pavo-real" />
-
                 <select id="login-sede" class="w-full p-4 bg-slate-900 text-white rounded-2xl border-0 font-bold uppercase shadow-lg">
                     <option value="" disabled selected>Punto de Venta</option>
                     <option value="bodega">BODEGA CENTRAL</option>
@@ -48,8 +54,7 @@
                     <option value="jardin">JARDÍN</option>
                     <option value="online">ONLINE</option>
                 </select>
-
-                <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs mt-4 leading-none">Entrar al Sistema</button>
+                <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs mt-4">Entrar al Sistema</button>
             </div>
         </div>
     </div>
@@ -64,12 +69,12 @@
                 </div>
             </div>
             <nav id="nav-menu" class="p-4 mt-10 space-y-2 flex-1 hide-scroll"></nav>
-            <div id="sidebar-cesta" class="hidden p-4 border-t border-white/5 animate-in">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic text-left leading-none">Cesta Actual</p>
+            <div id="sidebar-cesta" class="p-4 border-t border-white/5 animate-in">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic text-left leading-none">Cesta de Venta</p>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 hide-scroll"></div>
                 <div class="mt-6 pt-4 border-t border-white/10 text-right leading-none">
                     <span id="cesta-total" class="block font-black text-xl text-orange-500 tabular-nums mb-4">$0</span>
-                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all leading-none">Finalizar</button>
+                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all leading-none shadow-lg">Finalizar</button>
                 </div>
             </div>
             <div class="p-4 border-t border-white/5 text-center">
@@ -81,7 +86,7 @@
             <header class="h-28 bg-slate-900 px-10 flex items-center justify-between z-10 border-b border-white/5">
                 <div class="flex items-center gap-6 text-white text-left italic leading-none">
                     <div class="flex flex-col">
-                        <span id="label-sede-top" class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1">...</span>
+                        <span id="label-sede-top" class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1 italic">...</span>
                         <span id="current-vendedor-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest">...</span>
                     </div>
                 </div>
@@ -99,14 +104,16 @@
     </div>
 
     <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6 leading-none">
-        <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
-            <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic text-left">
-                <h2 id="modal-title" class="font-black text-2xl tracking-tighter uppercase leading-none italic">Gestión</h2>
+        <div class="bg-white w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
+            <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic text-left leading-none">
+                <h2 id="modal-title" class="font-black text-2xl tracking-tighter uppercase leading-none italic">Operación</h2>
                 <button onclick="cerrarModal()" id="btn-close-modal" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
             <div id="modal-content" class="p-10 max-h-[85vh] overflow-y-auto hide-scroll bg-slate-50/30 relative text-left leading-none"></div>
         </div>
     </div>
+
+    <div id="ticket-print" class="hidden"></div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk", authDomain: "crafts-colombia-pos.firebaseapp.com", projectId: "crafts-colombia-pos", storageBucket: "crafts-colombia-pos.firebasestorage.app", messagingSenderId: "924957968575", appId: "1:924957968575:web:12be975b2346dcdf585e0a" };
@@ -116,16 +123,13 @@
         let vendedorActivo = "";
         let unsubProductos = null, unsubVentasStats = null;
 
-        // HELPERS MAESTROS
         const safeStr = v => (v ?? "").toString();
         const safeUpper = v => safeStr(v).toUpperCase();
         const safeNum = v => Number(v || 0);
         const money = v => `$${safeNum(v).toLocaleString('es-CO')}`;
-
-        // ✅ NORMALIZACIÓN ULTRA-ROBUSTA (Finlandia -> Filandia)
         const normalizeSede = v => {
             let s = safeStr(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
-            return s.replace('finlandia', 'filandia'); // Puente de seguridad
+            return s.replace('finlandia', 'filandia');
         };
 
         function updateClock() { const now = new Date(); if (document.getElementById('header-time')) document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); if (document.getElementById('header-date')) document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }); }
@@ -164,9 +168,7 @@
                     unsubProductos = db.collection("productos").onSnapshot(snap => {
                         productosData = [];
                         snap.forEach(d => productosData.push({id: d.id, ...d.data()}));
-                        const query = document.getElementById('global-search')?.value || "";
-                        filtrarVenta(query);
-                        if(document.getElementById('inventory-list')) ejecutarBusquedaAvanzada();
+                        filtrarVenta(document.getElementById('global-search')?.value || "");
                     });
 
                     escucharCategorias(); escucharProveedores(); renderSidebar(currentUserData.rol); navegar('inicio');
@@ -186,42 +188,43 @@
                 menu += `<button onclick="navegar('historial')" data-vista="historial" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-history"></i><span class="hidden md:block">Historial</span></button>`;
             }
             nav.innerHTML = menu;
-            // ✅ CORRECCIÓN QUIRÚRGICA: Cesta visible para todos (Nicole y Andrés)
-            const cesta = document.getElementById('sidebar-cesta'); if(cesta) cesta.classList.remove('hidden');
         }
 
         function navegar(vista) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            const btn = document.querySelector(`.nav-btn[data-vista="${vista}"]`); if(btn) btn.classList.add('nav-active');
             const container = document.getElementById('view-container');
             const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control';
-            
             if (vista === 'inicio') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 leading-none">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center leading-none"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px]"></div><div id="stats-container" class="space-y-4"></div></div>`;
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 leading-none">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center leading-none"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all leading-none"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px] leading-none"></div><div id="stats-container" class="space-y-4 leading-none"></div></div>`;
                 if(isAdmin) {
                     const rowGen = (t,l,id,acc=false) => `<div class="${acc?'bg-blue-50':'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in leading-none"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left leading-none"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40 leading-none">${l}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3 leading-none">${t}</h3><h3 id="dash-total-${id}" class="text-5xl font-black ${id==='hoy'?'text-orange-500':'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center leading-none">${[1,2,3,4,5,6].map(i=>`<div class="flex flex-col items-center justify-center leading-none"><p class="text-4xl font-black ${acc?'text-blue-200':'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
-                    document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Ventas de Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic leading-none">Cifras Globales</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
+                    document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Ventas Globales Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic leading-none">Control Maestro</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
                 } else {
                     document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Mis Ventas Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div></div>`;
                 }
                 cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre o Referencia</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede Destino</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS LAS SEDES</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer shadow-lg leading-none"><i class="fas fa-search-plus"></i> Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm"><option value="TODAS">TODAS</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl border-0 cursor-pointer shadow-lg leading-none">Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
             }
         }
 
-        // --- CESTA (QUIRÚRGICAMENTE RECONECTADO) ---
+        // --- LÓGICA DE CESTA Y PAGO (RECONECTADA) ---
         function agregarCarrito(id) {
             const p = productosData.find(x => x.id === id);
-            if(!p || safeNum(p.stock) <= 0) return alert("Sin stock.");
+            if(!p || safeNum(p.stock) <= 0) return alert("Sin existencias físicas.");
             
+            // Regla: Solo agregar si pertenece a la sede activa (Nicole) o si es admin
+            if (currentUserData.rol !== 'admin' && normalizeSede(p.sede_ubicacion || p.sede) !== normalizeSede(activeSede)) {
+                return alert("Este producto no está en tu sede actual.");
+            }
+
             const existing = carrito.find(i => i.id === id);
             if(existing) {
-                if(existing.cantidad + 1 > safeNum(p.stock)) return alert("Límite stock.");
+                if(existing.cantidad + 1 > safeNum(p.stock)) return alert("Límite de stock alcanzado.");
                 existing.cantidad++;
                 existing.subtotal = existing.cantidad * existing.precio;
             } else {
-                carrito.push({id: p.id, nombre: p.nombre, precio: safeNum(p.precio), cantidad: 1, subtotal: safeNum(p.precio)});
+                carrito.push({id: p.id, nombre: safeUpper(p.nombre), precio: safeNum(p.precio), cantidad: 1, subtotal: safeNum(p.precio)});
             }
             renderCarrito();
         }
@@ -233,14 +236,86 @@
             let total = 0;
             l.innerHTML = carrito.map((item, i) => {
                 total += item.subtotal;
-                return `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between mb-2 animate-in leading-none"><div class="min-w-0 flex-1 text-left leading-none"><p class="text-[9px] font-black text-white truncate uppercase mb-1 italic leading-none">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold leading-none">${money(item.subtotal)}</p></div><button onclick="quitarDelCarrito(${i})" class="text-slate-500 hover:text-red-500 text-xs bg-transparent border-0 cursor-pointer">x</button></div>`;
+                return `<div class="bg-white/5 p-3 rounded-2xl flex items-center justify-between mb-2 animate-in leading-none border border-white/5"><div class="min-w-0 flex-1 text-left leading-none"><p class="text-[9px] font-black text-white truncate uppercase mb-1 italic leading-none">${item.nombre}</p><p class="text-[10px] text-orange-400 font-bold leading-none">${money(item.subtotal)}</p></div><button onclick="quitarDelCarrito(${i})" class="text-slate-500 hover:text-red-500 text-xs bg-transparent border-0 cursor-pointer">x</button></div>`;
             }).join('');
             document.getElementById('cesta-total').innerText = money(total);
         }
 
         function quitarDelCarrito(i) { carrito.splice(i, 1); renderCarrito(); }
 
-        // --- SOPORTE COMÚN ---
+        // --- CHECKOUT Y TICKET ---
+        function finalizarVenta() {
+            if (!carrito.length) return;
+            const total = carrito.reduce((acc, i) => acc + i.subtotal, 0);
+            const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = "Finalizar Venta";
+            c.innerHTML = `
+                <div class="text-center space-y-8 animate-in leading-none">
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Total a Recibir</p>
+                    <h2 class="text-7xl font-black text-pavo-real tabular-nums tracking-tighter">${money(total)}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10">
+                        <button onclick="confirmarPago('Efectivo')" class="bg-slate-900 text-white p-8 rounded-[2.5rem] font-black uppercase text-xs hover:bg-green-600 transition-all border-0 cursor-pointer shadow-xl leading-none">
+                            <i class="fas fa-money-bill-wave text-2xl mb-4 block"></i>Efectivo
+                        </button>
+                        <button onclick="confirmarPago('Tarjeta')" class="bg-slate-900 text-white p-8 rounded-[2.5rem] font-black uppercase text-xs hover:bg-blue-600 transition-all border-0 cursor-pointer shadow-xl leading-none">
+                            <i class="fas fa-credit-card text-2xl mb-4 block"></i>Tarjeta
+                        </button>
+                        <button onclick="confirmarPago('Transferencia')" class="bg-slate-900 text-white p-8 rounded-[2.5rem] font-black uppercase text-xs hover:bg-orange-500 transition-all border-0 cursor-pointer shadow-xl leading-none">
+                            <i class="fas fa-mobile-alt text-2xl mb-4 block"></i>Transferencia
+                        </button>
+                    </div>
+                </div>`;
+            m.classList.remove('hidden');
+        }
+
+        async function confirmarPago(metodo) {
+            const total = carrito.reduce((acc, i) => acc + i.subtotal, 0);
+            try {
+                const batch = db.batch();
+                const ventaId = db.collection("ventas").doc().id;
+                const ventaRef = db.collection("ventas").doc(ventaId);
+                
+                const ventaData = {
+                    id: ventaId,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
+                    vendedor: vendedorActivo,
+                    sede: activeSede,
+                    total: total,
+                    metodo_pago: metodo,
+                    items: carrito
+                };
+
+                batch.set(ventaRef, ventaData);
+                carrito.forEach(item => {
+                    batch.update(db.collection("productos").doc(item.id), { stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
+                });
+
+                await batch.commit();
+                alert("✅ Venta procesada.");
+                imprimirTicket(ventaData);
+                carrito = []; renderCarrito(); cerrarModal(); navegar('inicio');
+            } catch (e) { alert("Error en el cierre."); }
+        }
+
+        function imprimirTicket(v) {
+            const t = document.getElementById('ticket-print');
+            const itemsHtml = v.items.map(i => `<tr><td>${i.nombre}</td><td align="right">x${i.cantidad}</td><td align="right">${money(i.subtotal)}</td></tr>`).join('');
+            t.innerHTML = `
+                <div style="text-align:center;">
+                    <h2 style="margin-bottom:5px;">CRAFTS COLOMBIA</h2>
+                    <p style="text-transform:uppercase; font-size:10px;">SEDE: ${activeSede}</p>
+                    <hr>
+                    <p style="font-size:10px;">Vendedor: ${vendedorActivo}<br>Fecha: ${new Date().toLocaleString()}</p>
+                    <hr>
+                    <table width="100%" style="font-size:10px;">${itemsHtml}</table>
+                    <hr>
+                    <h3 style="text-align:right;">TOTAL: ${money(v.total)}</h3>
+                    <p style="text-align:center; font-size:9px;">Pago: ${v.metodo_pago}<br>¡Gracias por su compra!</p>
+                </div>`;
+            window.print();
+        }
+
+        // --- SOPORTE COMÚN (FILTRADO BLINDADO) ---
         function filtrarVenta(q) {
             const query = safeStr(q).toLowerCase().trim(); const list = document.getElementById('search-results-list'); if(!list) return;
             const filtered = productosData.filter(p => {
@@ -259,24 +334,26 @@
                     <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl leading-none"><i class="fas fa-gem"></i></div>
                     <div class="flex-1 text-left leading-none">
                         <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
-                        <h3 onclick="verDetalleFicha('${p.id}')" class="font-black text-slate-600 text-lg uppercase truncate cursor-pointer hover:text-pavo-real transition-all leading-none">${safeUpper(p.nombre)}</h3>
+                        <h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3>
                     </div>
                     <div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none">
-                        <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
+                        <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(p.sede_ubicacion || p.sede)}</span>
                         <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
                     </div>
                     <div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none">
                         <p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p>
                     </div>
                     <div class="flex gap-2 border-l border-slate-50 pl-4 leading-none">
-                        ${(currentUserData.rol === 'admin' || currentUserData.rol === 'control') ? `<button onclick="verTraslado('${p.id}')" title="Trasladar" class="text-slate-300 hover:text-orange-500 transition-all text-xl bg-transparent border-0 cursor-pointer px-2"><i class="fas fa-exchange-alt"></i></button><button onclick="verFicha('${p.id}')" title="Editar" class="text-slate-300 hover:text-pavo-real transition-all text-xl bg-transparent border-0 cursor-pointer px-2"><i class="fas fa-pen"></i></button>` : `<button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none">Agregar</button>`}
+                        <button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none">Agregar</button>
                     </div>
                 </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
         }
 
-        async function cargarEstadisticasDashboard() { if (typeof unsubVentasStats === 'function') unsubVentasStats(); const h = new Date(); h.setHours(0,0,0,0); const aI = new Date(h); aI.setDate(h.getDate()-1); const aF = new Date(h); aF.setMilliseconds(-1); const mI = new Date(h.getFullYear(), h.getMonth(), 1); const yI = new Date(h.getFullYear(), 0, 1); unsubVentasStats = db.collection("ventas").onSnapshot(snap => { let totals = { hoy: 0, ayer: 0, mes: 0, año: 0 }; let mapSedes = { "filandia1": "1", "filandia2": "2", "cableplaza": "3", "fundadores": "4", "jardin": "5", "online": "6" }; let bVals = { hoy: {}, ayer: {}, mes: {}, año: {} }; [1,2,3,4,5,6].forEach(i => { bVals.hoy[i]=0; bVals.ayer[i]=0; bVals.mes[i]=0; bVals.año[i]=0; }); snap.forEach(doc => { const v = doc.data(); const f = v.fecha?.toDate() || new Date(); const t = safeNum(v.total); const sV = normalizeSede(v.sede); if(currentUserData.rol !== 'admin' && sV !== normalizeSede(activeSede)) return; const n = mapSedes[sV] || null; if(f >= h) { totals.hoy += t; if(n) bVals.hoy[n] += t; } if(f >= aI && f <= aF) { totals.ayer += t; if(n) bVals.ayer[n] += t; } if(f >= mI) { totals.mes += t; if(n) bVals.mes[n] += t; } if(f >= yI) { totals.año += t; if(n) bVals.año[n] += t; } }); ['hoy','ayer','mes','año'].forEach(k => { const el = document.getElementById(`dash-total-${k}`); if(el) el.innerText = money(totals[k]); }); if(currentUserData.rol === 'admin') { [1,2,3,4,5,6].forEach(i => { ['hoy','ayer','mes','año'].forEach(p => { const bEl = document.getElementById(`val-${p}-${i}`); if(bEl) bEl.innerText = money(bVals[p][i]); }); }); } }); }
+        async function cargarEstadisticasDashboard() { if (typeof unsubVentasStats === 'function') unsubVentasStats(); const h = new Date(); h.setHours(0,0,0,0); unsubVentasStats = db.collection("ventas").onSnapshot(snap => { let totals = { hoy: 0 }; snap.forEach(doc => { const v = doc.data(); const f = v.fecha?.toDate() || new Date(); if(f >= h && normalizeSede(v.sede) === normalizeSede(activeSede)) totals.hoy += safeNum(v.total); }); if(document.getElementById(`dash-total-hoy`)) document.getElementById(`dash-total-hoy`).innerText = money(totals.hoy); }); }
         function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
         function cerrarModal() { document.getElementById('main-modal')?.classList.add('hidden'); }
+        // Inicial
+        updateClock(); renderCarrito();
     </script>
 </body>
 </html>

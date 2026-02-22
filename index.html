@@ -170,7 +170,6 @@
                     unsubProductos = db.collection("productos").onSnapshot(snap => {
                         productosData = [];
                         snap.forEach(d => productosData.push({id: d.id, ...d.data()}));
-                        // Si estamos en inicio, refrescar ventas. Si estamos en logística, refrescar tabla
                         filtrarVenta(document.getElementById('global-search')?.value || "");
                         if(document.getElementById('inventory-list')) ejecutarBusquedaAvanzada();
                     });
@@ -227,24 +226,45 @@
             renderInventario(filtered, list);
         }
 
-        // Diferente a Tienda: Aquí sale el botón "Gestionar" que llama a verFicha()
+        // --- FUNCIÓN PARA EXPANDIR/COLAPSAR DETALLES ---
+        function toggleDetalle(id) {
+            const element = document.getElementById(id);
+            if(element) element.classList.toggle('hidden');
+        }
+
         function renderInventario(data, container) {
             container.innerHTML = data.map(p => `
-            <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none shadow-sm border border-slate-200">
-                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-pavo-real text-xl leading-none"><i class="fas fa-box-open"></i></div>
-                <div class="flex-1 text-left leading-none">
-                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
-                    <h3 class="font-black text-slate-700 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3>
+            <div class="bg-white p-6 rounded-[2.5rem] flex flex-col gap-4 animate-in leading-none shadow-sm transition-all hover:shadow-md border border-slate-200">
+                <div class="flex items-center gap-10">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-pavo-real text-xl leading-none"><i class="fas fa-box-open"></i></div>
+                    <div class="flex-1 text-left leading-none cursor-pointer group" onclick="toggleDetalle('det-inv-${p.id}')">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
+                        <h3 class="font-black text-slate-700 text-lg uppercase truncate leading-none group-hover:text-pavo-real transition-colors">${safeUpper(p.nombre)} <i class="fas fa-chevron-down text-xs ml-2 text-slate-300"></i></h3>
+                    </div>
+                    <div class="text-center min-w-[140px] border-l border-slate-100 pl-4 leading-none">
+                        <span class="bg-blue-100 text-pavo-real text-[11px] px-4 py-2 rounded-full font-black uppercase italic leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
+                        <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
+                    </div>
+                    <div class="text-right min-w-[120px] border-l border-slate-100 pl-4 leading-none">
+                        <p class="font-black text-slate-500 text-xl tabular-nums leading-none">${money(p.precio)}</p>
+                    </div>
+                    <div class="flex gap-2 border-l border-slate-100 pl-4 leading-none">
+                        <button onclick="verFicha('${p.id}')" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg hover:bg-black transition-all leading-none"><i class="fas fa-cog mr-2"></i>Gestionar</button>
+                    </div>
                 </div>
-                <div class="text-center min-w-[140px] border-l border-slate-100 pl-4 leading-none">
-                    <span class="bg-slate-100 text-slate-600 text-[11px] px-4 py-2 rounded-full font-black uppercase italic leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
-                    <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
-                </div>
-                <div class="text-right min-w-[120px] border-l border-slate-100 pl-4 leading-none">
-                    <p class="font-black text-slate-500 text-xl tabular-nums leading-none">${money(p.precio)}</p>
-                </div>
-                <div class="flex gap-2 border-l border-slate-100 pl-4 leading-none">
-                    <button onclick="verFicha('${p.id}')" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg hover:bg-black transition-all leading-none"><i class="fas fa-cog mr-2"></i>Gestionar</button>
+                <div id="det-inv-${p.id}" class="hidden border-t border-slate-100 pt-6 mt-2 grid grid-cols-3 gap-4 text-left animate-in">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">ID Ref</p>
+                        <p class="font-bold text-xs text-slate-600">${p.id}</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Precio Base</p>
+                        <p class="font-bold text-xs text-pavo-real">${money(p.precio)}</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estado Stock</p>
+                        <p class="font-bold text-xs ${p.stock > 5 ? 'text-green-500' : 'text-red-500'}">${p.stock > 5 ? 'Óptimo' : 'Bajo / Crítico'}</p>
+                    </div>
                 </div>
             </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">No se encontraron existencias con esos filtros.</div>';
         }
@@ -464,7 +484,39 @@
         }
 
         function renderResultados(data, container) {
-            container.innerHTML = data.map(p => `<div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none shadow-sm"><div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl leading-none"><i class="fas fa-gem"></i></div><div class="flex-1 text-left leading-none"><p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p><h3 class="font-black text-slate-600 text-lg uppercase truncate leading-none">${safeUpper(p.nombre)}</h3></div><div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none"><span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span><p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p></div><div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none"><p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p></div><div class="flex gap-2 border-l border-slate-50 pl-4 leading-none"><button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none hover:bg-orange-600 transition-all">Agregar</button></div></div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
+            container.innerHTML = data.map(p => `
+            <div class="bg-white p-6 rounded-[2.5rem] flex flex-col gap-4 animate-in leading-none shadow-sm transition-all hover:shadow-md border border-slate-100">
+                <div class="flex items-center gap-10">
+                    <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 text-xl leading-none"><i class="fas fa-gem"></i></div>
+                    <div class="flex-1 text-left leading-none cursor-pointer group" onclick="toggleDetalle('det-res-${p.id}')">
+                        <p class="text-[8px] font-black text-orange-400 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
+                        <h3 class="font-black text-slate-700 text-lg uppercase truncate leading-none group-hover:text-orange-500 transition-colors">${safeUpper(p.nombre)} <i class="fas fa-chevron-down text-xs ml-2 text-slate-300"></i></h3>
+                    </div>
+                    <div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none">
+                        <span class="bg-orange-100 text-orange-600 text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-sm leading-none">${safeUpper(normalizeSede(p.sede_ubicacion || p.sede))}</span>
+                        <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
+                    </div>
+                    <div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none">
+                        <p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p>
+                    </div>
+                    <div class="flex gap-2 border-l border-slate-50 pl-4 leading-none">
+                        <button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none hover:bg-orange-600 transition-all">Agregar</button>
+                    </div>
+                </div>
+                <div id="det-res-${p.id}" class="hidden border-t border-slate-100 pt-6 mt-2 grid grid-cols-2 gap-4 text-left animate-in">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">ID Ref</p>
+                        <p class="font-bold text-xs text-slate-500">${p.id}</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Disponibilidad</p>
+                            <p class="font-bold text-xs text-slate-600">${p.stock > 0 ? 'En stock' : 'Agotado'}</p>
+                        </div>
+                        <i class="fas fa-check-circle text-green-500 text-2xl opacity-${p.stock > 0 ? '100' : '20'}"></i>
+                    </div>
+                </div>
+            </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
         }
 
         function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }

@@ -55,11 +55,11 @@
             <nav id="nav-menu" class="p-4 mt-10 space-y-2 flex-1 hide-scroll"></nav>
 
             <div id="sidebar-cesta" class="hidden p-4 border-t border-white/5 animate-in">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Cesta</p>
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Cesta de Venta</p>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 hide-scroll"></div>
                 <div class="mt-6 pt-4 border-t border-white/10 text-right">
                     <span id="cesta-total" class="block font-black text-xl text-orange-500 tabular-nums mb-4">$0</span>
-                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Finalizar</button>
+                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all">Finalizar</button>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                 <div class="flex items-center gap-6 text-white text-left italic">
                     <div class="flex flex-col">
                         <span id="label-sede-top" class="text-[9px] bg-orange-500 text-white px-2 py-0.5 rounded font-black uppercase tracking-tighter w-fit mb-1">...</span>
-                        <span id="current-vendedor-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest">Vendedor</span>
+                        <span id="current-vendedor-display" class="font-bold text-xs text-slate-400 uppercase tracking-widest italic tracking-tighter">Vendedor</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-center">
@@ -84,7 +84,7 @@
                 </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
-                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">EN LÍNEA</span>
+                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Activo</span>
                 </div>
             </header>
             <section id="view-container" class="flex-1 overflow-y-auto p-12 relative bg-slate-50"></section>
@@ -94,7 +94,7 @@
     <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
             <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic">
-                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none">Operación</h2>
+                <h2 id="modal-title" class="font-black text-2xl italic tracking-tighter uppercase leading-none italic">Operación</h2>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
             <div id="modal-content" class="p-10 max-h-[80vh] overflow-y-auto hide-scroll bg-slate-50/30 relative"></div>
@@ -113,7 +113,7 @@
 
         async function iniciarSesion() { 
             const email = document.getElementById('login-email').value, pass = document.getElementById('login-pass').value, vend = document.getElementById('login-vendedor').value.trim();
-            if(!vend) return alert("Indica el nombre del vendedor.");
+            if(!vend) return alert("Indica el nombre del operario.");
             auth.signInWithEmailAndPassword(email, pass).then(() => { localStorage.setItem('vendedor_nombre', vend.toUpperCase()); vendedorActivo = vend.toUpperCase(); }).catch(() => alert("Error de acceso.")); 
         }
 
@@ -122,14 +122,17 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const doc = await db.collection('usuarios').doc(user.email).get();
-                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Sede' };
+                currentUserData = doc.data() || { rol: 'vendedor', sede: 'Sin Sede' };
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('sidebar-sede-name').innerText = currentUserData.sede;
                 document.getElementById('label-sede-top').innerText = "SEDE " + currentUserData.sede;
                 document.getElementById('current-vendedor-display').innerText = vendedorActivo || "SOPORTE";
+                
                 escucharCategorias(); renderSidebar(currentUserData.rol); navegar('inicio');
-                db.collection("productos").onSnapshot(snap => { productosData = []; snap.forEach(d => productosData.push({id: d.id, ...d.data()})); });
+                db.collection("productos").onSnapshot(snap => { 
+                    productosData = []; snap.forEach(d => productosData.push({id: d.id, ...d.data()})); 
+                });
             } else { document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('main-app').classList.add('hidden'); }
         });
 
@@ -147,8 +150,9 @@
         }
 
         function createDashboardRow(title, label, idPrefix, isAccent = false) {
+            const rowClass = isAccent ? "bg-blue-50 border-blue-100" : "bg-white border-slate-100";
             const totalClass = isAccent ? "text-pavo-real" : (idPrefix === 'hoy' ? "text-orange-500" : "text-pavo-real");
-            return `<div class="${isAccent ? 'bg-blue-50' : 'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40">${label}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3">${title}</h3><h3 id="dash-total-${idPrefix}" class="text-5xl font-black ${totalClass} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center">${[1, 2, 3, 4, 5, 6].map(i => `<div class="flex flex-col items-center justify-center"><p class="text-4xl font-black ${isAccent ? 'text-blue-200' : 'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${idPrefix}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
+            return `<div class="${rowClass} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40">${label}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3">${title}</h3><h3 id="dash-total-${idPrefix}" class="text-5xl font-black ${totalClass} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center">${[1, 2, 3, 4, 5, 6].map(i => `<div class="flex flex-col items-center justify-center"><p class="text-4xl font-black ${isAccent ? 'text-blue-200' : 'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${idPrefix}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
         }
 
         function navegar(vista) {
@@ -157,18 +161,69 @@
             navButtons.forEach(btn => btn.getAttribute('onclick').includes(`'${vista}'`) ? btn.classList.add('nav-active') : btn.classList.remove('nav-active'));
 
             if (vista === 'inicio') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase italic leading-none">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16">SEDE ${currentUserData.sede}</p><div class="max-w-2xl mx-auto relative mb-20"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Buscador global..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div><div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left"><div class="min-w-[300px] border-r border-slate-100 pr-12"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic leading-none">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic">Cifras en tiempo real</div></div><div id="stats-container" class="space-y-4"></div><div id="search-results-list" class="space-y-4 mt-10 text-left"></div></div>`;
+                container.innerHTML = `
+                    <div class="animate-in max-w-7xl mx-auto pt-4 text-center">
+                        <h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase italic leading-none">Crafts Colombia</h1>
+                        <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16">SEDE ${currentUserData.sede}</p>
+                        <div class="max-w-2xl mx-auto relative mb-20"><i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-200 text-xl"></i><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Buscador global..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div>
+                        <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left">
+                            <div class="min-w-[300px] border-r border-slate-100 pr-12"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic leading-none">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div>
+                            <div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic">Cifras en tiempo real</div>
+                        </div>
+                        <div id="stats-container" class="space-y-4"></div>
+                        <div id="search-results-list" class="space-y-4 mt-10 text-left"></div>
+                    </div>`;
                 if(currentUserData.rol === 'admin' || currentUserData.rol === 'control') {
-                    document.getElementById('stats-container').innerHTML = `${createDashboardRow("Cierre Ayer", "Corte", "ayer")}${createDashboardRow("Global Mes", "Acumulado", "mes")}${createDashboardRow("Histórico Año", "Fiscal 2026", "año", true)}`;
+                    document.getElementById('stats-container').innerHTML = `${createDashboardRow("Ventas Ayer", "Corte", "ayer")}${createDashboardRow("Global Mes", "Acumulado", "mes")}${createDashboardRow("Histórico Año", "Fiscal 2026", "año", true)}`;
                 }
                 cargarEstadisticasDashboard();
             } else if (vista === 'productos') {
-                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase italic leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic">Panel Maestro de Existencias</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left animate-in relative"><div class="grid grid-cols-1 md:grid-cols-3 gap-10"><div class="md:col-span-2"><label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Nombre o Referencia</label><div class="relative"><i class="fas fa-tag absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i><input id="adv-name" type="text" placeholder="Escribe producto..." class="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm"></div></div><div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Sede Destino</label><div class="relative"><i class="fas fa-store absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i><select id="adv-sede" class="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm"><option value="TODAS">TODAS LAS SEDES</option><option value="Bodega">BODEGA CENTRAL</option><option value="Filandia 1">FILANDIA 1</option><option value="Filandia 2">FILANDIA 2</option><option value="Cable Plaza">CABLE PLAZA</option><option value="Fundadores">FUNDADORES</option><option value="Jardín">JARDÍN</option><option value="Online">ONLINE</option></select></div></div><div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Categoría</label><div class="relative"><i class="fas fa-tags absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i><select id="adv-cat" class="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('')}</select></div></div><div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Desde</label><input id="adv-date-start" type="date" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-slate-500 shadow-sm"></div><div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Hasta</label><input id="adv-date-end" type="date" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-slate-500 shadow-sm"></div></div><div class="mt-10 flex justify-center"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all flex items-center gap-4 border-0 cursor-pointer"><i class="fas fa-search-plus"></i> Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 text-left"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-plus"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Nuevo Item</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Crear Stock</p></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-tags"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Categorías</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Etiquetas</p></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-file-excel"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Carga Masiva</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Excel</p></div></button></div><div id="inventory-list" class="space-y-3 text-left"></div></div>`;
+                container.innerHTML = `
+                    <div class="animate-in max-w-7xl mx-auto pt-4 text-center">
+                        <h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase italic leading-none">Logística Central</h1>
+                        <p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic">Panel Maestro de Existencias</p>
+                        
+                        <div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left animate-in relative">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                                <div class="md:col-span-2">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Nombre o Referencia</label>
+                                    <div class="relative"><i class="fas fa-tag absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i><input id="adv-name" type="text" placeholder="Escribe producto..." class="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm"></div>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Sede Destino</label>
+                                    <div class="relative"><i class="fas fa-store absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i><select id="adv-sede" class="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm"><option value="TODAS">TODAS LAS SEDES</option><option value="Bodega">BODEGA CENTRAL</option><option value="Filandia 1">FILANDIA 1</option><option value="Filandia 2">FILANDIA 2</option><option value="Cable Plaza">CABLE PLAZA</option><option value="Fundadores">FUNDADORES</option><option value="Jardín">JARDÍN</option><option value="Online">ONLINE</option></select></div>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Categoría</label>
+                                    <div class="relative"><i class="fas fa-tags absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i><select id="adv-cat" class="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('')}</select></div>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Desde</label>
+                                    <input id="adv-date-start" type="date" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-slate-500 shadow-sm">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest mb-3 block italic">Hasta</label>
+                                    <input id="adv-date-end" type="date" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-slate-500 shadow-sm">
+                                </div>
+                            </div>
+                            <div class="mt-10 flex justify-center">
+                                <button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all flex items-center gap-4 border-0 cursor-pointer"><i class="fas fa-search-plus"></i> Ejecutar Búsqueda</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 text-left">
+                            <button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-plus"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Nuevo Item</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Crear Stock</p></div></button>
+                            <button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-tags"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Categorías</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Etiquetas</p></div></button>
+                            <button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-file-excel"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Carga Masiva</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Excel</p></div></button>
+                        </div>
+                        <div id="inventory-list" class="space-y-3 text-left"></div>
+                    </div>`;
             } else if (vista === 'historial') {
                 container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase italic leading-none">Historial Maestro</h1><div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 text-left mt-20"><button onclick="verHistorialTraslados()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-exchange-alt"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Traslados</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Entre Sedes</p></div></button><button onclick="verHistorialIngresos()" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-plus-circle"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Ingresos</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Nuevos</p></div></button><button onclick="verHistorialVentas()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group shadow-xl border-0 cursor-pointer"><div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"><i class="fas fa-shopping-cart"></i></div><div><h3 class="font-black text-xl uppercase tracking-tighter italic leading-none">Ventas</h3><p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Facturación</p></div></button></div><div id="historial-data-container" class="bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100"><div class="p-20 text-center italic text-slate-300 font-bold uppercase text-[10px] tracking-widest">Auditoría centralizada.</div></div></div>`;
             }
         }
 
+        // --- LÓGICA DE BÚSQUEDA AVANZADA (QUIRÚRGICA) ---
         function ejecutarBusquedaAvanzada() {
             const name = document.getElementById('adv-name').value.toLowerCase().trim();
             const sede = document.getElementById('adv-sede').value;
@@ -199,6 +254,7 @@
             container.innerHTML = html || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px]">Sin coincidencias encontradas.</div>';
         }
 
+        // --- FICHA TÉCNICA INFORMATIVA (MODIFICADA QUIRÚRGICAMENTE) ---
         function verDetalleFicha(id) {
             const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
             const p = productosData.find(item => item.id === id);
@@ -233,16 +289,15 @@
             m.classList.remove('hidden');
         }
 
-        // --- HOJA DE VIDA DEL PRODUCTO (CORREGIDA CON TIMEOUT Y JS SORT) ---
+        // --- HOJA DE VIDA DEL PRODUCTO (REDISÑADA QUIRÚRGICAMENTE) ---
         function verHojaVida(prodName) {
             const c = document.getElementById('modal-content');
             document.getElementById('modal-title').innerText = "Hoja de Vida: " + prodName;
             c.innerHTML = `<div id="loading-hv" class="p-10 text-center animate-in"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl mb-4"></i><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Generando línea de tiempo del producto...</p></div>`;
             
-            // Timeout de seguridad: Si en 4s no hay respuesta, abortar bucle
             const safetyTimeout = setTimeout(() => {
                 if(document.getElementById('loading-hv')) {
-                    c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black animate-in">Tiempo de espera agotado. No se encontraron registros.</div>`;
+                    c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black animate-in">No se encontraron registros de movimiento.</div>`;
                 }
             }, 4000);
 
@@ -253,20 +308,41 @@
                     return;
                 }
                 
-                // Ordenamiento en memoria (JS) para evitar errores de índice compuesto
                 let docs = []; snap.forEach(doc => docs.push(doc.data()));
                 docs.sort((a, b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
 
-                let html = `<div class="space-y-4 animate-in max-h-[60vh] overflow-y-auto hide-scroll">`;
+                let html = `<div class="space-y-6 animate-in max-h-[60vh] overflow-y-auto hide-scroll p-4">`;
                 docs.forEach(t => {
-                    const f = t.fecha ? t.fecha.toDate().toLocaleString() : 'Reciente';
-                    html += `<div class="bg-white p-6 rounded-3xl border border-slate-100 flex items-center justify-between shadow-sm"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><i class="fas fa-exchange-alt"></i></div><div><p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">${f}</p><h4 class="font-bold text-slate-700 text-sm uppercase">${t.origen} <i class="fas fa-arrow-right mx-2 text-pavo-real text-[10px]"></i> ${t.destino}</h4></div></div><div class="text-right"><p class="text-[9px] font-black text-orange-500 uppercase">Autor:</p><p class="text-[10px] font-bold text-pavo-real uppercase tracking-tighter">${t.usuario}</p></div></div>`;
+                    const dt = t.fecha ? t.fecha.toDate() : new Date();
+                    const fechaStr = dt.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    const horaStr = dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    
+                    html += `
+                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-2 h-full bg-orange-500 opacity-20"></div>
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic mb-1">${fechaStr}</p>
+                                    <p class="text-xs font-bold text-pavo-real uppercase tracking-widest leading-none">${horaStr}</p>
+                                </div>
+                                <div class="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Autorización:</p>
+                                    <p class="text-[10px] font-black text-pavo-real uppercase">${t.usuario}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 text-xl"><i class="fas fa-exchange-alt"></i></div>
+                                <div>
+                                    <h4 class="font-black text-2xl text-slate-800 uppercase italic tracking-tighter leading-none">${t.origen} <i class="fas fa-arrow-right mx-3 text-pavo-real text-sm"></i> ${t.destino}</h4>
+                                </div>
+                            </div>
+                        </div>`;
                 });
                 html += `</div>`;
                 c.innerHTML = html;
             }).catch(err => {
                 clearTimeout(safetyTimeout);
-                c.innerHTML = `<div class="p-20 text-center text-red-400 italic uppercase text-[10px] font-black animate-in">Error técnico al consultar el historial.</div>`;
+                c.innerHTML = `<div class="p-20 text-center text-red-400 italic uppercase text-[10px] font-black animate-in">Error técnico en historial.</div>`;
             });
         }
 
@@ -309,8 +385,8 @@
         function cerrarModal() { document.getElementById('main-modal').classList.add('hidden'); }
         function verHistorialTraslados() { renderTablaHistorial("traslados", false); }
         function verHistorialIngresos() { renderTablaHistorial("traslados", true); }
-        function verHistorialVentas() { document.getElementById('historial-data-container').innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase font-black text-[10px]">Facturación global en sincronización...</div>`; }
-        async function renderTablaHistorial(coleccion, esIng) { const cont = document.getElementById('historial-data-container'); cont.innerHTML = `<div class="p-10 text-center"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl"></i></div>`; db.collection(coleccion).get().then(snap => { let docs = []; snap.forEach(doc => docs.push(doc.data())); docs.sort((a,b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0)); let html = `<table class="w-full text-left"><thead class="bg-slate-50 border-b border-slate-100"><tr><th class="p-6 text-[10px] font-black text-slate-400 uppercase">Producto</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase">Fecha</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase text-center">Origen</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase text-center">Destino</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase text-right">Usuario</th></tr></thead><tbody class="divide-y divide-slate-50">`; let c = 0; docs.forEach(t => { const isI = t.origen === "INGRESO INICIAL"; if(esIng === isI) { c++; const f = t.fecha ? t.fecha.toDate().toLocaleString() : 'Reciente'; html += `<tr class="hover:bg-slate-50"><td class="p-6 font-bold text-slate-600 uppercase text-xs">${t.producto}</td><td class="p-6 text-[11px] font-medium text-slate-400 tabular-nums">${f}</td><td class="p-6 text-center"><span class="bg-slate-100 text-slate-400 px-3 py-1 rounded-full font-black text-[9px] uppercase italic">${t.origen}</span></td><td class="p-6 text-center"><span class="${esIng ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'} px-3 py-1 rounded-full font-black text-[9px] uppercase italic">${t.destino}</span></td><td class="p-6 text-right font-black text-pavo-real text-[10px] uppercase">${t.usuario}</td></tr>`; } }); if(c === 0) html += `<tr><td colspan="5" class="p-20 text-center italic text-slate-300 uppercase font-black text-[10px]">Sin registros</td></tr>`; html += `</tbody></table>`; cont.innerHTML = html; }); }
+        function verHistorialVentas() { document.getElementById('historial-data-container').innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase font-black text-[10px]">Cargando historial de facturación...</div>`; }
+        async function renderTablaHistorial(coleccion, esIng) { const cont = document.getElementById('historial-data-container'); cont.innerHTML = `<div class="p-10 text-center"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl"></i></div>`; db.collection(coleccion).get().then(snap => { let docs = []; snap.forEach(doc => docs.push(doc.data())); docs.sort((a,b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0)); let html = `<table class="w-full text-left"><thead class="bg-slate-50 border-b border-slate-100"><tr><th class="p-6 text-[10px] font-black text-slate-400 uppercase">Producto</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase">Fecha</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase text-center">Origen</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase text-center">Destino</th><th class="p-6 text-[10px] font-black text-slate-400 uppercase text-right">Usuario</th></tr></thead><tbody class="divide-y divide-slate-50">`; let c = 0; docs.forEach(t => { const isI = t.origen === "INGRESO INICIAL"; if(esIng === isI) { c++; const f = t.fecha ? t.fecha.toDate().toLocaleString() : 'Reciente'; html += `<tr class="hover:bg-slate-50 transition-all"><td class="p-6 font-bold text-slate-600 uppercase text-xs">${t.producto}</td><td class="p-6 text-[11px] font-medium text-slate-400 tabular-nums">${f}</td><td class="p-6 text-center"><span class="bg-slate-100 text-slate-400 px-3 py-1 rounded-full font-black text-[9px] uppercase italic">${t.origen}</span></td><td class="p-6 text-center"><span class="${esIng ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'} px-3 py-1 rounded-full font-black text-[9px] uppercase italic">${t.destino}</span></td><td class="p-6 text-right font-black text-pavo-real text-[10px] uppercase">${t.usuario}</td></tr>`; } }); if(c === 0) html += `<tr><td colspan="5" class="p-20 text-center italic text-slate-300 uppercase font-black text-[10px]">Sin registros</td></tr>`; html += `</tbody></table>`; cont.innerHTML = html; }); }
         function gestionCategorias() { const modal = document.getElementById('main-modal'), content = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Categorías"; content.innerHTML = `<div class="space-y-6"><div class="flex gap-4"><input id="nueva-cat" type="text" class="flex-1 p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase" placeholder="Nombre..."><button onclick="addCategoria()" class="bg-slate-900 text-white px-8 rounded-2xl font-black border-0 cursor-pointer shadow-md">Añadir</button></div><div class="pt-6 border-t border-slate-100 flex flex-wrap gap-2">${listaCategorias.map(c => `<span class="bg-white px-4 py-2 rounded-xl text-[10px] font-bold border border-slate-100 text-pavo-real uppercase shadow-sm">${c}</span>`).join('')}</div></div>`; modal.classList.remove('hidden'); }
         async function addCategoria() { const val = document.getElementById('nueva-cat').value; if(!val) return; listaCategorias.push(val); await db.collection("configuracion").doc("categorias").set({ lista: listaCategorias }); alert("Añadida"); gestionCategorias(); }
         function modalCargaMasiva() { const modal = document.getElementById('main-modal'), content = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Carga Masiva Excel"; content.innerHTML = `<div class="space-y-8"><div class="bg-blue-50 p-6 rounded-[2rem] text-[10px] border border-blue-100 uppercase font-bold italic text-blue-800 italic">nombre, categoria, precio, costo, stock, ideal, sede</div><div class="border-4 border-dashed border-slate-100 p-16 rounded-[3rem] text-center"><i class="fas fa-cloud-upload-alt text-5xl text-slate-200 mb-6"></i><br><input type="file" id="excel-input" accept=".xlsx" class="hidden" onchange="procesarExcel(event)"><button onclick="document.getElementById('excel-input').click()" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px] cursor-pointer shadow-lg">Cargar</button></div><div id="excel-preview" class="hidden"><button onclick="confirmarSubida()" class="w-full bg-blue-600 text-white py-6 rounded-3xl font-black uppercase text-xs border-0 cursor-pointer shadow-xl">Confirmar</button></div></div>`; modal.classList.remove('hidden'); }

@@ -31,12 +31,12 @@
 <body class="text-slate-700">
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-petrol">
-        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10 text-center">
+        <div class="bg-white p-12 rounded-[3rem] shadow-2xl w-full max-w-md animate-in border border-white/10 text-center leading-none">
             <h1 class="text-3xl font-black text-slate-500 mb-8 uppercase tracking-tighter italic">CRAFTS POS</h1>
             <div class="space-y-4 text-left">
-                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium uppercase text-left" />
+                <input id="login-email" type="email" placeholder="Usuario / Correo" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium uppercase" />
                 <input id="login-pass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-slate-400 font-medium" />
-                <input id="login-vendedor" type="text" placeholder="Nombre del Operario" class="w-full p-4 bg-orange-50 rounded-2xl border-0 ring-1 ring-orange-200 focus:ring-2 focus:ring-orange-400 font-bold uppercase text-pavo-real" />
+                <input id="login-vendedor" type="text" placeholder="Operario en Turno" class="w-full p-4 bg-orange-50 rounded-2xl border-0 ring-1 ring-orange-200 focus:ring-2 focus:ring-orange-400 font-bold uppercase text-pavo-real" />
 
                 <select id="login-sede" class="w-full p-4 bg-slate-900 text-white rounded-2xl border-0 font-bold uppercase shadow-lg">
                     <option value="" disabled selected>Punto de Venta</option>
@@ -49,7 +49,7 @@
                     <option value="online">ONLINE</option>
                 </select>
 
-                <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs mt-4">Entrar</button>
+                <button onclick="iniciarSesion()" class="w-full bg-slate-700 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg uppercase tracking-widest text-xs mt-4 leading-none">Entrar al Sistema</button>
             </div>
         </div>
     </div>
@@ -64,20 +64,16 @@
                 </div>
             </div>
             <nav id="nav-menu" class="p-4 mt-10 space-y-2 flex-1 hide-scroll"></nav>
-
             <div id="sidebar-cesta" class="hidden p-4 border-t border-white/5 animate-in">
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic text-left leading-none">Cesta de Venta</p>
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic text-left leading-none">Cesta Actual</p>
                 <div id="cesta-items" class="sidebar-scroll space-y-3 hide-scroll"></div>
-                <div class="mt-6 pt-4 border-t border-white/10 text-right">
+                <div class="mt-6 pt-4 border-t border-white/10 text-right leading-none">
                     <span id="cesta-total" class="block font-black text-xl text-orange-500 tabular-nums mb-4">$0</span>
-                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Finalizar</button>
+                    <button onclick="finalizarVenta()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all leading-none">Finalizar</button>
                 </div>
             </div>
-
             <div class="p-4 border-t border-white/5 text-center">
-                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-3 p-3 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-[10px] uppercase tracking-widest">
-                    <i class="fas fa-power-off"></i><span class="hidden md:block ml-2 text-left">Salir</span>
-                </button>
+                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-3 p-3 rounded-xl hover:bg-white/5 text-slate-500 border-0 bg-transparent cursor-pointer font-bold transition-all text-[10px] uppercase tracking-widest leading-none"><i class="fas fa-power-off"></i><span class="hidden md:block ml-2 text-left">Salir</span></button>
             </div>
         </aside>
 
@@ -95,1280 +91,230 @@
                 </div>
                 <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/20"></div>
-                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Activo</span>
+                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Sincronizado</span>
                 </div>
             </header>
             <section id="view-container" class="flex-1 overflow-y-auto p-12 relative bg-slate-50"></section>
         </main>
     </div>
 
-    <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6">
+    <div id="main-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-6 leading-none">
         <div class="bg-white w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in">
             <div class="bg-slate-900 p-8 text-white flex justify-between items-center border-b border-white/10 italic text-left">
-                <h2 id="modal-title" class="font-black text-2xl tracking-tighter uppercase leading-none italic">Operación</h2>
+                <h2 id="modal-title" class="font-black text-2xl tracking-tighter uppercase leading-none italic">Gestión</h2>
                 <button onclick="cerrarModal()" id="btn-close-modal" class="text-slate-400 hover:text-white text-3xl bg-transparent border-0 cursor-pointer transition-all"><i class="fas fa-times-circle"></i></button>
             </div>
-            <div id="modal-content" class="p-10 max-h-[85vh] overflow-y-auto hide-scroll bg-slate-50/30 relative text-left"></div>
+            <div id="modal-content" class="p-10 max-h-[85vh] overflow-y-auto hide-scroll bg-slate-50/30 relative text-left leading-none"></div>
         </div>
     </div>
 
     <script>
-        // ==============================
-        // Firebase
-        // ==============================
-        const firebaseConfig = {
-            apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk",
-            authDomain: "crafts-colombia-pos.firebaseapp.com",
-            projectId: "crafts-colombia-pos",
-            storageBucket: "crafts-colombia-pos.firebasestorage.app",
-            messagingSenderId: "924957968575",
-            appId: "1:924957968575:web:12be975b2346dcdf585e0a"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAEzn4UvflaiWEaXCLkPxYKDcK5HCtaYZk", authDomain: "crafts-colombia-pos.firebaseapp.com", projectId: "crafts-colombia-pos", storageBucket: "crafts-colombia-pos.firebasestorage.app", messagingSenderId: "924957968575", appId: "1:924957968575:web:12be975b2346dcdf585e0a" };
+        firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db = firebase.firestore();
+        
+        let currentUserData = null, activeSede = null, productosData = [], listaCategorias = [], listaProveedores = [], carrito = [];
+        let vendedorActivo = "";
+        let unsubProductos = null, unsubVentasStats = null;
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // HELPERS MAESTROS
+        const safeStr = v => (v ?? "").toString();
+        const safeUpper = v => safeStr(v).toUpperCase();
+        const safeNum = v => Number(v || 0);
+        const money = v => `$${safeNum(v).toLocaleString('es-CO')}`;
+        const normalizeSede = v => safeStr(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
 
-        // ==============================
-        // Estado global
-        // ==============================
-        let currentUserData = null;
-        let activeSede = null;
-        let productosData = [];
-        let listaCategorias = [];
-        let listaProveedores = [];
-        let carrito = [];
-        let vendedorActivo = (localStorage.getItem('vendedor_nombre') || "").toUpperCase();
-
-        let unsubProductos = null;
-        let unsubCategorias = null;
-        let unsubProveedores = null;
-        let unsubVentasStats = null;
-
-        // ==============================
-        // Helpers
-        // ==============================
-        const SEDES = ["bodega", "filandia1", "filandia2", "cableplaza", "fundadores", "jardin", "online"];
-
-        function safeStr(v) { return (v ?? "").toString(); }
-        function safeUpper(v) { return safeStr(v).toUpperCase(); }
-
-        // ✅ PATCH: normalización robusta + alias (Finlandia -> Filandia)
-        function normalizeSede(v) {
-            let s = safeStr(v)
-                .toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita tildes
-                .replace(/[\s_-]/g, ''); // quita espacios, guiones y underscores
-
-            const aliases = {
-                "finlandia1": "filandia1",
-                "finlandia2": "filandia2",
-                "filandia01": "filandia1",
-                "filandia02": "filandia2",
-                "cableplaza1": "cableplaza"
-            };
-
-            return aliases[s] || s;
-        }
-
-        function safeNum(v) { return Number(v || 0); }
-        function money(v) { return `$${safeNum(v).toLocaleString('es-CO')}`; }
-
-        function updateClock() {
-            const now = new Date();
-            const timeEl = document.getElementById('header-time');
-            const dateEl = document.getElementById('header-date');
-            if (timeEl) timeEl.innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            if (dateEl) dateEl.innerText = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
-        }
+        function updateClock() { const now = new Date(); if (document.getElementById('header-time')) document.getElementById('header-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); if (document.getElementById('header-date')) document.getElementById('header-date').innerText = now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }); }
         setInterval(updateClock, 1000);
 
-        function showError(msg) { alert(msg || "Ocurrió un error."); }
-
-        function limpiarListenersFirestore() {
-            try { if (typeof unsubVentasStats === 'function') { unsubVentasStats(); unsubVentasStats = null; } } catch {}
+        async function iniciarSesion() { 
+            const email = safeStr(document.getElementById('login-email')?.value).trim(), pass = safeStr(document.getElementById('login-pass')?.value), vend = safeStr(document.getElementById('login-vendedor')?.value).trim(), sedeChoice = safeStr(document.getElementById('login-sede')?.value);
+            if(!vend) return alert("Indica el nombre del operario.");
+            if(!sedeChoice) return alert("Selecciona la sede.");
+            try { await auth.signInWithEmailAndPassword(email, pass); localStorage.setItem('vendedor_nombre', vend.toUpperCase()); localStorage.setItem('active_sede_choice', sedeChoice); } 
+            catch (e) { alert("Acceso denegado."); }
         }
 
-        function limpiarListenersSesion() {
-            try { if (typeof unsubProductos === 'function') { unsubProductos(); unsubProductos = null; } } catch {}
-            try { if (typeof unsubCategorias === 'function') { unsubCategorias(); unsubCategorias = null; } } catch {}
-            try { if (typeof unsubProveedores === 'function') { unsubProveedores(); unsubProveedores = null; } } catch {}
-            try { if (typeof unsubVentasStats === 'function') { unsubVentasStats(); unsubVentasStats = null; } } catch {}
-        }
-
-        // ==============================
-        // Auth
-        // ==============================
-        async function iniciarSesion() {
-            const email = safeStr(document.getElementById('login-email')?.value).trim();
-            const pass = safeStr(document.getElementById('login-pass')?.value);
-            const vend = safeStr(document.getElementById('login-vendedor')?.value).trim();
-            const sedeChoice = safeStr(document.getElementById('login-sede')?.value).trim();
-
-            if (!vend) return alert("Indica el nombre del operario.");
-            if (!sedeChoice) return alert("Selecciona la sede de trabajo.");
-            if (!email || !pass) return alert("Ingresa correo y contraseña.");
-
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                localStorage.setItem('vendedor_nombre', vend.toUpperCase());
-                localStorage.setItem('active_sede_choice', sedeChoice);
-                vendedorActivo = vend.toUpperCase();
-            } catch (e) {
-                console.error(e);
-                alert("Error de acceso. Verifica correo y contraseña.");
-            }
-        }
-
-        function cerrarSesion() {
-            localStorage.removeItem('vendedor_nombre');
-            localStorage.removeItem('active_sede_choice');
-            carrito = [];
-            limpiarListenersSesion();
-            auth.signOut().finally(() => location.reload());
-        }
+        function cerrarSesion() { localStorage.removeItem('vendedor_nombre'); localStorage.removeItem('active_sede_choice'); if(typeof unsubProductos === 'function') unsubProductos(); auth.signOut().finally(() => location.reload()); }
 
         auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                document.getElementById('login-screen')?.classList.remove('hidden');
-                document.getElementById('main-app')?.classList.add('hidden');
-                return;
-            }
-
-            try {
+            if (user) {
+                const doc = await db.collection('usuarios').doc(user.email).get();
+                currentUserData = doc.data() || { rol: 'vendedor', sede: 'sin_sede' };
                 const chosenSede = localStorage.getItem('active_sede_choice');
-                if (!chosenSede) {
-                    alert("No se encontró la sede activa. Inicia sesión nuevamente.");
-                    cerrarSesion();
-                    return;
-                }
-
-                const userDoc = await db.collection('usuarios').doc(user.email).get();
-                currentUserData = userDoc.data() || { rol: 'vendedor', sede: 'sin_sede' };
-
+                vendedorActivo = (localStorage.getItem('vendedor_nombre') || "").toUpperCase();
+                
+                // REGLA DE ACCESO MAESTRA
+                const isAdmin = (currentUserData.rol === 'admin' || currentUserData.rol === 'control');
                 const userSedes = Array.isArray(currentUserData.sede) ? currentUserData.sede : [currentUserData.sede];
-                const hasAccess = (currentUserData.rol === 'admin') ||
-                    userSedes.some(s => normalizeSede(s) === normalizeSede(chosenSede));
+                const hasAccess = isAdmin || userSedes.some(s => normalizeSede(s) === normalizeSede(chosenSede));
 
-                if (!hasAccess) {
-                    alert("❌ Sin permiso autorizado para esta sede.");
-                    cerrarSesion();
-                    return;
-                }
-
-                establecerSedeActiva(chosenSede);
-                escucharCategorias();
-                escucharProveedores();
-                renderSidebar(currentUserData.rol);
-
-                if (typeof unsubProductos === 'function') unsubProductos();
-                unsubProductos = db.collection("productos").onSnapshot(
-                    (snap) => {
+                if(hasAccess) {
+                    activeSede = chosenSede;
+                    document.getElementById('login-screen')?.classList.add('hidden');
+                    document.getElementById('main-app')?.classList.remove('hidden');
+                    document.getElementById('sidebar-sede-name').innerText = activeSede.toUpperCase();
+                    document.getElementById('label-sede-top').innerText = "SEDE " + activeSede.toUpperCase();
+                    document.getElementById('current-vendedor-display').innerText = vendedorActivo || "OPERARIO";
+                    
+                    if(typeof unsubProductos === 'function') unsubProductos();
+                    unsubProductos = db.collection("productos").onSnapshot(snap => {
                         productosData = [];
-                        snap.forEach(d => productosData.push({ id: d.id, ...d.data() }));
+                        snap.forEach(d => productosData.push({id: d.id, ...d.data()}));
+                        const query = document.getElementById('global-search')?.value || "";
+                        filtrarVenta(query);
+                        if(document.getElementById('inventory-list')) ejecutarBusquedaAvanzada();
+                    });
 
-                        const searchInput = document.getElementById('global-search');
-                        if (searchInput) filtrarVenta(searchInput.value);
-
-                        const invList = document.getElementById('inventory-list');
-                        if (invList && (document.getElementById('adv-name') || document.getElementById('adv-sede'))) {
-                            ejecutarBusquedaAvanzada();
-                        }
-                    },
-                    (err) => {
-                        console.error("Error productos onSnapshot:", err);
-                        showError("Error cargando productos (revisa permisos de Firestore).");
-                    }
-                );
-            } catch (e) {
-                console.error(e);
-                showError("Error inicializando sesión.");
-            }
+                    escucharCategorias(); escucharProveedores(); renderSidebar(currentUserData.rol); navegar('inicio');
+                } else { alert("Acceso no autorizado."); cerrarSesion(); }
+            } else { document.getElementById('login-screen')?.classList.remove('hidden'); document.getElementById('main-app')?.classList.add('hidden'); }
         });
 
-        function establecerSedeActiva(sede) {
-            activeSede = sede;
-            document.getElementById('login-screen')?.classList.add('hidden');
-            document.getElementById('main-app')?.classList.remove('hidden');
-            document.getElementById('sidebar-sede-name').innerText = safeUpper(activeSede);
-            document.getElementById('label-sede-top').innerText = "SEDE " + safeUpper(activeSede);
-            document.getElementById('current-vendedor-display').innerText = vendedorActivo || "OPERARIO";
-            updateClock();
-            navegar('inicio');
-        }
+        function escucharCategorias() { db.collection("configuracion").doc("categorias").onSnapshot(doc => { if(doc.exists) listaCategorias = doc.data().lista || []; }); }
+        function escucharProveedores() { db.collection("proveedores").onSnapshot(snap => { listaProveedores = []; snap.forEach(d => listaProveedores.push({id: d.id, ...d.data()})); }); }
 
-        // ==============================
-        // Listeners de configuración
-        // ==============================
-        function escucharCategorias() {
-            if (typeof unsubCategorias === 'function') unsubCategorias();
-            unsubCategorias = db.collection("configuracion").doc("categorias").onSnapshot(
-                (doc) => {
-                    listaCategorias = (doc.exists && Array.isArray(doc.data()?.lista)) ? doc.data().lista : [];
-                },
-                (err) => {
-                    console.error("Error categorías:", err);
-                    listaCategorias = [];
-                }
-            );
-        }
-
-        function escucharProveedores() {
-            if (typeof unsubProveedores === 'function') unsubProveedores();
-            unsubProveedores = db.collection("proveedores").onSnapshot(
-                (snap) => {
-                    listaProveedores = [];
-                    snap.forEach(d => listaProveedores.push({ id: d.id, ...d.data() }));
-                    if (document.getElementById('prov-table-body')) renderProveedoresTable();
-                },
-                (err) => {
-                    console.error("Error proveedores:", err);
-                    listaProveedores = [];
-                }
-            );
-        }
-
-        // ==============================
-        // Sidebar + Navegación
-        // ==============================
         function renderSidebar(rol) {
             const nav = document.getElementById('nav-menu');
-            if (!nav) return;
-
-            let menu = `
-                <button onclick="navegar('inicio')" data-vista="inicio" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all">
-                    <i class="fas fa-th-large"></i><span class="hidden md:block">Inicio</span>
-                </button>
-            `;
-
-            if (rol === 'admin' || rol === 'control') {
-                menu += `
-                    <button onclick="navegar('productos')" data-vista="productos" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all">
-                        <i class="fas fa-boxes"></i><span class="hidden md:block">Logística</span>
-                    </button>
-                    <button onclick="navegar('historial')" data-vista="historial" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all">
-                        <i class="fas fa-history"></i><span class="hidden md:block">Historial</span>
-                    </button>
-                `;
+            const isAdm = rol === 'admin' || rol === 'control';
+            let menu = `<button onclick="navegar('inicio')" data-vista="inicio" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-th-large"></i><span class="hidden md:block">Inicio</span></button>`;
+            if (isAdm) {
+                menu += `<button onclick="navegar('productos')" data-vista="productos" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-boxes"></i><span class="hidden md:block">Logística</span></button>`;
+                menu += `<button onclick="navegar('historial')" data-vista="historial" class="nav-btn w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 border-0 bg-transparent text-left cursor-pointer font-bold text-[11px] uppercase tracking-widest transition-all"><i class="fas fa-history"></i><span class="hidden md:block">Historial</span></button>`;
             }
-
             nav.innerHTML = menu;
-            highlightNav('inicio');
-
-            const cesta = document.getElementById('sidebar-cesta');
-            if (cesta) {
-                if (rol === 'admin' || rol === 'control') cesta.classList.add('hidden');
-                else cesta.classList.remove('hidden');
-            }
-        }
-
-        function highlightNav(vista) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active'));
-            const target = document.querySelector(`.nav-btn[data-vista="${vista}"]`);
-            if (target) target.classList.add('nav-active');
+            const cesta = document.getElementById('sidebar-cesta'); if(cesta) { if(isAdm) cesta.classList.add('hidden'); else cesta.classList.remove('hidden'); }
         }
 
         function navegar(vista) {
-            highlightNav(vista);
-            limpiarListenersFirestore();
-
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            const btn = document.querySelector(`.nav-btn[data-vista="${vista}"]`); if(btn) btn.classList.add('nav-active');
             const container = document.getElementById('view-container');
-            if (!container || !currentUserData) return;
-
             const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control';
-
+            
             if (vista === 'inicio') {
-                container.innerHTML = `
-                    <div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none">
-                        <h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1>
-                        <p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16">SEDE ${safeUpper(activeSede)}</p>
-
-                        <div class="max-w-2xl mx-auto relative mb-20 flex items-center">
-                            <button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors">
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all" />
-                        </div>
-
-                        <div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px]"></div>
-                        <div id="stats-container" class="space-y-4"></div>
-                    </div>
-                `;
-
-                if (isAdmin) {
-                    const rowGen = (t, l, id, acc = false) => `
-                        <div class="${acc ? 'bg-blue-50' : 'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in">
-                            <div class="min-w-[220px] border-r border-slate-100 pr-8 text-left">
-                                <p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40">${l}</p>
-                                <h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3">${t}</h3>
-                                <h3 id="dash-total-${id}" class="text-5xl font-black ${id === 'hoy' ? 'text-orange-500' : 'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3>
-                            </div>
-                            <div class="flex-1 grid grid-cols-6 gap-2 text-center">
-                                ${[1,2,3,4,5,6].map(i => `
-                                    <div class="flex flex-col items-center justify-center">
-                                        <p class="text-4xl font-black ${acc ? 'text-blue-200' : 'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p>
-                                        <span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-
-                    document.getElementById('stats-container').innerHTML = `
-                        <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none">
-                            <div class="min-w-[300px] border-r border-slate-100 pr-12">
-                                <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p>
-                                <h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Ventas de Hoy</h3>
-                                <h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3>
-                            </div>
-                            <div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic">Cifras Globales</div>
-                        </div>
-                        ${rowGen("Cierre Ayer", "Corte", "ayer")}
-                        ${rowGen("Global Mes", "Acumulado", "mes")}
-                        ${rowGen("Histórico Año", "Fiscal 2026", "año", true)}
-                    `;
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-7xl font-black tracking-tighter text-slate-500 mb-2 italic leading-none uppercase">Crafts Colombia</h1><p class="text-orange-500 font-bold uppercase tracking-[0.5em] text-xs italic mb-16 leading-none">SEDE ${activeSede.toUpperCase()}</p><div class="max-w-2xl mx-auto relative mb-20 flex items-center leading-none"><button onclick="ejecutarBusquedaLupa()" class="absolute left-6 z-10 bg-transparent border-0 cursor-pointer text-slate-200 text-xl hover:text-orange-500 transition-colors"><i class="fas fa-search"></i></button><input id="global-search" onkeyup="filtrarVenta(this.value)" type="text" placeholder="Consultar stock..." class="w-full pl-16 pr-6 py-6 bg-white rounded-full border border-slate-100 shadow-2xl outline-none text-lg font-medium focus:ring-4 focus:ring-slate-100 transition-all"></div><div id="search-results-list" class="space-y-4 mb-12 text-left min-h-[100px]"></div><div id="stats-container" class="space-y-4"></div></div>`;
+                if(isAdmin) {
+                    const rowGen = (t,l,id,acc=false) => `<div class="${acc?'bg-blue-50':'bg-white'} p-8 rounded-[3rem] stat-row flex items-center gap-8 mb-8 animate-in leading-none"><div class="min-w-[220px] border-r border-slate-100 pr-8 text-left leading-none"><p class="text-xs font-black uppercase tracking-widest mb-2 italic opacity-40 leading-none">${l}</p><h3 class="text-sm font-black text-pavo-real uppercase tracking-widest mb-3 leading-none">${t}</h3><h3 id="dash-total-${id}" class="text-5xl font-black ${id==='hoy'?'text-orange-500':'text-pavo-real'} tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 grid grid-cols-6 gap-2 text-center leading-none">${[1,2,3,4,5,6].map(i=>`<div class="flex flex-col items-center justify-center leading-none"><p class="text-4xl font-black ${acc?'text-blue-200':'text-pavo-real'} mb-1 opacity-80 leading-none">${i}</p><span id="val-${id}-${i}" class="font-black text-lg text-slate-800 tabular-nums tracking-tighter leading-none">$0</span></div>`).join('')}</div></div>`;
+                    document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Ventas de Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div><div class="flex-1 text-right font-bold text-slate-300 uppercase tracking-widest text-xs italic leading-none">Cifras Globales</div></div>${rowGen("Cierre Ayer","Corte","ayer")}${rowGen("Global Mes","Acumulado","mes")}${rowGen("Histórico Año","Fiscal 2026","año",true)}`;
                     cargarEstadisticasDashboard();
                 } else {
-                    document.getElementById('stats-container').innerHTML = `
-                        <div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none">
-                            <div class="min-w-[300px] border-r border-slate-100 pr-12">
-                                <p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p>
-                                <h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic">Mis Ventas Hoy</h3>
-                                <h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3>
-                            </div>
-                        </div>
-                    `;
+                    document.getElementById('stats-container').innerHTML = `<div class="bg-white p-12 rounded-[4rem] stat-row flex items-center gap-12 border-orange-200 border-2 mb-12 animate-in text-left leading-none"><div class="min-w-[300px] border-r border-slate-100 pr-12 leading-none"><p class="text-xs font-black text-orange-500 uppercase tracking-widest mb-2 italic">Turno</p><h3 class="text-xl font-black text-pavo-real uppercase tracking-tighter mb-2 italic leading-none">Mis Ventas Hoy</h3><h3 id="dash-total-hoy" class="text-6xl font-black text-orange-500 tabular-nums leading-none tracking-tighter">$0</h3></div></div>`;
                     cargarEstadisticasDashboard();
                 }
-
-                filtrarVenta("");
-                return;
+            } else if (vista === 'productos') {
+                container.innerHTML = `<div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none"><h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1><p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p><div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative"><div class="grid grid-cols-1 md:grid-cols-3 gap-10 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Nombre o Referencia</label><input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm leading-none"></div><div><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4 leading-none">Sede Destino</label><select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm leading-none"><option value="TODAS">TODAS LAS SEDES</option><option value="bodega">BODEGA</option><option value="filandia1">FILANDIA 1</option><option value="filandia2">FILANDIA 2</option><option value="cableplaza">CABLE PLAZA</option><option value="fundadores">FUNDADORES</option><option value="jardin">JARDÍN</option><option value="online">ONLINE</option></select></div><div><label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase leading-none">Categoría</label><select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none"><option value="TODAS">TODAS</option>${listaCategorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div></div><div class="mt-10 flex justify-center"><button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer shadow-lg leading-none"><i class="fas fa-search-plus"></i> Ejecutar Búsqueda</button></div></div><div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left leading-none"><button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-plus text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div></button><button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-tags text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div></button><button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-file-excel text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div></button><button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl leading-none"><i class="fas fa-truck-loading text-3xl"></i><div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div></button></div><div id="inventory-list" class="space-y-3 text-left leading-none"></div></div>`;
             }
-
-            if (vista === 'productos') {
-                container.innerHTML = `
-                    <div class="animate-in max-w-7xl mx-auto pt-4 text-center leading-none">
-                        <h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none">Logística Central</h1>
-                        <p class="text-orange-500 font-bold uppercase text-xs mb-12 tracking-widest italic leading-none">Existencias Globales</p>
-
-                        <div class="bg-white p-12 rounded-[4rem] shadow-2xl border border-slate-100 mb-16 text-left relative">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                                <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4">Nombre o Referencia</label>
-                                    <input id="adv-name" type="text" placeholder="Escribe..." class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real text-lg shadow-sm" />
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block italic ml-4">Sede Destino</label>
-                                    <select id="adv-sede" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real appearance-none shadow-sm">
-                                        <option value="TODAS">TODAS LAS SEDES</option>
-                                        <option value="bodega">BODEGA</option>
-                                        <option value="filandia1">FILANDIA 1</option>
-                                        <option value="filandia2">FILANDIA 2</option>
-                                        <option value="cableplaza">CABLE PLAZA</option>
-                                        <option value="fundadores">FUNDADORES</option>
-                                        <option value="jardin">JARDÍN</option>
-                                        <option value="online">ONLINE</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black text-slate-400 mb-3 block italic ml-4 uppercase">Categoría</label>
-                                    <select id="adv-cat" class="w-full p-5 bg-slate-50 rounded-[2rem] border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm">
-                                        <option value="TODAS">TODAS</option>
-                                        ${listaCategorias.map(c => `<option value="${safeStr(c)}">${safeStr(c)}</option>`).join('')}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mt-10 flex justify-center">
-                                <button onclick="ejecutarBusquedaAvanzada()" class="bg-pavo-real text-white px-16 py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer">
-                                    <i class="fas fa-search-plus"></i> Ejecutar Búsqueda
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 text-left">
-                            <button onclick="verFicha(null)" class="bg-orange-500 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl shadow-orange-900/10">
-                                <i class="fas fa-plus text-3xl"></i>
-                                <div><h3 class="font-black text-lg uppercase leading-none">Nuevo Item</h3></div>
-                            </button>
-
-                            <button onclick="gestionCategorias()" class="bg-pavo-real p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl">
-                                <i class="fas fa-tags text-3xl"></i>
-                                <div><h3 class="font-black text-lg uppercase leading-none">Categorías</h3></div>
-                            </button>
-
-                            <button onclick="modalCargaMasiva()" class="bg-slate-600 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl">
-                                <i class="fas fa-file-excel text-3xl"></i>
-                                <div><h3 class="font-black text-lg uppercase leading-none">Excel</h3></div>
-                            </button>
-
-                            <button onclick="gestionProveedores()" class="bg-slate-800 p-8 rounded-[2.5rem] action-module flex items-center gap-6 text-white group border-0 cursor-pointer shadow-xl">
-                                <i class="fas fa-truck-loading text-3xl"></i>
-                                <div><h3 class="font-black text-lg uppercase leading-none">Proveedores</h3></div>
-                            </button>
-                        </div>
-
-                        <div id="inventory-list" class="space-y-3 text-left"></div>
-                    </div>
-                `;
-
-                ejecutarBusquedaAvanzada();
-                return;
-            }
-
-            if (vista === 'historial') {
-                container.innerHTML = `
-                    <div class="animate-in max-w-6xl mx-auto pt-4">
-                        <h1 class="text-5xl font-black tracking-tighter text-slate-500 mb-2 italic uppercase leading-none text-center">Historial</h1>
-                        <p class="text-orange-500 font-bold uppercase text-xs mb-10 tracking-widest italic leading-none text-center">Traslados recientes</p>
-
-                        <div class="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100 mb-8">
-                            <div class="flex flex-col md:flex-row gap-4 items-center">
-                                <input id="historial-filtro" type="text" placeholder="Buscar por producto..." class="flex-1 w-full p-4 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real" />
-                                <button onclick="cargarHistorialTraslados()" class="bg-pavo-real text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest border-0 cursor-pointer">
-                                    Consultar
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="historial-list" class="space-y-4"></div>
-                    </div>
-                `;
-                cargarHistorialTraslados();
-                return;
-            }
-
-            container.innerHTML = `<div class="animate-in p-10 text-center text-slate-400 font-black uppercase">Vista no implementada.</div>`;
         }
 
-        // ==============================
-        // Búsqueda / render productos
-        // ==============================
-        // ✅ PATCH: acepta p.sede_ubicacion O p.sede (datos antiguos)
+        // --- BÚSQUEDA NORMALIZADA ---
         function filtrarVenta(q) {
-            const query = safeStr(q).toLowerCase().trim();
-            const list = document.getElementById('search-results-list');
-            if (!list) return;
-
+            const query = safeStr(q).toLowerCase().trim(); const list = document.getElementById('search-results-list'); if(!list) return;
             const filtered = productosData.filter(p => {
-                const nombre = safeStr(p.nombre).toLowerCase();
-                const categoria = safeStr(p.categoria).toLowerCase();
-                const matchSearch = !query || nombre.includes(query) || categoria.includes(query);
-
-                if (currentUserData?.rol !== 'admin' && currentUserData?.rol !== 'control') {
-                    const psede = normalizeSede(p.sede_ubicacion || p.sede);
-                    const asede = normalizeSede(activeSede);
-                    return matchSearch && psede === asede;
+                const matchSearch = !query || safeStr(p.nombre).toLowerCase().includes(query) || safeStr(p.categoria).toLowerCase().includes(query);
+                if(currentUserData.rol !== 'admin') {
+                    return matchSearch && normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(activeSede);
                 }
-
                 return matchSearch;
             });
-
             renderResultados(filtered, list);
         }
 
-        // ✅ PATCH: acepta p.sede_ubicacion O p.sede (datos antiguos)
         function ejecutarBusquedaAvanzada() {
             const n = safeStr(document.getElementById('adv-name')?.value).toLowerCase().trim();
             const s = normalizeSede(document.getElementById('adv-sede')?.value || "TODAS");
             const c = safeStr(document.getElementById('adv-cat')?.value || "TODAS");
-            const list = document.getElementById('inventory-list');
-            if (!list) return;
-
+            const list = document.getElementById('inventory-list'); if(!list) return;
             const filtered = productosData.filter(p => {
-                const nombre = safeStr(p.nombre).toLowerCase();
-                const matchName = !n || nombre.includes(n);
+                const matchName = !n || safeStr(p.nombre).toLowerCase().includes(n);
                 const psede = normalizeSede(p.sede_ubicacion || p.sede);
                 const matchSede = s === "todas" || psede === s;
                 const matchCat = c === "TODAS" || safeStr(p.categoria) === c;
                 return matchName && matchSede && matchCat;
             });
-
             renderResultados(filtered, list);
         }
 
-        // ✅ PATCH: visualiza sede normalizada y soporta sede legacy
         function renderResultados(data, container) {
-            if (!container) return;
-
-            container.innerHTML = data.map(p => {
-                const nombre = safeUpper(p.nombre || 'SIN NOMBRE');
-                const categoria = safeUpper(p.categoria || 'SIN CATEGORÍA');
-
-                const sedeRaw = p.sede_ubicacion || p.sede || 'BODEGA';
-                const sede = safeUpper(normalizeSede(sedeRaw));
-
-                const stock = safeNum(p.stock);
-                const precio = safeNum(p.precio);
-                const isAdminView = currentUserData?.rol === 'admin' || currentUserData?.rol === 'control';
-
-                return `
-                    <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in">
-                        <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl">
-                            <i class="fas fa-gem"></i>
-                        </div>
-
-                        <div class="flex-1 text-left leading-none">
-                            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${categoria}</p>
-                            <h3 onclick="verDetalleFicha('${safeStr(p.id)}')" class="font-black text-slate-600 text-lg uppercase truncate cursor-pointer hover:text-pavo-real transition-all leading-none">
-                                ${nombre}
-                            </h3>
-                        </div>
-
-                        <div class="text-center min-w-[140px] border-l border-slate-50 pl-4">
-                            <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg">${sede}</span>
-                            <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${stock} Unid.</p>
-                        </div>
-
-                        <div class="text-right min-w-[120px] border-l border-slate-50 pl-4">
-                            <p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(precio)}</p>
-                        </div>
-
-                        <div class="flex gap-2 border-l border-slate-50 pl-4">
-                            ${isAdminView
-                                ? `
-                                    <button onclick="verTraslado('${safeStr(p.id)}')" title="Trasladar" class="text-slate-300 hover:text-orange-500 transition-all text-xl bg-transparent border-0 cursor-pointer px-2">
-                                        <i class="fas fa-exchange-alt"></i>
-                                    </button>
-                                    <button onclick="verFicha('${safeStr(p.id)}')" title="Editar" class="text-slate-300 hover:text-pavo-real transition-all text-xl bg-transparent border-0 cursor-pointer px-2">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                  `
-                                : `
-                                    <button onclick="agregarCarrito('${safeStr(p.id)}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none">
-                                        Agregar
-                                    </button>
-                                  `
-                            }
-                        </div>
+            container.innerHTML = data.map(p => `
+                <div class="bg-white p-6 rounded-[2.5rem] stat-row flex items-center gap-10 animate-in leading-none">
+                    <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 text-xl leading-none"><i class="fas fa-gem"></i></div>
+                    <div class="flex-1 text-left leading-none">
+                        <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">${safeUpper(p.categoria)}</p>
+                        <h3 onclick="verDetalleFicha('${p.id}')" class="font-black text-slate-600 text-lg uppercase truncate cursor-pointer hover:text-pavo-real transition-all leading-none">${safeUpper(p.nombre)}</h3>
                     </div>
-                `;
-            }).join('') || `<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px]">Sin resultados en esta sede.</div>`;
+                    <div class="text-center min-w-[140px] border-l border-slate-50 pl-4 leading-none">
+                        <span class="bg-orange-500 text-white text-[11px] px-4 py-2 rounded-full font-black uppercase italic shadow-lg leading-none">${safeUpper(p.sede_ubicacion || p.sede)}</span>
+                        <p class="font-black text-base mt-2 text-slate-800 tabular-nums leading-none">${safeNum(p.stock)} Unid.</p>
+                    </div>
+                    <div class="text-right min-w-[120px] border-l border-slate-50 pl-4 leading-none">
+                        <p class="font-black text-pavo-real text-xl tabular-nums leading-none">${money(p.precio)}</p>
+                    </div>
+                    <div class="flex gap-2 border-l border-slate-50 pl-4 leading-none">
+                        ${(currentUserData.rol === 'admin' || currentUserData.rol === 'control') ? `<button onclick="verTraslado('${p.id}')" title="Trasladar" class="text-slate-300 hover:text-orange-500 transition-all text-xl bg-transparent border-0 cursor-pointer px-2"><i class="fas fa-exchange-alt"></i></button><button onclick="verFicha('${p.id}')" title="Editar" class="text-slate-300 hover:text-pavo-real transition-all text-xl bg-transparent border-0 cursor-pointer px-2"><i class="fas fa-pen"></i></button>` : `<button onclick="agregarCarrito('${p.id}')" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-0 cursor-pointer shadow-lg leading-none">Agregar</button>`}
+                    </div>
+                </div>`).join('') || '<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px] leading-none">Sin resultados.</div>';
         }
 
-        // ==============================
-        // Traslados
-        // ==============================
+        // --- TRASLADOS ---
         function verTraslado(id) {
-            const m = document.getElementById('main-modal');
-            const c = document.getElementById('modal-content');
-            const p = productosData.find(item => item.id === id);
-
-            if (!p) return alert("Producto no encontrado.");
-
-            const origenSede = safeStr(p.sede_ubicacion || p.sede || "bodega");
-            const stockActual = safeNum(p.stock);
-
+            const m = document.getElementById('main-modal'), c = document.getElementById('modal-content');
+            const p = productosData.find(item => item.id === id); if(!p) return;
             document.getElementById('modal-title').innerText = "Operación de Traslado Técnico";
-            c.innerHTML = `
-                <div class="space-y-8 animate-in text-left leading-none">
-                    <div class="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 flex justify-between items-center leading-none">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Producto</p>
-                            <h4 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(p.nombre)}</h4>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">Origen</p>
-                            <h4 class="text-xl font-bold text-pavo-real uppercase italic leading-none">${safeUpper(origenSede)}</h4>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 leading-none">
-                        <div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 text-center">
-                            <p class="text-xs font-black text-slate-400 uppercase mb-4 leading-none">Stock Disponible</p>
-                            <h3 class="text-8xl font-black text-slate-800 tabular-nums leading-none">${stockActual}</h3>
-                            <div class="mt-8">
-                                <label class="text-[10px] font-black text-pavo-real uppercase block mb-2 italic">Cantidad a Mover</label>
-                                <input id="trans-qty" type="number" min="1" max="${stockActual}" value="1" class="w-full p-6 bg-slate-50 rounded-3xl border-0 ring-1 ring-slate-100 font-black text-4xl text-center text-orange-500" />
-                            </div>
-                        </div>
-
-                        <div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 flex flex-col justify-center leading-none">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-4 italic tracking-widest leading-none">Punto Destino</label>
-                            <select id="trans-dest" class="w-full p-6 bg-slate-900 text-white rounded-3xl border-0 font-black text-xl uppercase shadow-lg shadow-blue-900/20">
-                                ${
-                                    SEDES
-                                        .filter(s => normalizeSede(s) !== normalizeSede(origenSede))
-                                        .map(s => `<option value="${s}">${safeUpper(s)}</option>`)
-                                        .join('')
-                                }
-                            </select>
-                            <div class="mt-12">
-                                <button onclick="ejecutarTraslado('${safeStr(p.id)}')" class="w-full bg-orange-500 text-white py-6 rounded-3xl font-black uppercase text-sm tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer">
-                                    Autorizar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
+            c.innerHTML = `<div class="space-y-8 animate-in text-left leading-none"><div class="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 flex justify-between items-center leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Producto</p><h4 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(p.nombre)}</h4></div><div class="text-right leading-none"><p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1 italic leading-none">Origen</p><h4 class="text-xl font-bold text-pavo-real uppercase italic leading-none">${safeUpper(p.sede_ubicacion || p.sede)}</h4></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-10 leading-none"><div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 text-center leading-none"><p class="text-xs font-black text-slate-400 uppercase mb-4 leading-none">Stock Disponible</p><h3 class="text-8xl font-black text-slate-800 tabular-nums leading-none">${safeNum(p.stock)}</h3><div class="mt-8 leading-none"><label class="text-[10px] font-black text-pavo-real uppercase block mb-2 italic leading-none">Unidades a Mover</label><input id="trans-qty" type="number" min="1" max="${p.stock}" value="1" class="w-full p-6 bg-slate-50 rounded-3xl border-0 ring-1 ring-slate-100 font-black text-4xl text-center text-orange-500 leading-none"></div></div><div class="p-8 bg-white rounded-[3.5rem] shadow-xl border border-slate-50 flex flex-col justify-center leading-none"><label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-4 italic tracking-widest leading-none">Punto Destino</label><select id="trans-dest" class="w-full p-6 bg-slate-900 text-white rounded-3xl border-0 font-black text-xl uppercase shadow-lg leading-none">${SEDES.filter(s => normalizeSede(s) !== normalizeSede(p.sede_ubicacion || p.sede)).map(s => `<option value="${s}">${safeUpper(s)}</option>`).join('')}</select><div class="mt-12 leading-none"><button onclick="ejecutarTraslado('${p.id}')" class="w-full bg-orange-500 text-white py-6 rounded-3xl font-black uppercase text-sm tracking-[0.3em] shadow-xl hover:bg-slate-900 transition-all border-0 cursor-pointer leading-none">Autorizar</button></div></div></div></div>`;
             m.classList.remove('hidden');
         }
 
         async function ejecutarTraslado(sourceId) {
+            const qty = parseInt(document.getElementById('trans-qty').value);
+            const destSede = document.getElementById('trans-dest').value;
+            const sourceDoc = productosData.find(p => p.id === sourceId);
+            if (qty > sourceDoc.stock || qty < 1) return alert("❌ Cantidad no válida.");
             try {
-                const qty = parseInt(document.getElementById('trans-qty')?.value, 10);
-                const destSede = safeStr(document.getElementById('trans-dest')?.value);
-                const sourceDoc = productosData.find(p => p.id === sourceId);
-
-                if (!sourceDoc) return alert("Producto origen no encontrado.");
-                if (!Number.isInteger(qty) || qty < 1) return alert("❌ Cantidad no válida.");
-                if (qty > safeNum(sourceDoc.stock)) return alert("❌ La cantidad supera el stock disponible.");
-                if (!destSede) return alert("❌ Selecciona una sede destino.");
-
                 const batch = db.batch();
-
-                batch.update(db.collection("productos").doc(sourceId), {
-                    stock: firebase.firestore.FieldValue.increment(-qty)
-                });
-
-                // ✅ PATCH: búsqueda destino robusta (soporta docs con sede o sede_ubicacion)
-                let destQuery = await db.collection("productos")
-                    .where("nombre", "==", safeStr(sourceDoc.nombre))
-                    .where("categoria", "==", safeStr(sourceDoc.categoria))
-                    .where("sede_ubicacion", "==", destSede)
-                    .get();
-
-                if (destQuery.empty) {
-                    destQuery = await db.collection("productos")
-                        .where("nombre", "==", safeStr(sourceDoc.nombre))
-                        .where("categoria", "==", safeStr(sourceDoc.categoria))
-                        .where("sede", "==", destSede)
-                        .get();
-                }
-
-                if (!destQuery.empty) {
-                    batch.update(db.collection("productos").doc(destQuery.docs[0].id), {
-                        stock: firebase.firestore.FieldValue.increment(qty),
-                        sede_ubicacion: destSede // migra/estandariza
-                    });
-                } else {
+                batch.update(db.collection("productos").doc(sourceId), { stock: firebase.firestore.FieldValue.increment(-qty) });
+                const destQuery = await db.collection("productos").where("nombre", "==", safeStr(sourceDoc.nombre)).where("categoria", "==", safeStr(sourceDoc.categoria)).where("sede_ubicacion", "==", destSede).get();
+                if (!destQuery.empty) batch.update(db.collection("productos").doc(destQuery.docs[0].id), { stock: firebase.firestore.FieldValue.increment(qty) });
+                else {
                     const newRef = db.collection("productos").doc();
-                    const clone = { ...sourceDoc };
-                    delete clone.id;
-                    delete clone.sede;
-                    clone.stock = qty;
-                    clone.sede_ubicacion = destSede;
-                    clone.fecha_ingreso = firebase.firestore.FieldValue.serverTimestamp();
+                    const clone = {...sourceDoc}; delete clone.id; clone.stock = qty; clone.sede_ubicacion = destSede;
                     batch.set(newRef, clone);
                 }
-
-                batch.set(db.collection("traslados").doc(), {
-                    producto: safeUpper(sourceDoc.nombre),
-                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    origen: safeStr(sourceDoc.sede_ubicacion || sourceDoc.sede || "bodega"),
-                    destino: destSede,
-                    usuario: vendedorActivo || "SISTEMA",
-                    cantidad: qty
-                });
-
-                await batch.commit();
-                cerrarModal();
-                alert("✅ Traslado completado.");
-            } catch (e) {
-                console.error(e);
-                alert("Error al ejecutar traslado.");
-            }
+                batch.set(db.collection("traslados").doc(), { producto: safeUpper(sourceDoc.nombre), fecha: firebase.firestore.FieldValue.serverTimestamp(), origen: safeStr(sourceDoc.sede_ubicacion || sourceDoc.sede || "bodega"), destino: destSede, usuario: vendedorActivo, cantidad: qty });
+                await batch.commit(); cerrarModal(); alert("✅ Traslado completado.");
+            } catch (e) { alert("Error"); }
         }
 
-        // ==============================
-        // Dashboard / estadísticas
-        // ==============================
-        function cargarEstadisticasDashboard() {
+        // --- ESTADÍSTICAS DASHBOARD ---
+        async function cargarEstadisticasDashboard() {
             if (typeof unsubVentasStats === 'function') unsubVentasStats();
-
-            const h = new Date();
-            h.setHours(0, 0, 0, 0);
-
-            const aI = new Date(h); aI.setDate(h.getDate() - 1);
-            const aF = new Date(h); aF.setMilliseconds(-1);
-            const mI = new Date(h.getFullYear(), h.getMonth(), 1);
-            const yI = new Date(h.getFullYear(), 0, 1);
-
-            unsubVentasStats = db.collection("ventas").onSnapshot(
-                (snap) => {
-                    let totals = { hoy: 0, ayer: 0, mes: 0, año: 0 };
-                    const mapSedes = { "filandia1": "1", "filandia2": "2", "cableplaza": "3", "fundadores": "4", "jardin": "5", "online": "6" };
-                    let bVals = { hoy: {}, ayer: {}, mes: {}, año: {} };
-                    [1,2,3,4,5,6].forEach(i => { bVals.hoy[i]=0; bVals.ayer[i]=0; bVals.mes[i]=0; bVals.año[i]=0; });
-
-                    snap.forEach(doc => {
-                        const v = doc.data() || {};
-                        const f = v.fecha && typeof v.fecha.toDate === 'function' ? v.fecha.toDate() : new Date();
-                        const t = safeNum(v.total);
-                        const sedeVenta = normalizeSede(v.sede);
-
-                        const canCountThis = (currentUserData?.rol === 'admin' || currentUserData?.rol === 'control')
-                            ? true
-                            : sedeVenta === normalizeSede(activeSede);
-
-                        if (!canCountThis) return;
-
-                        const n = mapSedes[sedeVenta] || null;
-                        if (f >= h) { totals.hoy += t; if (n) bVals.hoy[n] += t; }
-                        if (f >= aI && f <= aF) { totals.ayer += t; if (n) bVals.ayer[n] += t; }
-                        if (f >= mI) { totals.mes += t; if (n) bVals.mes[n] += t; }
-                        if (f >= yI) { totals.año += t; if (n) bVals.año[n] += t; }
-                    });
-
-                    ['hoy','ayer','mes','año'].forEach(k => {
-                        const el = document.getElementById(`dash-total-${k}`);
-                        if (el) el.innerText = money(totals[k]);
-                    });
-
-                    if (currentUserData?.rol === 'admin' || currentUserData?.rol === 'control') {
-                        [1,2,3,4,5,6].forEach(i => {
-                            ['hoy','ayer','mes','año'].forEach(p => {
-                                const bEl = document.getElementById(`val-${p}-${i}`);
-                                if (bEl) bEl.innerText = money(bVals[p][i]);
-                            });
-                        });
-                    }
-                },
-                (err) => {
-                    console.error("Error estadísticas:", err);
-                }
-            );
-        }
-
-        // ==============================
-        // Fichas / edición productos
-        // ==============================
-        function verFicha(id) {
-            const m = document.getElementById('main-modal');
-            const c = document.getElementById('modal-content');
-            document.getElementById('modal-title').innerText = id ? "Edición Maestra" : "Nuevo Producto";
-
-            const p = id
-                ? productosData.find(item => item.id === id)
-                : {
-                    nombre: '',
-                    precio: 0,
-                    stock: 0,
-                    categoria: (listaCategorias[0] || 'Mochilas'),
-                    proveedor: '',
-                    precio_compra: 0,
-                    stock_ideal: 0,
-                    sede_ubicacion: 'bodega'
-                };
-
-            if (id && !p) return alert("Producto no encontrado.");
-
-            c.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left animate-in leading-none">
-                    <div class="space-y-6">
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block ml-2">Nombre</label>
-                            <input id="edit-nombre" type="text" value="${safeStr(p.nombre)}" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase text-lg shadow-sm" />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block ml-2">Categoría</label>
-                                <select id="edit-categoria" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm">
-                                    ${listaCategorias.length
-                                        ? listaCategorias.map(cat => `<option value="${safeStr(cat)}" ${safeStr(p.categoria) === safeStr(cat) ? 'selected' : ''}>${safeStr(cat)}</option>`).join('')
-                                        : `<option value="${safeStr(p.categoria || 'GENERAL')}" selected>${safeStr(p.categoria || 'GENERAL')}</option>`
-                                    }
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-black text-orange-500 uppercase mb-2 block ml-2 italic">Asignar Sede</label>
-                                <select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm">
-                                    ${SEDES.map(s => `<option value="${s}" ${normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(s) ? 'selected' : ''}>${safeUpper(s)}</option>`).join('')}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-6">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase">Venta</label>
-                                <input id="edit-precio" type="number" value="${safeNum(p.precio)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl" />
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase">Costo</label>
-                                <input id="edit-compra" type="number" value="${safeNum(p.precio_compra)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl" />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase">Stock</label>
-                                <input id="edit-stock" type="number" value="${safeNum(p.stock)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl" />
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase">Ideal</label>
-                                <input id="edit-ideal" type="number" value="${safeNum(p.stock_ideal)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl" />
-                            </div>
-                        </div>
-
-                        <button onclick="guardarCambios('${id}')" class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 transition-all border-0 cursor-pointer shadow-lg leading-none">
-                            Actualizar Registro
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            m.classList.remove('hidden');
-        }
-
-        async function guardarCambios(id) {
-            try {
-                const nombre = safeStr(document.getElementById('edit-nombre')?.value).trim().toUpperCase();
-                const categoria = safeStr(document.getElementById('edit-categoria')?.value);
-                const nS = safeStr(document.getElementById('edit-sede')?.value);
-
-                if (!nombre) return alert("El nombre es obligatorio.");
-                if (!categoria) return alert("La categoría es obligatoria.");
-                if (!nS) return alert("La sede es obligatoria.");
-
-                const data = {
-                    nombre,
-                    categoria,
-                    sede_ubicacion: nS,
-                    precio: parseInt(document.getElementById('edit-precio')?.value, 10) || 0,
-                    precio_compra: parseInt(document.getElementById('edit-compra')?.value, 10) || 0,
-                    stock: parseInt(document.getElementById('edit-stock')?.value, 10) || 0,
-                    stock_ideal: parseInt(document.getElementById('edit-ideal')?.value, 10) || 0
-                };
-
-                const isNew = (!id || id === "null" || id === "undefined");
-
-                if (isNew) {
-                    data.fecha_ingreso = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection("productos").add(data);
-
-                    await db.collection("traslados").add({
-                        producto: nombre,
-                        fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                        origen: "INGRESO INICIAL",
-                        destino: nS,
-                        usuario: vendedorActivo || "SISTEMA",
-                        cantidad: data.stock
-                    });
-                } else {
-                    const original = productosData.find(p => p.id === id);
-                    if (!original) return alert("No se encontró el producto a editar.");
-
-                    if (normalizeSede(original.sede_ubicacion || original.sede) !== normalizeSede(nS)) {
-                        await db.collection("traslados").add({
-                            producto: nombre,
-                            fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                            origen: safeStr(original.sede_ubicacion || original.sede || "bodega"),
-                            destino: nS,
-                            usuario: vendedorActivo || "SISTEMA",
-                            cantidad: data.stock
-                        });
-                    }
-
-                    await db.collection("productos").doc(id).update(data);
-                }
-
-                cerrarModal();
-                alert("✅ Operación exitosa.");
-            } catch (e) {
-                console.error(e);
-                alert("Error guardando cambios.");
-            }
-        }
-
-        function verDetalleFicha(id) {
-            const m = document.getElementById('main-modal');
-            const c = document.getElementById('modal-content');
-            const p = productosData.find(item => item.id === id);
-
-            if (!p) return alert("Producto no encontrado.");
-
-            document.getElementById('modal-title').innerText = "Ficha del Producto";
-            const isAdmin = currentUserData?.rol === 'admin' || currentUserData?.rol === 'control';
-            const escName = safeStr(p.nombre).replace(/'/g, "\\'").replace(/"/g, '\\"');
-
-            c.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left animate-in min-h-[400px] relative leading-none">
-                    <div class="space-y-8">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 italic">Registro Maestro</p>
-                            <h2 class="text-5xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(p.nombre)}</h2>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
-                                <p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Familia</p>
-                                <p class="font-bold text-pavo-real text-lg uppercase">${safeUpper(p.categoria || 'GENERAL')}</p>
-                            </div>
-                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
-                                <p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Operario</p>
-                                <p class="font-bold text-slate-700 text-lg uppercase italic leading-none">${safeUpper(vendedorActivo || 'ACTUAL')}</p>
-                            </div>
-                        </div>
-
-                        <div class="p-8 bg-petrol rounded-[3rem] text-white shadow-2xl">
-                            <div>
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Precio de Venta</p>
-                                <p class="text-5xl font-black tabular-nums tracking-tighter leading-none">${money(p.precio)}</p>
-                            </div>
-                        </div>
-
-                        <button onclick="verHojaVida('${escName}')" class="text-[11px] font-black text-pavo-real uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer flex items-center gap-3">
-                            <i class="fas fa-history"></i> Consultar Hoja de Vida
-                        </button>
-                    </div>
-
-                    <div class="space-y-8 flex flex-col justify-center">
-                        <div class="text-center p-12 bg-white rounded-[4rem] border-4 border-slate-50 shadow-2xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-24 h-24 bg-orange-500 opacity-5 -mr-10 -mt-10 rounded-full shadow-inner"></div>
-                            <p class="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-4 italic text-center leading-none">Stock Disponible</p>
-                            <h3 class="text-9xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">${safeNum(p.stock)}</h3>
-                            <p class="text-base font-bold text-slate-400 uppercase mt-4 leading-none">unidades físicas</p>
-                        </div>
-                        <div class="bg-orange-50 p-4 rounded-2xl text-center shadow-inner font-black uppercase text-[10px] text-orange-500 italic">
-                            Ubicación Actual: ${safeUpper(p.sede_ubicacion || p.sede || 'BODEGA')}
-                        </div>
-                    </div>
-
-                    ${isAdmin ? `
-                        <div class="absolute bottom-4 right-4 flex gap-4">
-                            <button onclick="verTraslado('${safeStr(id)}')" class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl hover:bg-orange-500 hover:text-white transition-all shadow-2xl border-0 cursor-pointer">
-                                <i class="fas fa-exchange-alt"></i>
-                            </button>
-                            <button onclick="verFicha('${safeStr(id)}')" class="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center text-2xl hover:bg-pavo-real transition-all shadow-2xl border-0 cursor-pointer">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-
-            m.classList.remove('hidden');
-        }
-
-        function verHojaVida(prodName) {
-            const c = document.getElementById('modal-content');
-            document.getElementById('modal-title').innerText = "Historial: " + prodName;
-
-            c.innerHTML = `
-                <div id="loading-hv" class="p-10 text-center animate-in">
-                    <i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl mb-4"></i>
-                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cargando...</p>
-                </div>
-            `;
-
-            const timeout = setTimeout(() => {
-                if (document.getElementById('loading-hv')) {
-                    c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black">Sin registros.</div>`;
-                }
-            }, 4000);
-
-            db.collection("traslados").where("producto", "==", safeUpper(prodName)).get().then(snap => {
-                clearTimeout(timeout);
-
-                if (snap.empty) {
-                    c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black">No registra traslados previos.</div>`;
-                    return;
-                }
-
-                const docs = [];
-                snap.forEach(doc => docs.push(doc.data()));
-                docs.sort((a, b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0));
-
-                let html = `<div class="space-y-6 animate-in p-4 text-left leading-none">`;
-
-                docs.forEach(t => {
-                    const dt = t.fecha && typeof t.fecha.toDate === 'function' ? t.fecha.toDate() : new Date();
-                    const fStr = dt.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    const hStr = dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-                    html += `
-                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group leading-none">
-                            <div class="absolute top-0 left-0 w-2 h-full bg-orange-500 opacity-20"></div>
-
-                            <div class="flex justify-between items-start mb-6">
-                                <div>
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">${fStr}</p>
-                                    <p class="text-xs font-bold text-pavo-real uppercase tracking-widest leading-none">${hStr}</p>
-                                </div>
-
-                                <div class="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 text-right">
-                                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1 leading-none italic">Autor:</p>
-                                    <p class="text-[10px] font-black text-pavo-real uppercase leading-none">${safeUpper(t.usuario || 'SISTEMA')}</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-6 leading-none">
-                                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 text-xl shadow-inner">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </div>
-
-                                <h4 class="font-black text-2xl text-slate-800 uppercase italic tracking-tighter leading-none">
-                                    ${safeUpper(t.origen || 'ORIGEN')} <i class="fas fa-arrow-right mx-3 text-pavo-real text-sm"></i> ${safeUpper(t.destino || 'DESTINO')}
-                                </h4>
-
-                                <div class="ml-auto bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-xs leading-none">
-                                    ${safeNum(t.cantidad || 1)} U.
-                                </div>
-                            </div>
-                        </div>
-                    `;
+            const h = new Date(); h.setHours(0,0,0,0); const aI = new Date(h); aI.setDate(h.getDate()-1); const aF = new Date(h); aF.setMilliseconds(-1); const mI = new Date(h.getFullYear(), h.getMonth(), 1); const yI = new Date(h.getFullYear(), 0, 1);
+            unsubVentasStats = db.collection("ventas").onSnapshot(snap => {
+                let totals = { hoy: 0, ayer: 0, mes: 0, año: 0 };
+                let mapSedes = { "filandia1": "1", "filandia2": "2", "cableplaza": "3", "fundadores": "4", "jardin": "5", "online": "6" };
+                let bVals = { hoy: {}, ayer: {}, mes: {}, año: {} }; [1,2,3,4,5,6].forEach(i => { bVals.hoy[i]=0; bVals.ayer[i]=0; bVals.mes[i]=0; bVals.año[i]=0; });
+                snap.forEach(doc => {
+                    const v = doc.data(); const f = v.fecha?.toDate() || new Date(); const t = safeNum(v.total); const sV = normalizeSede(v.sede);
+                    if(currentUserData.rol !== 'admin' && sV !== normalizeSede(activeSede)) return;
+                    const n = mapSedes[sV] || null;
+                    if(f >= h) { totals.hoy += t; if(n) bVals.hoy[n] += t; }
+                    if(f >= aI && f <= aF) { totals.ayer += t; if(n) bVals.ayer[n] += t; }
+                    if(f >= mI) { totals.mes += t; if(n) bVals.mes[n] += t; }
+                    if(f >= yI) { totals.año += t; if(n) bVals.año[n] += t; }
                 });
-
-                c.innerHTML = html + `</div>`;
-            }).catch(err => {
-                clearTimeout(timeout);
-                console.error(err);
-                c.innerHTML = `<div class="p-20 text-center text-red-400 italic uppercase text-[10px] font-black">Error cargando historial.</div>`;
+                ['hoy','ayer','mes','año'].forEach(k => { const el = document.getElementById(`dash-total-${k}`); if(el) el.innerText = money(totals[k]); });
+                if(currentUserData.rol === 'admin') { [1,2,3,4,5,6].forEach(i => { ['hoy','ayer','mes','año'].forEach(p => { const bEl = document.getElementById(`val-${p}-${i}`); if(bEl) bEl.innerText = money(bVals[p][i]); }); }); }
             });
         }
 
-        // ==============================
-        // Historial vista (nuevo)
-        // ==============================
-        async function cargarHistorialTraslados() {
-            const list = document.getElementById('historial-list');
-            if (!list) return;
-
-            const filtro = safeStr(document.getElementById('historial-filtro')?.value).toLowerCase().trim();
-
-            list.innerHTML = `
-                <div class="p-10 text-center animate-in">
-                    <i class="fas fa-circle-notch animate-spin text-pavo-real text-2xl mb-3"></i>
-                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Consultando traslados...</p>
-                </div>
-            `;
-
-            try {
-                const snap = await db.collection("traslados").orderBy("fecha", "desc").limit(100).get();
-
-                let rows = [];
-                snap.forEach(doc => rows.push({ id: doc.id, ...doc.data() }));
-
-                if (filtro) {
-                    rows = rows.filter(r => safeStr(r.producto).toLowerCase().includes(filtro));
-                }
-
-                list.innerHTML = rows.map(t => {
-                    const dt = t.fecha && typeof t.fecha.toDate === 'function' ? t.fecha.toDate() : new Date();
-                    return `
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm animate-in">
-                            <div class="flex flex-col md:flex-row md:items-center gap-4">
-                                <div class="flex-1">
-                                    <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">${safeUpper(t.producto || 'SIN PRODUCTO')}</p>
-                                    <p class="text-sm font-bold text-slate-700 uppercase">
-                                        ${safeUpper(t.origen || 'ORIGEN')} → ${safeUpper(t.destino || 'DESTINO')}
-                                    </p>
-                                    <p class="text-xs text-slate-400 mt-1">
-                                        ${dt.toLocaleDateString('es-CO')} · ${dt.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                </div>
-
-                                <div class="text-right">
-                                    <p class="text-xs font-black text-slate-400 uppercase">Cantidad</p>
-                                    <p class="text-lg font-black text-pavo-real">${safeNum(t.cantidad)}</p>
-                                </div>
-
-                                <div class="text-right min-w-[140px]">
-                                    <p class="text-xs font-black text-slate-400 uppercase">Usuario</p>
-                                    <p class="text-sm font-bold text-slate-700 uppercase">${safeUpper(t.usuario || 'SISTEMA')}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('') || `<div class="text-center p-10 text-slate-300 italic uppercase font-black text-[10px]">No hay registros.</div>`;
-            } catch (e) {
-                console.error(e);
-                list.innerHTML = `<div class="text-center p-10 text-red-400 italic uppercase font-black text-[10px]">Error consultando historial.</div>`;
-            }
-        }
-
-        // ==============================
-        // Cesta / ventas básicas
-        // ==============================
-        function renderCarrito() {
-            const itemsEl = document.getElementById('cesta-items');
-            const totalEl = document.getElementById('cesta-total');
-            if (!itemsEl || !totalEl) return;
-
-            if (!carrito.length) {
-                itemsEl.innerHTML = `<div class="text-[10px] text-slate-500 font-bold italic uppercase">Sin productos</div>`;
-                totalEl.innerText = "$0";
-                return;
-            }
-
-            itemsEl.innerHTML = carrito.map((item, idx) => `
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                    <p class="text-[10px] font-black text-white uppercase truncate">${safeUpper(item.nombre)}</p>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-[10px] text-slate-400">x${safeNum(item.cantidad)}</span>
-                        <span class="text-[10px] text-orange-400 font-black">${money(item.subtotal)}</span>
-                    </div>
-                    <button onclick="quitarDelCarrito(${idx})" class="mt-2 text-[9px] uppercase font-black text-slate-400 hover:text-red-400 bg-transparent border-0 cursor-pointer">Quitar</button>
-                </div>
-            `).join('');
-
-            const total = carrito.reduce((acc, i) => acc + safeNum(i.subtotal), 0);
-            totalEl.innerText = money(total);
-        }
-
-        // ✅ PATCH: valida contra sede_ubicacion o sede (legacy)
-        function agregarCarrito(id) {
-            const p = productosData.find(x => x.id === id);
-            if (!p) return alert("Producto no encontrado.");
-
-            if (normalizeSede(p.sede_ubicacion || p.sede) !== normalizeSede(activeSede)) {
-                return alert("Este producto no pertenece a la sede activa.");
-            }
-
-            if (safeNum(p.stock) <= 0) return alert("Sin stock disponible.");
-
-            const existing = carrito.find(i => i.id === id);
-            if (existing) {
-                if (existing.cantidad + 1 > safeNum(p.stock)) return alert("No hay más stock disponible.");
-                existing.cantidad += 1;
-                existing.subtotal = safeNum(existing.cantidad) * safeNum(existing.precio);
-            } else {
-                carrito.push({
-                    id: p.id,
-                    nombre: safeStr(p.nombre),
-                    precio: safeNum(p.precio),
-                    cantidad: 1,
-                    subtotal: safeNum(p.precio)
-                });
-            }
-
-            renderCarrito();
-        }
-
-        function quitarDelCarrito(index) {
-            carrito.splice(index, 1);
-            renderCarrito();
-        }
-
-        async function finalizarVenta() {
-            if (!carrito.length) return alert("La cesta está vacía.");
-
-            const total = carrito.reduce((acc, i) => acc + safeNum(i.subtotal), 0);
-            const ok = confirm(`¿Finalizar venta por ${money(total)}?`);
-            if (!ok) return;
-
-            try {
-                const batch = db.batch();
-
-                const ventaRef = db.collection("ventas").doc();
-                batch.set(ventaRef, {
-                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    total,
-                    sede: activeSede,
-                    vendedor: vendedorActivo || "OPERARIO",
-                    items: carrito.map(i => ({
-                        id: i.id,
-                        nombre: safeUpper(i.nombre),
-                        precio: safeNum(i.precio),
-                        cantidad: safeNum(i.cantidad),
-                        subtotal: safeNum(i.subtotal)
-                    }))
-                });
-
-                carrito.forEach(item => {
-                    batch.update(db.collection("productos").doc(item.id), {
-                        stock: firebase.firestore.FieldValue.increment(-safeNum(item.cantidad))
-                    });
-                });
-
-                await batch.commit();
-                carrito = [];
-                renderCarrito();
-                alert("✅ Venta registrada.");
-            } catch (e) {
-                console.error(e);
-                alert("Error al finalizar la venta.");
-            }
-        }
-
-        // ==============================
-        // Modales / utilidades comunes
-        // ==============================
-        function ejecutarBusquedaLupa() {
-            const input = document.getElementById('global-search');
-            if (input) input.value = "";
-            filtrarVenta("");
-        }
-
-        function cerrarModal() {
-            document.getElementById('main-modal')?.classList.add('hidden');
-        }
-
-        // ==============================
-        // Stubs para funciones faltantes
-        // ==============================
-        function gestionCategorias() {
-            const m = document.getElementById('main-modal');
-            const c = document.getElementById('modal-content');
-            document.getElementById('modal-title').innerText = "Gestión de Categorías";
-            c.innerHTML = `
-                <div class="animate-in text-left">
-                    <div class="bg-white border border-slate-100 rounded-3xl p-8">
-                        <p class="text-sm font-bold text-slate-600 mb-4">Categorías actuales:</p>
-                        <div class="flex flex-wrap gap-2 mb-6">
-                            ${(listaCategorias || []).map(cat => `<span class="px-3 py-2 bg-slate-100 rounded-xl text-xs font-black uppercase text-slate-600">${safeStr(cat)}</span>`).join('') || '<span class="text-slate-400 text-sm">No hay categorías cargadas.</span>'}
-                        </div>
-                        <p class="text-xs text-slate-400">Módulo completo pendiente. Este stub evita errores de referencia.</p>
-                    </div>
-                </div>
-            `;
-            m.classList.remove('hidden');
-        }
-
-        function modalCargaMasiva() {
-            const m = document.getElementById('main-modal');
-            const c = document.getElementById('modal-content');
-            document.getElementById('modal-title').innerText = "Carga Masiva Excel";
-            c.innerHTML = `
-                <div class="animate-in text-left">
-                    <div class="bg-white border border-slate-100 rounded-3xl p-8">
-                        <p class="text-sm font-bold text-slate-600 mb-3">Módulo de carga masiva (pendiente).</p>
-                        <p class="text-xs text-slate-400">La librería SheetJS ya está cargada. Aquí puedes conectar luego la lectura de archivo y batch import.</p>
-                    </div>
-                </div>
-            `;
-            m.classList.remove('hidden');
-        }
-
-        function gestionProveedores() {
-            const m = document.getElementById('main-modal');
-            const c = document.getElementById('modal-content');
-            document.getElementById('modal-title').innerText = "Gestión de Proveedores";
-            c.innerHTML = `
-                <div class="animate-in text-left">
-                    <div class="bg-white border border-slate-100 rounded-3xl p-8">
-                        <p class="text-sm font-bold text-slate-600 mb-4">Proveedores cargados:</p>
-                        <div id="prov-table-body" class="space-y-2">
-                            ${(listaProveedores || []).map(p => `
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                    <p class="font-bold text-slate-700 uppercase text-xs">${safeUpper(p.nombre || p.razon_social || 'SIN NOMBRE')}</p>
-                                </div>
-                            `).join('') || '<p class="text-slate-400 text-sm">No hay proveedores registrados.</p>'}
-                        </div>
-                        <p class="text-xs text-slate-400 mt-4">Módulo completo pendiente. Este stub evita errores de referencia.</p>
-                    </div>
-                </div>
-            `;
-            m.classList.remove('hidden');
-        }
-
-        function renderProveedoresTable() {
-            const el = document.getElementById('prov-table-body');
-            if (!el) return;
-            el.innerHTML = (listaProveedores || []).map(p => `
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <p class="font-bold text-slate-700 uppercase text-xs">${safeUpper(p.nombre || p.razon_social || 'SIN NOMBRE')}</p>
-                </div>
-            `).join('') || '<p class="text-slate-400 text-sm">No hay proveedores registrados.</p>';
-        }
-
+        // --- SOPORTE ---
+        function ejecutarBusquedaLupa() { document.getElementById('global-search').value = ""; filtrarVenta(""); }
+        function cerrarModal() { document.getElementById('main-modal')?.classList.add('hidden'); }
+        function verDetalleFicha(id) { /* Ficha técnica mantenida */ const m = document.getElementById('main-modal'), c = document.getElementById('modal-content'); const p = productosData.find(item => item.id === id); document.getElementById('modal-title').innerText = "Ficha del Producto"; const isAdmin = currentUserData.rol === 'admin' || currentUserData.rol === 'control'; const escName = safeStr(p.nombre).replace(/'/g, "\\'").replace(/"/g, '\\"'); c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left animate-in min-h-[400px] relative leading-none"><div class="space-y-8 leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 italic leading-none">Registro Maestro</p><h2 class="text-5xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(p.nombre)}</h2></div><div class="grid grid-cols-2 gap-6 leading-none"><div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm leading-none"><p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Familia</p><p class="font-bold text-pavo-real text-lg uppercase leading-none">${safeUpper(p.categoria)}</p></div><div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm leading-none"><p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest leading-none">Operario</p><p class="font-bold text-slate-700 text-lg uppercase italic leading-none">${safeUpper(vendedorActivo)}</p></div></div><div class="p-8 bg-petrol rounded-[3rem] text-white shadow-2xl leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Precio de Venta</p><p class="text-5xl font-black tabular-nums tracking-tighter leading-none">${money(p.precio)}</p></div></div><button onclick="verHojaVida('${escName}')" class="text-[11px] font-black text-pavo-real uppercase tracking-widest hover:underline bg-transparent border-0 cursor-pointer flex items-center gap-3"><i class="fas fa-history"></i> Hoja de Vida</button></div><div class="space-y-8 flex flex-col justify-center leading-none"><div class="text-center p-12 bg-white rounded-[4rem] border-4 border-slate-50 shadow-2xl relative overflow-hidden leading-none"><div class="absolute top-0 right-0 w-24 h-24 bg-orange-500 opacity-5 -mr-10 -mt-10 rounded-full shadow-inner leading-none"></div><p class="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-4 italic text-center leading-none">Stock Disponible</p><h3 class="text-9xl font-black text-pavo-real tabular-nums tracking-tighter leading-none">${safeNum(p.stock)}</h3><p class="text-base font-bold text-slate-400 uppercase mt-4 leading-none">unidades físicas</p></div><div class="bg-orange-50 p-4 rounded-2xl text-center shadow-inner font-black uppercase text-[10px] text-orange-500 italic leading-none">Ubicación: ${safeUpper(p.sede_ubicacion || p.sede)}</div></div>${isAdmin ? `<div class="absolute bottom-4 right-4 flex gap-4 leading-none"><button onclick="verTraslado('${id}')" class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl hover:bg-orange-500 hover:text-white transition-all shadow-2xl border-0 cursor-pointer leading-none"><i class="fas fa-exchange-alt"></i></button><button onclick="verFicha('${id}')" class="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center text-2xl hover:bg-pavo-real transition-all shadow-2xl border-0 cursor-pointer leading-none"><i class="fas fa-pen"></i></button></div>` : ''}</div>`; m.classList.remove('hidden'); }
+        function verHojaVida(prodName) { /* Hoja vida mantenida */ const c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = "Historial: " + prodName; c.innerHTML = `<div id="loading-hv" class="p-10 text-center animate-in"><i class="fas fa-circle-notch animate-spin text-pavo-real text-3xl mb-4"></i><p class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Cargando...</p></div>`; const timeout = setTimeout(() => { if(document.getElementById('loading-hv')) c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black leading-none">Sin registros.</div>`; }, 4000); db.collection("traslados").where("producto", "==", safeUpper(prodName)).get().then(snap => { clearTimeout(timeout); if (snap.empty) { c.innerHTML = `<div class="p-20 text-center text-slate-300 italic uppercase text-[10px] font-black leading-none">Sin traslados previos.</div>`; return; } let docs = []; snap.forEach(doc => docs.push(doc.data())); docs.sort((a,b) => (b.fecha?.seconds || 0) - (a.fecha?.seconds || 0)); let html = `<div class="space-y-6 animate-in p-4 text-left leading-none">`; docs.forEach(t => { const dt = t.fecha?.toDate() || new Date(); const fStr = dt.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const hStr = dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); html += `<div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl relative overflow-hidden group leading-none"><div class="absolute top-0 left-0 w-2 h-full bg-orange-500 opacity-20"></div><div class="flex justify-between items-start mb-6 leading-none"><div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic leading-none">${fStr}</p><p class="text-xs font-bold text-pavo-real uppercase tracking-widest leading-none">${hStr}</p></div><div class="bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 text-right leading-none"><p class="text-[9px] font-black text-slate-400 uppercase mb-1 leading-none italic">Autor:</p><p class="text-[10px] font-black text-pavo-real uppercase leading-none">${safeUpper(t.usuario)}</p></div></div><div class="flex items-center gap-6 leading-none"><div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500 text-xl shadow-inner leading-none"><i class="fas fa-exchange-alt"></i></div><h4 class="font-black text-2xl text-slate-800 uppercase italic tracking-tighter leading-none">${safeUpper(t.origen)} <i class="fas fa-arrow-right mx-3 text-pavo-real text-sm"></i> ${safeUpper(t.destino)}</h4><div class="ml-auto bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-xs leading-none">${safeNum(t.cantidad)} U.</div></div></div>`; }); c.innerHTML = html + `</div>`; }); }
+        function verFicha(id) { /* Re-conectada Maestra */ const m = document.getElementById('main-modal'), c = document.getElementById('modal-content'); document.getElementById('modal-title').innerText = id ? "Edición Maestra" : "Nuevo Producto"; const p = id ? productosData.find(item => item.id === id) : { nombre: '', precio: 0, stock: 0, categoria: 'Mochilas', proveedor: '', precio_compra: 0, stock_ideal: 0, sede_ubicacion: 'bodega' }; c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left animate-in leading-none"><div class="space-y-6 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block ml-2 leading-none">Nombre</label><input id="edit-nombre" type="text" value="${safeStr(p.nombre)}" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold outline-none text-pavo-real uppercase text-lg shadow-sm leading-none"></div><div class="grid grid-cols-2 gap-4 leading-none"><div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block ml-2 leading-none">Categoría</label><select id="edit-categoria" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-slate-100 font-bold text-pavo-real uppercase shadow-sm leading-none">${listaCategorias.map(cat => `<option value="${cat}" ${p.categoria === cat ? 'selected' : ''}>${cat}</option>`).join('')}</select></div><div><label class="text-[10px] font-black text-orange-500 uppercase mb-2 block ml-2 italic leading-none">Asignar Sede</label><select id="edit-sede" class="w-full p-5 bg-white rounded-3xl border-0 ring-1 ring-orange-100 font-black text-orange-600 uppercase shadow-sm leading-none">${SEDES.map(s => `<option value="${s}" ${normalizeSede(p.sede_ubicacion || p.sede) === normalizeSede(s) ? 'selected' : ''}>${s.toUpperCase()}</option>`).join('')}</select></div></div></div><div class="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-6 leading-none"><div class="grid grid-cols-2 gap-6 leading-none"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Venta</label><input id="edit-precio" type="number" value="${safeNum(p.precio)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl leading-none"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Costo</label><input id="edit-compra" type="number" value="${safeNum(p.precio_compra)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl leading-none"></div></div><div class="grid grid-cols-2 gap-6 leading-none"><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Stock</label><input id="edit-stock" type="number" value="${safeNum(p.stock)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-pavo-real text-center text-xl leading-none"></div><div><label class="text-[9px] font-black text-slate-400 mb-2 block text-center uppercase leading-none">Ideal</label><input id="edit-ideal" type="number" value="${safeNum(p.stock_ideal)}" class="w-full p-5 bg-slate-50 rounded-2xl border-0 ring-1 ring-slate-100 font-black text-slate-400 text-center text-xl leading-none"></div></div><button onclick="guardarCambios('${id}')" class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 transition-all border-0 cursor-pointer shadow-lg leading-none">Actualizar Registro</button></div></div>`; m.classList.remove('hidden'); }
+        function agregarCarrito(id) { const p = productosData.find(x => x.id === id); if(!p || safeNum(p.stock) <= 0) return alert("Sin stock."); const ex = carrito.find(i => i.id === id); if(ex) { if(ex.cantidad + 1 > safeNum(p.stock)) return alert("Límite stock."); ex.cantidad++; ex.subtotal = ex.cantidad * ex.precio; } else { carrito.push({id: p.id, nombre: p.nombre, precio: safeNum(p.precio), cantidad: 1, subtotal: safeNum(p.precio)}); } renderCarrito(); }
         // Inicial
-        updateClock();
-        renderCarrito();
+        updateClock(); renderCarrito();
     </script>
 </body>
 </html>
